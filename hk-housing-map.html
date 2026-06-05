@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港找房指南 · 选个好窝~</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+            background: #fff5f8;
+            color: #4a3347;
+        }
+
+        /* ===== Sakura Petals Background ===== */
+        .petals {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .petal {
+            position: absolute;
+            width: 12px; height: 12px;
+            background: radial-gradient(ellipse at 30% 30%, #ffb7d0, #ff8fb8);
+            border-radius: 50% 0 50% 50%;
+            opacity: 0.5;
+            animation: fall var(--dur) linear infinite;
+            animation-delay: var(--delay);
+        }
+        @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg) translateX(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(100vh) rotate(720deg) translateX(var(--drift)); opacity: 0; }
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: relative; z-index: 10;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4ef 50%, #ffd6e7 100%);
+            padding: 18px 32px;
+            border-bottom: 2px solid #ffb7d0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .header-left h1 {
+            font-size: 24px; font-weight: 700;
+            color: #e8527a;
+            letter-spacing: 2px;
+        }
+        .header-left p {
+            font-size: 13px; color: #c97a8e; margin-top: 2px;
+        }
+        .header-right {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .char-avatar {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: linear-gradient(135deg, #ffc1d6, #ff8fb8);
+            border: 3px solid white;
+            box-shadow: 0 2px 12px rgba(255,143,184,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        .char-avatar img {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+        }
+        .char-avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 4px 20px rgba(255,143,184,0.6);
+        }
+        .header-tag {
+            font-size: 11px; color: #e8527a;
+            background: rgba(232,82,122,0.08);
+            border: 1px solid rgba(232,82,122,0.2);
+            padding: 4px 12px; border-radius: 20px;
+        }
+
+        /* ===== Main Layout ===== */
+        .main { display: flex; height: calc(100vh - 72px); position: relative; z-index: 5; }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            width: 470px; min-width: 470px; overflow-y: auto;
+            background: white;
+            border-right: 1px solid #ffd6e7;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: #fff5f8; }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: linear-gradient(#ffb7d0, #ff8fb8);
+            border-radius: 3px;
+        }
+
+        .section-title {
+            font-size: 14px; font-weight: 700;
+            color: #e8527a;
+            margin: 18px 0 10px; padding-bottom: 6px;
+            border-bottom: 2px solid #ffd6e7;
+            letter-spacing: 1px;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        /* ===== Summary Table ===== */
+        .summary-table {
+            width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px;
+            border-radius: 10px; overflow: hidden;
+        }
+        .summary-table th {
+            background: linear-gradient(135deg, #ff8fb8, #e8527a);
+            color: white; padding: 8px 10px; text-align: left;
+            font-size: 11px; font-weight: 500;
+        }
+        .summary-table td {
+            padding: 7px 10px; border-bottom: 1px solid #fff0f5;
+        }
+        .summary-table tr { cursor: pointer; transition: all 0.3s; }
+        .summary-table tr:hover td { background: #fff5f8; }
+        .summary-table tr.active-row td { background: #ffe4ef; }
+        .summary-table .dest-header { font-weight: 700; color: #e8527a; }
+
+        .distance-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 11px; font-weight: 600; white-space: nowrap;
+        }
+        .badge-green { background: #e8f8f0; color: #2eaa6e; }
+        .badge-orange { background: #fff5e6; color: #d4850a; }
+        .badge-red { background: #ffe8ec; color: #d1405b; }
+        .badge-blue { background: #e8f0ff; color: #4a7fd4; }
+
+        .legend {
+            display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0;
+            font-size: 11px; color: #b07a8a;
+        }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        /* ===== Place Cards ===== */
+        .place-card {
+            background: white;
+            border: 1.5px solid #ffe4ef;
+            border-radius: 14px; padding: 14px; margin-bottom: 10px;
+            cursor: pointer; transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+        .place-card::after {
+            content: ''; position: absolute; top: -2px; right: -2px;
+            width: 30px; height: 30px;
+            background: radial-gradient(circle at top right, #ffd6e7, transparent 70%);
+            pointer-events: none;
+        }
+        .place-card:hover {
+            border-color: #ff8fb8;
+            box-shadow: 0 4px 16px rgba(255,143,184,0.15);
+            transform: translateX(3px);
+        }
+        .place-card.highlight {
+            background: #fff5f8;
+            border-color: #ff8fb8;
+            box-shadow: 0 0 0 3px rgba(255,143,184,0.15), 0 4px 16px rgba(255,143,184,0.2);
+            transform: translateX(3px);
+        }
+        .place-card.active-pulse { animation: cardPulse 0.6s ease; }
+        @keyframes cardPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,143,184,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(255,143,184,0); }
+            100% { box-shadow: 0 0 0 3px rgba(255,143,184,0.15); }
+        }
+
+        .place-header { display: flex; align-items: center; gap: 8px; }
+        .place-color-dot {
+            width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+            box-shadow: 0 0 6px currentColor;
+        }
+        .place-name { font-size: 15px; font-weight: 700; color: #4a3347; }
+        .place-name-en { font-size: 11px; color: #b07a8a; margin-bottom: 6px; }
+        .place-desc { font-size: 12px; color: #7a5a6a; line-height: 1.6; }
+
+        /* ===== Route Blocks ===== */
+        .route-block {
+            background: #fff8fa;
+            border: 1px solid #ffe4ef;
+            border-radius: 10px; padding: 10px 12px; margin-top: 8px;
+        }
+        .route-dest {
+            font-size: 12px; font-weight: 700; color: #e8527a;
+            margin-bottom: 6px;
+        }
+        .route-step {
+            display: flex; align-items: flex-start; gap: 8px;
+            font-size: 11px; color: #7a5a6a; line-height: 1.5;
+            margin-bottom: 3px;
+        }
+        .route-step .mode {
+            display: inline-block; padding: 1px 6px; border-radius: 6px;
+            font-size: 10px; font-weight: 600; white-space: nowrap; margin-top: 1px;
+        }
+        .mode-mtr { background: #e8f0ff; color: #4a7fd4; }
+        .mode-bus { background: #e8f8f0; color: #2eaa6e; }
+        .mode-walk { background: #f5f0f8; color: #9a7aaa; }
+        .mode-minibus { background: #fff5e6; color: #d4850a; }
+        .route-time {
+            font-size: 11px; font-weight: 700; color: #e8527a;
+            margin-top: 4px;
+        }
+
+        .links { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .links a {
+            font-size: 11px; color: #e8527a; text-decoration: none;
+            padding: 3px 8px; border: 1px solid #ffd6e7; border-radius: 8px;
+            transition: all 0.2s; background: white;
+        }
+        .links a:hover {
+            background: #fff0f5; border-color: #ff8fb8;
+        }
+
+        /* ===== Info Boxes ===== */
+        .note-box {
+            background: #fff8e6;
+            border-left: 3px solid #f5c242;
+            padding: 12px; border-radius: 0 10px 10px 0;
+            margin: 12px 0; font-size: 12px; color: #8a7030;
+        }
+        .note-box strong { color: #d4850a; }
+
+        .analysis-box {
+            background: #f0faf5;
+            border-left: 3px solid #2eaa6e;
+            padding: 12px; border-radius: 0 10px 10px 0;
+            margin: 12px 0; font-size: 12px; color: #3a6a4a;
+        }
+        .analysis-box strong { color: #2eaa6e; }
+
+        /* ===== Personal Analysis ===== */
+        .personal-analysis {
+            background: linear-gradient(135deg, #fff5f8, #fff0fa);
+            border: 2px solid #ffb7d0;
+            border-radius: 16px; padding: 18px; margin-top: 20px;
+        }
+        .personal-analysis h3 {
+            color: #e8527a; font-size: 15px; margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .personal-analysis .scenario {
+            background: white;
+            border: 1px solid #ffe4ef;
+            border-radius: 12px; padding: 12px;
+            margin-bottom: 10px; border-left: 3px solid #ff8fb8;
+        }
+        .personal-analysis .scenario h4 {
+            color: #e8527a; font-size: 13px; margin-bottom: 6px;
+        }
+        .personal-analysis .scenario p {
+            font-size: 12px; color: #7a5a6a; line-height: 1.7;
+        }
+        .personal-analysis .verdict {
+            background: #fff0f5;
+            border: 1.5px solid #ffb7d0;
+            border-radius: 12px; padding: 14px;
+            border-left: 4px solid #e8527a;
+        }
+        .personal-analysis .verdict h4 {
+            color: #e8527a; font-size: 14px; margin-bottom: 8px;
+        }
+        .personal-analysis .ranking-table {
+            width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px;
+        }
+        .personal-analysis .ranking-table th {
+            background: linear-gradient(135deg, #ff8fb8, #e8527a);
+            color: white; padding: 6px 10px; text-align: left; font-size: 11px;
+        }
+        .personal-analysis .ranking-table td {
+            padding: 6px 10px; border-bottom: 1px solid #fff0f5;
+        }
+        .personal-analysis .rank-1 { background: #fff5e6; font-weight: 700; }
+        .personal-analysis .rank-2 { background: #fff5f8; }
+        .personal-analysis .rank-3 { background: #f0faf5; }
+
+        /* ===== Map ===== */
+        #map { flex: 1; }
+
+        /* ===== Search Box ===== */
+        .search-box {
+            position: absolute; top: 10px; left: 60px; z-index: 1000;
+            display: flex; gap: 0;
+        }
+        .search-box input {
+            width: 280px; padding: 9px 14px;
+            border: 2px solid #ffd6e7;
+            border-right: none; border-radius: 12px 0 0 12px;
+            font-size: 13px; outline: none;
+            background: rgba(255,255,255,0.95);
+            color: #4a3347;
+            box-shadow: 0 2px 8px rgba(255,143,184,0.15);
+        }
+        .search-box input::placeholder { color: #c9a0ae; }
+        .search-box input:focus {
+            border-color: #ff8fb8;
+            box-shadow: 0 0 12px rgba(255,143,184,0.25);
+        }
+        .search-box button {
+            padding: 9px 16px;
+            background: linear-gradient(135deg, #ff8fb8, #e8527a);
+            color: white; border: 2px solid #ff8fb8;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer; font-size: 13px; font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255,143,184,0.3);
+            transition: all 0.2s;
+        }
+        .search-box button:hover {
+            background: linear-gradient(135deg, #ffa8c8, #f06a8a);
+            box-shadow: 0 0 16px rgba(255,143,184,0.5);
+        }
+        .search-results {
+            position: absolute; top: 48px; left: 60px; z-index: 1000;
+            background: white;
+            border: 2px solid #ffd6e7;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(255,143,184,0.2);
+            max-height: 240px; overflow-y: auto; width: 340px; display: none;
+        }
+        .search-result-item {
+            padding: 9px 14px; cursor: pointer; font-size: 12px;
+            border-bottom: 1px solid #fff0f5;
+            color: #7a5a6a; transition: all 0.2s;
+        }
+        .search-result-item:hover {
+            background: #fff5f8; color: #e8527a;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-hint {
+            position: absolute; top: 10px; left: 390px; z-index: 1000;
+            background: white; padding: 6px 14px; border-radius: 10px;
+            font-size: 12px; color: #e8527a;
+            border: 1.5px solid #ffd6e7;
+            box-shadow: 0 2px 8px rgba(255,143,184,0.15);
+            display: none;
+        }
+
+        /* ===== Popup overrides ===== */
+        .leaflet-popup-content-wrapper {
+            background: white !important;
+            color: #4a3347 !important;
+            border: 1.5px solid #ffd6e7 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 16px rgba(255,143,184,0.2) !important;
+        }
+        .leaflet-popup-tip { background: white !important; }
+        .leaflet-popup-close-button { color: #e8527a !important; }
+
+        /* ===== Route legend ===== */
+        .map-legend {
+            background: rgba(255,255,255,0.95) !important;
+            border: 1.5px solid #ffd6e7 !important;
+            color: #4a3347 !important;
+            border-radius: 12px !important;
+            padding: 10px 14px !important;
+            font-size: 12px !important;
+            box-shadow: 0 2px 10px rgba(255,143,184,0.15) !important;
+        }
+
+        /* ===== Character corner decoration ===== */
+        .char-corner {
+            position: fixed; bottom: 16px; right: 16px;
+            z-index: 100; pointer-events: none;
+            width: 120px; height: 120px;
+            border-radius: 50%; overflow: hidden;
+            border: 3px solid #ffb7d0;
+            box-shadow: 0 4px 20px rgba(255,143,184,0.3);
+            animation: charFloat 4s ease-in-out infinite;
+            background: linear-gradient(135deg, #ffe4ef, #ffd6e7);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 48px;
+        }
+        .char-corner img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        @keyframes charFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        @media (max-width: 900px) {
+            .main { flex-direction: column; height: auto; }
+            .sidebar { width: 100%; min-width: auto; max-height: 60vh; }
+            #map { height: 50vh; }
+            .char-corner { width: 80px; height: 80px; font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sakura Petals -->
+    <div class="petals" id="petals"></div>
+
+    <!-- Character corner -->
+    <div class="char-corner" title="绯英~"><img src="https://patchwiki.biligame.com/images/sr/9/93/0kwsaceudzpvh1vzhc3zwr8zy5zvqgh.png" alt="绯英" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>找房指南~</h1>
+            <p>港大主校区 / 数码港校区 / 中环 · 通勤路线与距离分析</p>
+        </div>
+        <div class="header-right">
+            <span class="header-tag">今日份努力找房中</span>
+            <div class="char-avatar" title="绯英~"><img src="https://patchwiki.biligame.com/images/sr/9/93/0kwsaceudzpvh1vzhc3zwr8zy5zvqgh.png" alt="绯英"></div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="sidebar" id="sidebar">
+            <div class="section-title">距离总览</div>
+            <table class="summary-table" id="summaryTable">
+                <thead>
+                    <tr><th>区域</th><th>→ 港大主校区</th><th>→ 数码港校区</th><th>→ 中环</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-place="坚尼地城">
+                        <td class="dest-header">坚尼地城</td>
+                        <td><span class="distance-badge badge-green">1.2km / ~10min</span></td>
+                        <td><span class="distance-badge badge-orange">3.2km / ~20min</span></td>
+                        <td><span class="distance-badge badge-orange">3.5km / ~10min</span></td>
+                    </tr>
+                    <tr data-place="西营盘">
+                        <td class="dest-header">西营盘</td>
+                        <td><span class="distance-badge badge-green">1.0km / ~8min</span></td>
+                        <td><span class="distance-badge badge-orange">3.8km / ~22min</span></td>
+                        <td><span class="distance-badge badge-green">2.5km / ~8min</span></td>
+                    </tr>
+                    <tr data-place="薄扶林">
+                        <td class="dest-header">薄扶林</td>
+                        <td><span class="distance-badge badge-green">0.8km / ~10min</span></td>
+                        <td><span class="distance-badge badge-green">1.5km / ~10min</span></td>
+                        <td><span class="distance-badge badge-orange">4.5km / ~25min</span></td>
+                    </tr>
+                    <tr data-place="香港仔">
+                        <td class="dest-header">香港仔</td>
+                        <td><span class="distance-badge badge-orange">3.8km / ~25min</span></td>
+                        <td><span class="distance-badge badge-orange">2.5km / ~15min</span></td>
+                        <td><span class="distance-badge badge-red">5.5km / ~25min</span></td>
+                    </tr>
+                    <tr data-place="黄竹坑">
+                        <td class="dest-header">黄竹坑</td>
+                        <td><span class="distance-badge badge-orange">4.2km / ~25min</span></td>
+                        <td><span class="distance-badge badge-orange">2.8km / ~20min</span></td>
+                        <td><span class="distance-badge badge-orange">4.0km / ~15min</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="legend">
+                <div class="legend-item"><span class="legend-dot" style="background:#2eaa6e"></span> &lt;15min</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#d4850a"></span> 15-25min</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#d1405b"></span> &gt;25min</div>
+            </div>
+            <div class="note-box">
+                <strong>提示：</strong>时间为门到门估计（含步行+候车+乘车），实际视具体地址和时段会有差异~
+            </div>
+
+            <div class="section-title">各地点通勤路线</div>
+
+            <!-- 坚尼地城 -->
+            <div class="place-card" data-place="坚尼地城" onclick="selectPlace('坚尼地城')">
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#2eaa6e; color:#2eaa6e"></span>
+                    <span class="place-name">坚尼地城</span>
+                </div>
+                <div class="place-name-en">Kennedy Town · 港岛线终点站</div>
+                <div class="place-desc">港岛最西端成熟社区。港铁终点站有座保障，生活配套齐全，租金相对较低~</div>
+                <div class="route-block">
+                    <div class="route-dest">🏫 → 港大主校区（约10分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 坚尼地城站 → 香港大学站（1站，约2分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> B2出口 → 港大校园（约5-8分钟）</div>
+                    <div class="route-time">合计约10分钟 | 单程约 $5-6</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">💻 → 数码港校区（约20分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 坚尼地城站 → 香港大学站（1站）</div>
+                    <div class="route-step"><span class="mode mode-bus">巴士</span> 港大站薄扶林道 → 数码港 <b>970/970X</b>（约10-12分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 数码港巴士站 → 校区（约3分钟）</div>
+                    <div class="route-time">合计约20分钟 | 或直接坐970约15分钟</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">🏢 → 中环（约10分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 坚尼地城站 → 中环站（3站，约8分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 出站（约2分钟）</div>
+                    <div class="route-time">合计约10分钟 | 终点站上车有座！</div>
+                </div>
+                <div class="links">
+                    <a href="https://www.google.com/maps/dir/Kennedy+Town+MTR+Station/HKU+MTR+Station" target="_blank" onclick="event.stopPropagation()">到港大</a>
+                    <a href="https://www.google.com/maps/dir/Kennedy+Town+MTR+Station/100+Cyberport+Road+Hong+Kong" target="_blank" onclick="event.stopPropagation()">到数码港</a>
+                    <a href="https://www.google.com/maps/dir/Kennedy+Town+MTR+Station/Central+MTR+Station" target="_blank" onclick="event.stopPropagation()">到中环</a>
+                </div>
+            </div>
+
+            <!-- 西营盘 -->
+            <div class="place-card" data-place="西营盘" onclick="selectPlace('西营盘')">
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#2eaa6e; color:#2eaa6e"></span>
+                    <span class="place-name">西营盘</span>
+                </div>
+                <div class="place-name-en">Sai Ying Pun · 港岛线</div>
+                <div class="place-desc">紧邻港大东侧老牌社区。到港大1站、到中环3站，社区成熟有新楼盘和咖啡店~</div>
+                <div class="route-block">
+                    <div class="route-dest">🏫 → 港大主校区（约8分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 西营盘站 → 香港大学站（1站，约2分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> B2出口 → 港大校园（约5分钟）</div>
+                    <div class="route-time">合计约8分钟</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">💻 → 数码港校区（约22分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 西营盘站 → 香港大学站（1站）</div>
+                    <div class="route-step"><span class="mode mode-bus">巴士</span> 港大站薄扶林道 → 数码港 <b>970/970X/30X</b>（约12-15分钟）</div>
+                    <div class="route-time">合计约22分钟</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">🏢 → 中环（约8分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 西营盘站 → 中环站（2站，约5分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 出站（约2分钟）</div>
+                    <div class="route-time">合计约8分钟</div>
+                </div>
+                <div class="links">
+                    <a href="https://www.google.com/maps/dir/Sai+Ying+Pun+MTR+Station/HKU+MTR+Station" target="_blank" onclick="event.stopPropagation()">到港大</a>
+                    <a href="https://www.google.com/maps/dir/Sai+Ying+Pun+MTR+Station/100+Cyberport+Road+Hong+Kong" target="_blank" onclick="event.stopPropagation()">到数码港</a>
+                    <a href="https://www.google.com/maps/dir/Sai+Ying+Pun+MTR+Station/Central+MTR+Station" target="_blank" onclick="event.stopPropagation()">到中环</a>
+                </div>
+            </div>
+
+            <!-- 薄扶林 -->
+            <div class="place-card" data-place="薄扶林" onclick="selectPlace('薄扶林')">
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#2eaa6e; color:#2eaa6e"></span>
+                    <span class="place-name">薄扶林</span>
+                </div>
+                <div class="place-name-en">Pok Fu Lam · 无港铁站</div>
+                <div class="place-desc">港大主校区所在地。没有港铁站，依赖巴士出行。到数码港最近，环境安静~</div>
+                <div class="route-block">
+                    <div class="route-dest">🏫 → 港大主校区（约10分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 沿薄扶林道北行（约8-10分钟）</div>
+                    <div class="route-step"><span class="mode mode-minibus">小巴</span> 或 <b>22/22S/23</b> 到港大站（约3分钟）</div>
+                    <div class="route-time">合计约10分钟</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">💻 → 数码港校区（约10分钟）</div>
+                    <div class="route-step"><span class="mode mode-bus">巴士</span> 薄扶林道 → 数码港 <b>970/970X/48/73</b>（约5-8分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 巴士站 → 校区（约3分钟）</div>
+                    <div class="route-time">合计约10分钟 | 也可步行约20分钟</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">🏢 → 中环（约25分钟）</div>
+                    <div class="route-step"><span class="mode mode-bus">巴士</span> 薄扶林道 → 中环 <b>4/4X/7/90B/970</b>（约15-20分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">或</span> 先到港大站 → 港铁到中环（约20分钟）</div>
+                    <div class="route-time">合计约20-25分钟</div>
+                </div>
+                <div class="links">
+                    <a href="https://www.google.com/maps/dir/Pok+Fu+Lam+Hong+Kong/HKU+MTR+Station" target="_blank" onclick="event.stopPropagation()">到港大</a>
+                    <a href="https://www.google.com/maps/dir/Pok+Fu+Lam+Hong+Kong/100+Cyberport+Road+Hong+Kong" target="_blank" onclick="event.stopPropagation()">到数码港</a>
+                    <a href="https://www.google.com/maps/dir/Pok+Fu+Lam+Hong+Kong/Central+MTR+Station" target="_blank" onclick="event.stopPropagation()">到中环</a>
+                </div>
+            </div>
+
+            <!-- 香港仔 -->
+            <div class="place-card" data-place="香港仔" onclick="selectPlace('香港仔')">
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#d4850a; color:#d4850a"></span>
+                    <span class="place-name">香港仔</span>
+                </div>
+                <div class="place-name-en">Aberdeen · 无港铁站</div>
+                <div class="place-desc">港岛南区传统渔港社区。没有港铁站，主要靠巴士。租金较低，通勤偏长~</div>
+                <div class="route-block">
+                    <div class="route-dest">🏫 → 港大主校区（约25分钟）</div>
+                    <div class="route-step"><span class="mode mode-bus">巴士</span> 香港仔 → 薄扶林道 → 港大站 <b>48/4/970</b>（约15-20分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 巴士站 → 港大校园（约5分钟）</div>
+                    <div class="route-time">合计约25分钟</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">💻 → 数码港校区（约15分钟）</div>
+                    <div class="route-step"><span class="mode mode-bus">巴士</span> 香港仔 → 数码港 <b>48/73/973</b>（约10-12分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 巴士站 → 校区（约3分钟）</div>
+                    <div class="route-time">合计约15分钟</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">🏢 → 中环（约25分钟）</div>
+                    <div class="route-step"><span class="mode mode-bus">巴士</span> 香港仔 → 中环 <b>7/70/90/97</b>（约20-25分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">或港铁</span> 先小巴到黄竹坑站 → 南港岛线到金钟 → 转港岛线（约20分钟）</div>
+                    <div class="route-time">合计约25分钟</div>
+                </div>
+                <div class="links">
+                    <a href="https://www.google.com/maps/dir/Aberdeen+Hong+Kong/HKU+MTR+Station" target="_blank" onclick="event.stopPropagation()">到港大</a>
+                    <a href="https://www.google.com/maps/dir/Aberdeen+Hong+Kong/100+Cyberport+Road+Hong+Kong" target="_blank" onclick="event.stopPropagation()">到数码港</a>
+                    <a href="https://www.google.com/maps/dir/Aberdeen+Hong+Kong/Central+MTR+Station" target="_blank" onclick="event.stopPropagation()">到中环</a>
+                </div>
+            </div>
+
+            <!-- 黄竹坑 -->
+            <div class="place-card" data-place="黄竹坑" onclick="selectPlace('黄竹坑')">
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#d4850a; color:#d4850a"></span>
+                    <span class="place-name">黄竹坑</span>
+                </div>
+                <div class="place-name-en">Wong Chuk Hang · 南港岛线</div>
+                <div class="place-desc">港岛南区新兴区域，港铁南港岛线。到中环港铁直达，新商场和创意空间多~</div>
+                <div class="route-block">
+                    <div class="route-dest">🏫 → 港大主校区（约25分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 黄竹坑站 → 金钟站（南港岛线，3站，约6分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 金钟站 → 香港大学站（港岛线，2站，约4分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> B2出口 → 港大校园（约5分钟）</div>
+                    <div class="route-time">合计约25分钟（含转乘）</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">💻 → 数码港校区（约20分钟）</div>
+                    <div class="route-step"><span class="mode mode-bus">巴士</span> 黄竹坑 → 数码港 <b>73/973</b> 经薄扶林道（约15-18分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 巴士站 → 校区（约3分钟）</div>
+                    <div class="route-time">合计约20分钟 | 或打车约10分钟/$40-50</div>
+                </div>
+                <div class="route-block">
+                    <div class="route-dest">🏢 → 中环（约15分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 黄竹坑站 → 金钟站（南港岛线，3站，约6分钟）</div>
+                    <div class="route-step"><span class="mode mode-mtr">港铁</span> 金钟站 → 中环站（港岛线，1站，约2分钟）</div>
+                    <div class="route-step"><span class="mode mode-walk">步行</span> 出站（约2分钟）</div>
+                    <div class="route-time">合计约15分钟（含转乘）</div>
+                </div>
+                <div class="links">
+                    <a href="https://www.google.com/maps/dir/Wong+Chuk+Hang+MTR+Station/HKU+MTR+Station" target="_blank" onclick="event.stopPropagation()">到港大</a>
+                    <a href="https://www.google.com/maps/dir/Wong+Chuk+Hang+MTR+Station/100+Cyberport+Road+Hong+Kong" target="_blank" onclick="event.stopPropagation()">到数码港</a>
+                    <a href="https://www.google.com/maps/dir/Wong+Chuk+Hang+MTR+Station/Central+MTR+Station" target="_blank" onclick="event.stopPropagation()">到中环</a>
+                </div>
+            </div>
+
+            <!-- Reference Points -->
+            <div class="place-card highlight" data-place="港大主校区" onclick="selectPlace('港大主校区')">
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#e8527a; color:#e8527a"></span>
+                    <span class="place-name">港大主校区</span>
+                </div>
+                <div class="place-name-en">HKU Main Campus · 港铁香港大学站</div>
+                <div class="place-desc">地标参考点~ 港铁港岛线「香港大学站」B2出口直达。</div>
+            </div>
+
+            <div class="place-card highlight" data-place="数码港校区" onclick="selectPlace('数码港校区')">
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#4a7fd4; color:#4a7fd4"></span>
+                    <span class="place-name">数码港校区 (HKU)</span>
+                </div>
+                <div class="place-name-en">HKU Cyberport Campus · 数码港道100号</div>
+                <div class="place-desc">地标参考点~ 无港铁站，需巴士/小巴/的士到达。</div>
+            </div>
+
+            <div class="place-card" data-place="中环" onclick="selectPlace('中环')">
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#9a7aaa; color:#9a7aaa"></span>
+                    <span class="place-name">中环</span>
+                </div>
+                <div class="place-name-en">Central · 商业核心区</div>
+                <div class="place-desc">香港商业金融中心~ 港铁港岛线和荃湾线交汇点。</div>
+            </div>
+
+            <!-- Analysis -->
+            <div class="section-title">通用分析</div>
+            <div class="analysis-box">
+                <strong>主要去港大主校区：</strong>西营盘 ≈ 坚尼地城 > 薄扶林 > 其他。有港铁直达最方便~
+            </div>
+            <div class="analysis-box">
+                <strong>主要去数码港校区：</strong>薄扶林 > 坚尼地城 ≈ 香港仔 > 黄竹坑 > 西营盘。薄扶林最近但没地铁~
+            </div>
+            <div class="analysis-box">
+                <strong>两个校区都去：</strong><strong>薄扶林</strong>最佳平衡（港大0.8km+数码港1.5km），<strong>坚尼地城</strong>次之~
+            </div>
+            <div class="analysis-box">
+                <strong>还需经常去中环：</strong><strong>西营盘</strong>最优（到港大1站+到中环2站），坚尼地城3站也方便~
+            </div>
+
+            <!-- Personal Analysis -->
+            <div class="personal-analysis">
+                <h3>针对你的情况~</h3>
+
+                <div class="scenario">
+                    <h4>你的任务面板</h4>
+                    <p>
+                        <strong>日常副本：</strong>大多数课在<strong>数码港校区</strong>（无港铁站，必须靠巴士/小巴/的士）<br>
+                        <strong>每周委托：</strong>实习大概率在<strong>中环</strong>（港铁直达最方便）<br>
+                        <strong>核心挑战：</strong>数码港交通不便 + 中环需要港铁 → 需要<strong>两边兼顾</strong>的住处
+                    </p>
+                </div>
+
+                <div class="scenario">
+                    <h4>通勤模拟</h4>
+                    <p>
+                        <strong>坚尼地城 → 数码港：</strong>港铁1站到HKU→巴士970约10min→步行3min，<strong>~20分钟</strong><br>
+                        <strong>坚尼地城 → 中环：</strong>港铁3站直达，<strong>~10分钟</strong>，终点站有座<br><br>
+                        <strong>西营盘 → 数码港：</strong>港铁1站到HKU→巴士970约10min，<strong>~22分钟</strong><br>
+                        <strong>西营盘 → 中环：</strong>港铁2站直达，<strong>~8分钟</strong><br><br>
+                        <strong>薄扶林 → 数码港：</strong>巴士/步行，<strong>~10分钟</strong>，最短通勤<br>
+                        <strong>薄扶林 → 中环：</strong>巴士约15-20min，<strong>~25分钟</strong>，早高峰可能堵车<br><br>
+                        <strong>香港仔 → 数码港：</strong>巴士48/73约10min，<strong>~15分钟</strong><br>
+                        <strong>香港仔 → 中环：</strong>巴士20-25min，<strong>~25分钟</strong><br><br>
+                        <strong>黄竹坑 → 数码港：</strong>巴士73/973约15min，<strong>~20分钟</strong><br>
+                        <strong>黄竹坑 → 中环：</strong>南港岛线到金钟→转港岛线，<strong>~15分钟</strong>
+                    </p>
+                </div>
+
+                <div class="scenario">
+                    <h4>关键机制分析</h4>
+                    <p>
+                        <strong>数码港通勤难题：</strong>无港铁站，从坚尼地城/西营盘出发需在HKU站换乘巴士。每天换乘一次，下雨天和高峰期体验较差。<strong>打车参考：</strong>$30-40，10分钟。<br><br>
+                        <strong>中环实习优势路线：</strong>坚尼地城/西营盘/黄竹坑都有港铁直达，通勤稳定可控。薄扶林和香港仔靠巴士，早高峰可能堵在薄扶林道上。
+                    </p>
+                </div>
+
+                <div class="verdict">
+                    <h4>最终推荐排名</h4>
+                    <table class="ranking-table">
+                        <thead>
+                            <tr><th>排名</th><th>区域</th><th>去数码港</th><th>去中环</th><th>综合评价</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr class="rank-1">
+                                <td>第1</td><td><strong>坚尼地城</strong></td>
+                                <td>港铁+巴士 ~20min</td><td>港铁 ~10min</td>
+                                <td>两边都方便，终点站有座，性价比高</td>
+                            </tr>
+                            <tr class="rank-2">
+                                <td>第2</td><td><strong>西营盘</strong></td>
+                                <td>港铁+巴士 ~22min</td><td>港铁 ~8min</td>
+                                <td>去中环最快，去数码港略绕</td>
+                            </tr>
+                            <tr class="rank-3">
+                                <td>第3</td><td><strong>黄竹坑</strong></td>
+                                <td>巴士 ~20min</td><td>港铁 ~15min</td>
+                                <td>中环通勤稳定，新社区环境好</td>
+                            </tr>
+                            <tr>
+                                <td>第4</td><td><strong>薄扶林</strong></td>
+                                <td>巴士/步行 ~10min</td><td>巴士 ~25min</td>
+                                <td>去数码港最短！但没港铁</td>
+                            </tr>
+                            <tr>
+                                <td>第5</td><td><strong>香港仔</strong></td>
+                                <td>巴士 ~15min</td><td>巴士 ~25min</td>
+                                <td>租金最低，两边通勤都偏长</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="scenario" style="margin-top:12px;">
+                    <h4>核心建议</h4>
+                    <p>
+                        <strong style="color:#e8527a">首选坚尼地城。</strong><br>
+                        ① 去数码港：港铁1站+巴士970约10分钟，全程约20分钟<br>
+                        ② 去中环：港铁3站直达约10分钟，终点站有座<br>
+                        ③ 港铁+巴士双保险，不会被单一交通方式卡住<br>
+                        ④ 租金比西营盘低，有街市和超市<br><br>
+                        <strong>次选西营盘</strong>（更看重去中环的速度）<br>
+                        <strong>不推荐薄扶林</strong>作为首选（没港铁，实习通勤不可控）
+                    </p>
+                </div>
+
+                <div class="scenario">
+                    <h4>月度交通费预估</h4>
+                    <p>
+                        <strong>坚尼地城：</strong>上课日 ~$330/月 + 实习日 ~$98/月 = <strong>~$400-450/月</strong><br>
+                        <strong>薄扶林：</strong>上课日 ~$150/月 + 实习日 ~$98/月 = <strong>~$250/月</strong>（但时间成本更高）<br>
+                        <em>注：八达通有转乘优惠，实际费用会略低~</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map -->
+        <div id="map" style="position:relative;">
+            <div class="search-box" id="searchBox">
+                <input type="text" id="searchInput" placeholder="搜索香港任意地点（如维多利亚港...）" />
+                <button onclick="doSearch()">搜索</button>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-hint" id="searchHint"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ========== Sakura Petals ==========
+        (function createPetals() {
+            const container = document.getElementById('petals');
+            for (let i = 0; i < 25; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                const size = Math.random() * 10 + 6;
+                petal.style.cssText = `
+                    width:${size}px; height:${size}px;
+                    left:${Math.random()*100}%;
+                    --dur:${Math.random()*8+6}s;
+                    --delay:${Math.random()*10}s;
+                    --drift:${(Math.random()-0.5)*100}px;
+                `;
+                container.appendChild(petal);
+            }
+        })();
+
+        // ========== Map Setup (standard OSM tiles) ==========
+        const map = L.map('map').setView([22.2700, 114.1450], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+            maxZoom: 18
+        }).addTo(map);
+
+        // ========== Place Data ==========
+        const places = {
+            '港大主校区': { lat: 22.2836, lng: 114.1379, color: '#e8527a', type: 'campus' },
+            '数码港校区': { lat: 22.2622, lng: 114.1286, color: '#4a7fd4', type: 'campus' },
+            '中环':       { lat: 22.2800, lng: 114.1580, color: '#9a7aaa', type: 'ref' },
+            '坚尼地城':   { lat: 22.2810, lng: 114.1280, color: '#2eaa6e', type: 'housing' },
+            '西营盘':     { lat: 22.2860, lng: 114.1430, color: '#2eaa6e', type: 'housing' },
+            '薄扶林':     { lat: 22.2690, lng: 114.1350, color: '#2eaa6e', type: 'housing' },
+            '香港仔':     { lat: 22.2478, lng: 114.1528, color: '#d4850a', type: 'housing' },
+            '黄竹坑':     { lat: 22.2480, lng: 114.1680, color: '#d4850a', type: 'housing' }
+        };
+
+        const markers = {};
+        let activeRouteLayers = [];
+        let routeCache = {};
+        let selectedPlace = null;
+
+        const destColors = {
+            '港大主校区': '#e8527a',
+            '数码港校区': '#4a7fd4',
+            '中环':       '#9a7aaa'
+        };
+
+        // ========== OSRM Routing ==========
+        const OSRM_BASE = 'https://router.project-osrm.org/route/v1/driving';
+
+        async function fetchRoute(fromName, toName) {
+            const cacheKey = fromName + '|' + toName;
+            if (routeCache[cacheKey]) return routeCache[cacheKey];
+            const from = places[fromName], to = places[toName];
+            const url = `${OSRM_BASE}/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
+            try {
+                const resp = await fetch(url);
+                const data = await resp.json();
+                if (data.routes && data.routes.length > 0) {
+                    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                    routeCache[cacheKey] = coords;
+                    return coords;
+                }
+            } catch (e) { console.warn('OSRM failed:', cacheKey, e); }
+            return [[from.lat, from.lng], [to.lat, to.lng]];
+        }
+
+        async function drawRoutes(fromName) {
+            clearRoutes();
+            const destinations = ['港大主校区', '数码港校区', '中环'];
+            await Promise.all(destinations.map(async dest => {
+                const coords = await fetchRoute(fromName, dest);
+                const color = destColors[dest];
+                const line = L.polyline(coords, {
+                    color: color, weight: 5, opacity: 0.8,
+                    lineCap: 'round', lineJoin: 'round'
+                }).addTo(map);
+                const endPt = coords[coords.length - 1];
+                const endLabel = L.marker(endPt, {
+                    icon: L.divIcon({
+                        className: '',
+                        html: `<div style="
+                            background:white; color:${color};
+                            padding:3px 10px; border-radius:8px;
+                            font-size:11px; font-weight:700; white-space:nowrap;
+                            border:1.5px solid ${color}60;
+                            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+                        ">→ ${dest}</div>`,
+                        iconSize: [80, 20], iconAnchor: [40, 10]
+                    }), interactive: false
+                }).addTo(map);
+                activeRouteLayers.push(line, endLabel);
+            }));
+        }
+
+        function clearRoutes() {
+            activeRouteLayers.forEach(l => map.removeLayer(l));
+            activeRouteLayers = [];
+        }
+
+        // Loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.cssText = `
+            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+            background:rgba(255,255,255,0.95); color:#e8527a;
+            padding:12px 24px; border-radius:12px; font-size:14px;
+            z-index:10000; display:none; pointer-events:none;
+            border:2px solid #ffd6e7;
+            box-shadow:0 4px 16px rgba(255,143,184,0.2);
+        `;
+        loadingDiv.innerHTML = '加载路线中~';
+        document.getElementById('map').appendChild(loadingDiv);
+        function showLoading() { loadingDiv.style.display = 'block'; }
+        function hideLoading() { loadingDiv.style.display = 'none'; }
+
+        // ========== Marker Icons ==========
+        function createMarkerIcon(name, color, size, isHousing) {
+            return L.divIcon({
+                className: '',
+                html: `<div style="position:relative;cursor:pointer;" title="${name}">
+                    <div style="
+                        width:${size}px; height:${size}px; border-radius:50%;
+                        background:${color}; border:2.5px solid white;
+                        box-shadow:0 2px 8px ${color}60;
+                        position:relative; z-index:2;
+                    "></div>
+                    <div style="
+                        position:absolute; top:${-18}px; left:50%; transform:translateX(-50%);
+                        background:white; color:${color};
+                        padding:2px 8px; border-radius:6px;
+                        font-size:${isHousing ? 12 : 10}px; font-weight:700; white-space:nowrap;
+                        border:1.5px solid ${color}40;
+                        box-shadow:0 1px 4px rgba(0,0,0,0.08);
+                    ">${name}</div>
+                </div>`,
+                iconSize: [size, size],
+                iconAnchor: [size/2, size/2]
+            });
+        }
+
+        function createActiveMarkerIcon(name, color, size, isHousing) {
+            const bigSize = size + 10;
+            return L.divIcon({
+                className: '',
+                html: `<div style="position:relative;cursor:pointer;animation:pop 0.4s ease;" title="${name}">
+                    <div style="
+                        width:${bigSize}px; height:${bigSize}px; border-radius:50%;
+                        background:${color}; border:3px solid #ffe4ef;
+                        box-shadow:0 0 16px ${color}70;
+                        position:relative; z-index:2;
+                    "></div>
+                    <div style="
+                        position:absolute; top:${-22}px; left:50%; transform:translateX(-50%);
+                        background:white; color:${color};
+                        padding:3px 10px; border-radius:8px;
+                        font-size:13px; font-weight:700; white-space:nowrap;
+                        border:1.5px solid ${color}50;
+                        box-shadow:0 2px 8px ${color}30;
+                    ">${name}</div>
+                </div>
+                <style>
+                    @keyframes pop {
+                        0% { transform: scale(0.3); opacity:0; }
+                        70% { transform: scale(1.1); }
+                        100% { transform: scale(1); opacity:1; }
+                    }
+                </style>`,
+                iconSize: [bigSize, bigSize],
+                iconAnchor: [bigSize/2, bigSize/2]
+            });
+        }
+
+        // ========== Place Markers ==========
+        for (const [name, p] of Object.entries(places)) {
+            const isHousing = p.type === 'housing';
+            const size = p.type === 'campus' ? 16 : (p.type === 'ref' ? 12 : 18);
+            const marker = L.marker([p.lat, p.lng], {
+                icon: createMarkerIcon(name, p.color, size, isHousing),
+                zIndexOffset: isHousing ? 1000 : 0
+            }).addTo(map);
+
+            const gmapLink = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+            marker.bindPopup(`
+                <div style="min-width:160px;">
+                    <strong style="color:#e8527a">${name}</strong><br>
+                    <span style="font-size:11px;color:#b07a8a">${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span><br>
+                    <a href="${gmapLink}" target="_blank" style="color:#e8527a;font-size:12px">在 Google Maps 打开</a>
+                </div>
+            `);
+            marker.on('click', () => selectPlace(name));
+            markers[name] = marker;
+        }
+
+        // Campus reference line
+        const hku = places['港大主校区'], cyber = places['数码港校区'];
+        L.polyline([[hku.lat, hku.lng], [cyber.lat, cyber.lng]], {
+            color: '#ff8fb8', weight: 2, opacity: 0.5, dashArray: '6,4', interactive: false
+        }).addTo(map);
+
+        // Route legend
+        const legendCtrl = L.control({ position: 'topright' });
+        legendCtrl.onAdd = function() {
+            const div = L.DomUtil.create('div', 'map-legend');
+            div.innerHTML = `
+                <div style="font-weight:700;margin-bottom:4px;color:#e8527a">路线图例</div>
+                <div><span style="display:inline-block;width:16px;height:3px;background:#e8527a;vertical-align:middle;border-radius:2px;margin-right:4px"></span>→ 港大主校区</div>
+                <div><span style="display:inline-block;width:16px;height:3px;background:#4a7fd4;vertical-align:middle;border-radius:2px;margin-right:4px"></span>→ 数码港校区</div>
+                <div><span style="display:inline-block;width:16px;height:3px;background:#9a7aaa;vertical-align:middle;border-radius:2px;margin-right:4px"></span>→ 中环</div>
+            `;
+            return div;
+        };
+        legendCtrl.addTo(map);
+
+        // ========== Select Place ==========
+        async function selectPlace(name) {
+            if (selectedPlace && selectedPlace !== name) resetPlace(selectedPlace);
+            selectedPlace = name;
+            const p = places[name];
+            const isHousing = p.type === 'housing';
+            const size = p.type === 'campus' ? 16 : (p.type === 'ref' ? 12 : 18);
+
+            markers[name].setIcon(createActiveMarkerIcon(name, p.color, size, isHousing));
+            markers[name].setZIndexOffset(5000);
+            markers[name].openPopup();
+
+            document.querySelectorAll('.place-card').forEach(c => c.classList.remove('highlight', 'active-pulse'));
+            const card = document.querySelector(`.place-card[data-place="${name}"]`);
+            if (card) { card.classList.add('highlight', 'active-pulse'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+            document.querySelectorAll('#summaryTable tbody tr').forEach(r => r.classList.remove('active-row'));
+            const row = document.querySelector(`#summaryTable tr[data-place="${name}"]`);
+            if (row) row.classList.add('active-row');
+
+            if (isHousing) {
+                showLoading();
+                try { await drawRoutes(name); } catch(e) { console.warn(e); }
+                hideLoading();
+                const bounds = L.latLngBounds([p.lat, p.lng]);
+                activeRouteLayers.forEach(l => { if (l.getBounds) bounds.extend(l.getBounds()); });
+                map.flyToBounds(bounds, { padding: [60, 60], duration: 0.8, maxZoom: 15 });
+            } else {
+                map.flyTo([p.lat, p.lng], 15, { duration: 0.8 });
+            }
+        }
+
+        function resetPlace(name) {
+            const p = places[name];
+            const isHousing = p.type === 'housing';
+            const size = p.type === 'campus' ? 16 : (p.type === 'ref' ? 12 : 18);
+            markers[name].setIcon(createMarkerIcon(name, p.color, size, isHousing));
+            markers[name].setZIndexOffset(isHousing ? 1000 : 0);
+            clearRoutes();
+        }
+
+        document.querySelectorAll('#summaryTable tbody tr').forEach(row => {
+            row.addEventListener('click', function() {
+                const placeName = this.getAttribute('data-place');
+                if (placeName) selectPlace(placeName);
+            });
+        });
+
+        // ========== Search ==========
+        let searchMarker = null, searchHintTimeout = null;
+
+        function showSearchHint(msg) {
+            const hint = document.getElementById('searchHint');
+            hint.textContent = msg; hint.style.display = 'block';
+            clearTimeout(searchHintTimeout);
+            searchHintTimeout = setTimeout(() => { hint.style.display = 'none'; }, 4000);
+        }
+
+        async function doSearch() {
+            const input = document.getElementById('searchInput');
+            const query = input.value.trim();
+            if (!query) return;
+            document.getElementById('searchResults').style.display = 'none';
+            if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
+            clearSearchRoutes();
+            showSearchHint('搜索中~');
+            const searchQuery = query.includes('香港') ? query : query + ' 香港';
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=6&accept-language=zh-CN`;
+            try {
+                const resp = await fetch(url, { headers: { 'User-Agent': 'HK-Housing-Map/1.0' } });
+                const data = await resp.json();
+                if (data.length === 0) { showSearchHint('没找到「' + query + '」换个词试试~'); return; }
+                document.getElementById('searchHint').style.display = 'none';
+                if (data.length === 1) { placeSearchResult(data[0]); }
+                else {
+                    const div = document.getElementById('searchResults');
+                    div.innerHTML = '';
+                    data.forEach(item => {
+                        const el = document.createElement('div');
+                        el.className = 'search-result-item';
+                        el.textContent = item.display_name;
+                        el.addEventListener('click', () => { placeSearchResult(item); div.style.display = 'none'; });
+                        div.appendChild(el);
+                    });
+                    div.style.display = 'block';
+                }
+            } catch (e) { showSearchHint('搜索出错了~'); }
+        }
+
+        let searchRouteLayers = [];
+
+        function clearSearchRoutes() {
+            searchRouteLayers.forEach(l => map.removeLayer(l));
+            searchRouteLayers = [];
+        }
+
+        function getBadgeClass(duration) {
+            if (duration < 15) return 'badge-green';
+            if (duration <= 25) return 'badge-orange';
+            return 'badge-red';
+        }
+
+        function getModeTag(text) {
+            if (text.includes('港铁') || text.includes('地铁')) return 'mode-mtr';
+            if (text.includes('巴士') || text.includes('公交')) return 'mode-bus';
+            if (text.includes('步行') || text.includes('走路')) return 'mode-walk';
+            if (text.includes('小巴')) return 'mode-minibus';
+            return 'mode-walk';
+        }
+
+        async function drawSearchRoutes(lat, lng) {
+            clearSearchRoutes();
+            const destinations = [
+                { name: '港大主校区', color: '#e8527a', icon: '🏫' },
+                { name: '数码港校区', color: '#4a7fd4', icon: '💻' },
+                { name: '中环', color: '#9a7aaa', icon: '🏢' }
+            ];
+            const results = [];
+
+            await Promise.all(destinations.map(async dest => {
+                const to = places[dest.name];
+                // 使用步行模式获取实际路线距离
+                const url = `https://router.project-osrm.org/route/v1/foot/${lng},${lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
+                try {
+                    const resp = await fetch(url);
+                    const data = await resp.json();
+                    if (data.routes && data.routes.length > 0) {
+                        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                        const walkDuration = Math.round(data.routes[0].duration / 60);
+                        const routeDistance = (data.routes[0].distance / 1000).toFixed(1);
+
+                        const line = L.polyline(coords, {
+                            color: dest.color, weight: 5, opacity: 0.8,
+                            lineCap: 'round', lineJoin: 'round'
+                        }).addTo(map);
+
+                        const endPt = coords[coords.length - 1];
+                        const endLabel = L.marker(endPt, {
+                            icon: L.divIcon({
+                                className: '',
+                                html: `<div style="
+                                    background:white; color:${dest.color};
+                                    padding:3px 10px; border-radius:8px;
+                                    font-size:11px; font-weight:700; white-space:nowrap;
+                                    border:1.5px solid ${dest.color}60;
+                                    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+                                ">→ ${dest.name}</div>`,
+                                iconSize: [80, 20], iconAnchor: [40, 10]
+                            }), interactive: false
+                        }).addTo(map);
+
+                        searchRouteLayers.push(line, endLabel);
+                        results.push({ ...dest, walkDuration, routeDistance });
+                    }
+                } catch (e) { console.warn('Route failed:', dest.name, e); }
+            }));
+            return results;
+        }
+
+        function createSearchResultCard(name, lat, lng, routeResults) {
+            const existingCard = document.getElementById('searchResultCard');
+            if (existingCard) existingCard.remove();
+
+            const card = document.createElement('div');
+            card.id = 'searchResultCard';
+            card.className = 'place-card highlight';
+            card.style.marginTop = '16px';
+            card.style.border = '2px solid #ff8fb8';
+            card.style.background = 'linear-gradient(135deg, #fff5f8, #fff0fa)';
+
+            // 生成每个目的地的路线卡片，模仿坚尼地城格式
+            let routesHtml = '';
+            routeResults.forEach(r => {
+                const dist = parseFloat(r.routeDistance);
+                // 估算巴士时间：路线距离/25km/h + 8分钟候车
+                const busTime = Math.round(dist / 25 * 60 + 8);
+                // 估算港铁时间：路线距离/35km/h + 10分钟换乘步行
+                const mtrTime = Math.round(dist / 35 * 60 + 10);
+                // 步行时间直接用 OSRM 的结果
+                const walkTime = r.walkDuration;
+
+                routesHtml += `
+                    <div class="route-block">
+                        <div class="route-dest">${r.icon} → ${r.name}（约${Math.min(walkTime, busTime, mtrTime)}-${Math.max(walkTime, busTime, mtrTime)}分钟）</div>
+                        <div class="route-step"><span class="mode mode-walk">步行</span> 沿路步行约${walkTime}分钟（${r.routeDistance}km）</div>
+                        <div class="route-step"><span class="mode mode-bus">巴士</span> 乘巴士约${busTime}分钟（含候车约8分钟）</div>
+                        <div class="route-step"><span class="mode mode-mtr">港铁</span> 乘港铁约${mtrTime}分钟（含换乘步行约10分钟）</div>
+                        <div class="route-time">路线距离约 ${r.routeDistance}km | 以上为估算时间~</div>
+                    </div>
+                `;
+            });
+
+            card.innerHTML = `
+                <div class="place-header">
+                    <span class="place-color-dot" style="background:#ff8fb8; color:#ff8fb8"></span>
+                    <span class="place-name">${name}</span>
+                </div>
+                <div class="place-name-en">搜索结果 · ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+                <div class="place-desc">搜索到的地点，以下是到各目的地的通勤估算~</div>
+                ${routesHtml}
+                <div class="links" style="margin-top:10px;">
+                    <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank">Google Maps</a>
+                    <a href="https://www.google.com/maps/dir/${lat},${lng}/22.2836,114.1379" target="_blank">到港大</a>
+                    <a href="https://www.google.com/maps/dir/${lat},${lng}/22.2622,114.1286" target="_blank">到数码港</a>
+                    <a href="https://www.google.com/maps/dir/${lat},${lng}/22.2800,114.1580" target="_blank">到中环</a>
+                </div>
+            `;
+
+            const sidebar = document.getElementById('sidebar');
+            const firstSection = sidebar.querySelector('.section-title');
+            sidebar.insertBefore(card, firstSection);
+
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function placeSearchResult(item) {
+            const lat = parseFloat(item.lat), lng = parseFloat(item.lon);
+            const name = item.display_name.split(',').slice(0, 2).join(',');
+            if (searchMarker) map.removeLayer(searchMarker);
+            clearSearchRoutes();
+
+            searchMarker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: '',
+                    html: `<div style="position:relative;">
+                        <div style="width:18px;height:18px;border-radius:50%;background:#ff8fb8;border:2.5px solid white;box-shadow:0 2px 8px rgba(255,143,184,0.5);"></div>
+                        <div style="position:absolute;top:-24px;left:50%;transform:translateX(-50%);background:white;color:#e8527a;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;border:1.5px solid #ffd6e7;box-shadow:0 2px 6px rgba(0,0,0,0.08);">${name}</div>
+                    </div>`,
+                    iconSize: [18, 18], iconAnchor: [9, 9]
+                }), zIndexOffset: 8000
+            }).addTo(map);
+
+            searchMarker.bindPopup(`
+                <div style="min-width:140px;">
+                    <strong style="color:#e8527a">${name}</strong><br>
+                    <span style="font-size:11px;color:#b07a8a">${lat.toFixed(4)}, ${lng.toFixed(4)}</span><br>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank" style="color:#e8527a;font-size:12px">Google Maps</a>
+                </div>
+            `).openPopup();
+
+            showLoading();
+            drawSearchRoutes(lat, lng).then((results) => {
+                hideLoading();
+                createSearchResultCard(name, lat, lng, results);
+
+                if (searchRouteLayers.length > 0) {
+                    const bounds = L.latLngBounds([[lat, lng]]);
+                    searchRouteLayers.forEach(l => { if (l.getBounds) bounds.extend(l.getBounds()); });
+                    map.flyToBounds(bounds, { padding: [60, 60], duration: 0.8, maxZoom: 15 });
+                } else {
+                    map.flyTo([lat, lng], 15, { duration: 0.8 });
+                }
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.search-box') && !e.target.closest('.search-results'))
+                document.getElementById('searchResults').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
