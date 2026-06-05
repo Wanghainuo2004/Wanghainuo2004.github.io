@@ -840,15 +840,27 @@
             if (routeCache[cacheKey]) return routeCache[cacheKey];
             const from = places[fromName], to = places[toName];
             const url = `${OSRM_BASE}/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
-            try {
-                const resp = await fetch(url);
-                const data = await resp.json();
-                if (data.routes && data.routes.length > 0) {
-                    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-                    routeCache[cacheKey] = coords;
-                    return coords;
+
+            // 添加重试机制
+            let retries = 3;
+            while (retries > 0) {
+                try {
+                    const resp = await fetch(url);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const data = await resp.json();
+                    if (data.routes && data.routes.length > 0) {
+                        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                        routeCache[cacheKey] = coords;
+                        return coords;
+                    }
+                } catch (e) {
+                    retries--;
+                    console.warn(`OSRM 失败，剩余重试次数: ${retries}`, e);
+                    if (retries > 0) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
                 }
-            } catch (e) { console.warn('OSRM failed:', cacheKey, e); }
+            }
             return [[from.lat, from.lng], [to.lat, to.lng]];
         }
 
@@ -1056,6 +1068,58 @@
             searchHintTimeout = setTimeout(() => { hint.style.display = 'none'; }, 4000);
         }
 
+        // 预设的香港热门地点（作为备选方案）
+        const hkPresetPlaces = [
+            { name: '铜锣湾 Causeway Bay', lat: 22.2800, lng: 114.1850 },
+            { name: '尖沙咀 Tsim Sha Tsui', lat: 22.2980, lng: 114.1720 },
+            { name: '旺角 Mong Kok', lat: 22.3190, lng: 114.1700 },
+            { name: '中环 Central', lat: 22.2800, lng: 114.1580 },
+            { name: '金钟 Admiralty', lat: 22.2780, lng: 114.1650 },
+            { name: '湾仔 Wan Chai', lat: 22.2780, lng: 114.1750 },
+            { name: '太古 Taikoo', lat: 22.2850, lng: 114.2150 },
+            { name: '沙田 Sha Tin', lat: 22.3810, lng: 114.1890 },
+            { name: '九龙塘 Kowloon Tong', lat: 22.3370, lng: 114.1750 },
+            { name: '红磡 Hung Hom', lat: 22.3050, lng: 114.1820 },
+            { name: '油麻地 Yau Ma Tei', lat: 22.3100, lng: 114.1710 },
+            { name: '佐敦 Jordan', lat: 22.3050, lng: 114.1720 },
+            { name: '深水埗 Sham Shui Po', lat: 22.3300, lng: 114.1620 },
+            { name: '黄大仙 Wong Tai Sin', lat: 22.3420, lng: 114.1930 },
+            { name: '观塘 Kwun Tong', lat: 22.3120, lng: 114.2260 },
+            { name: '荃湾 Tsuen Wan', lat: 22.3710, lng: 114.1140 },
+            { name: '元朗 Yuen Long', lat: 22.4450, lng: 114.0220 },
+            { name: '天后 Tin Hau', lat: 22.2820, lng: 114.1920 },
+            { name: '北角 North Point', lat: 22.2910, lng: 114.2000 },
+            { name: '筲箕湾 Shau Kei Wan', lat: 22.2790, lng: 114.2290 },
+            { name: '西湾河 Sai Wan Ho', lat: 22.2820, lng: 114.2210 },
+            { name: '香港大学 HKU', lat: 22.2836, lng: 114.1379 },
+            { name: '数码港 Cyberport', lat: 22.2622, lng: 114.1286 },
+            { name: '薄扶林 Pok Fu Lam', lat: 22.2690, lng: 114.1350 },
+            { name: '坚尼地城 Kennedy Town', lat: 22.2810, lng: 114.1280 },
+            { name: '西营盘 Sai Ying Pun', lat: 22.2860, lng: 114.1430 },
+            { name: '香港仔 Aberdeen', lat: 22.2478, lng: 114.1528 },
+            { name: '黄竹坑 Wong Chuk Hang', lat: 22.2480, lng: 114.1680 },
+            { name: '海洋公园 Ocean Park', lat: 22.2390, lng: 114.1740 },
+            { name: '浅水湾 Repulse Bay', lat: 22.2340, lng: 114.1850 },
+            { name: '赤柱 Stanley', lat: 22.2210, lng: 114.2120 },
+            { name: '维多利亚港 Victoria Harbour', lat: 22.2900, lng: 114.1650 },
+            { name: '太平山顶 The Peak', lat: 22.2760, lng: 114.1470 },
+            { name: '星光大道 Avenue of Stars', lat: 22.2930, lng: 114.1750 },
+            { name: '迪士尼乐园 Disneyland', lat: 22.3130, lng: 114.0450 },
+            { name: '机场 Airport', lat: 22.3080, lng: 113.9180 },
+            { name: '东涌 Tung Chung', lat: 22.2890, lng: 113.9430 },
+            { name: '青衣 Tsing Yi', lat: 22.3580, lng: 114.1070 },
+            { name: '葵涌 Kwai Chung', lat: 22.3560, lng: 114.1300 },
+            { name: '大埔 Tai Po', lat: 22.4510, lng: 114.1640 },
+            { name: '上水 Sheung Shui', lat: 22.5040, lng: 114.1310 },
+        ];
+
+        function searchFromPreset(query) {
+            const q = query.toLowerCase();
+            return hkPresetPlaces.filter(p =>
+                p.name.toLowerCase().includes(q)
+            ).slice(0, 6);
+        }
+
         async function doSearch() {
             const input = document.getElementById('searchInput');
             const query = input.value.trim();
@@ -1064,12 +1128,29 @@
             if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
             clearSearchRoutes();
             showSearchHint('搜索中~');
+
+            // 先尝试 Nominatim API
             const searchQuery = query.includes('香港') ? query : query + ' 香港';
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=6&accept-language=zh-CN`;
+            console.log('尝试 Nominatim:', url);
+
             try {
-                const resp = await fetch(url, { headers: { 'User-Agent': 'HK-Housing-Map/1.0' } });
+                const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                console.log('Nominatim 响应:', resp.status);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const data = await resp.json();
-                if (data.length === 0) { showSearchHint('没找到「' + query + '」换个词试试~'); return; }
+                console.log('Nominatim 结果:', data);
+
+                if (data.length === 0) {
+                    // Nominatim 没结果，尝试预设地点
+                    const presetResults = searchFromPreset(query);
+                    if (presetResults.length > 0) {
+                        showPresetResults(presetResults, query);
+                        return;
+                    }
+                    showSearchHint('没找到「' + query + '」换个词试试~');
+                    return;
+                }
                 document.getElementById('searchHint').style.display = 'none';
                 if (data.length === 1) { placeSearchResult(data[0]); }
                 else {
@@ -1084,7 +1165,54 @@
                     });
                     div.style.display = 'block';
                 }
-            } catch (e) { showSearchHint('搜索出错了~'); }
+            } catch (e) {
+                console.warn('Nominatim 失败:', e.message);
+                // Nominatim 失败，使用预设地点
+                const presetResults = searchFromPreset(query);
+                if (presetResults.length > 0) {
+                    showPresetResults(presetResults, query);
+                } else {
+                    showSearchHint('搜索服务暂时不可用，请从以下热门地点选择或稍后再试~');
+                    showPresetPlaces();
+                }
+            }
+        }
+
+        function showPresetResults(results, query) {
+            document.getElementById('searchHint').style.display = 'none';
+            const div = document.getElementById('searchResults');
+            div.innerHTML = '<div style="padding:8px 14px;font-size:11px;color:#b07a8a;background:#fff5f8;">从热门地点中找到：</div>';
+            results.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'search-result-item';
+                el.textContent = item.name;
+                el.addEventListener('click', () => {
+                    placeSearchResult({ lat: item.lat, lon: item.lng, display_name: item.name });
+                    div.style.display = 'none';
+                });
+                div.appendChild(el);
+            });
+            div.style.display = 'block';
+        }
+
+        function showPresetPlaces() {
+            const div = document.getElementById('searchResults');
+            div.innerHTML = '<div style="padding:8px 14px;font-size:11px;color:#b07a8a;background:#fff5f8;">热门地点：</div>';
+            const hotPlaces = ['铜锣湾', '尖沙咀', '旺角', '中环', '湾仔', '沙田', '太古', '红磡', '海洋公园', '维多利亚港'];
+            hotPlaces.forEach(name => {
+                const preset = hkPresetPlaces.find(p => p.name.includes(name));
+                if (preset) {
+                    const el = document.createElement('div');
+                    el.className = 'search-result-item';
+                    el.textContent = preset.name;
+                    el.addEventListener('click', () => {
+                        placeSearchResult({ lat: preset.lat, lon: preset.lng, display_name: preset.name });
+                        div.style.display = 'none';
+                    });
+                    div.appendChild(el);
+                }
+            });
+            div.style.display = 'block';
         }
 
         let searchRouteLayers = [];
@@ -1121,38 +1249,51 @@
                 const to = places[dest.name];
                 // 使用步行模式获取实际路线距离
                 const url = `https://router.project-osrm.org/route/v1/foot/${lng},${lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
-                try {
-                    const resp = await fetch(url);
-                    const data = await resp.json();
-                    if (data.routes && data.routes.length > 0) {
-                        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-                        const walkDuration = Math.round(data.routes[0].duration / 60);
-                        const routeDistance = (data.routes[0].distance / 1000).toFixed(1);
 
-                        const line = L.polyline(coords, {
-                            color: dest.color, weight: 5, opacity: 0.8,
-                            lineCap: 'round', lineJoin: 'round'
-                        }).addTo(map);
+                // 添加重试机制
+                let retries = 3;
+                while (retries > 0) {
+                    try {
+                        const resp = await fetch(url);
+                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                        const data = await resp.json();
+                        if (data.routes && data.routes.length > 0) {
+                            const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                            const walkDuration = Math.round(data.routes[0].duration / 60);
+                            const routeDistance = (data.routes[0].distance / 1000).toFixed(1);
 
-                        const endPt = coords[coords.length - 1];
-                        const endLabel = L.marker(endPt, {
-                            icon: L.divIcon({
-                                className: '',
-                                html: `<div style="
-                                    background:white; color:${dest.color};
-                                    padding:3px 10px; border-radius:8px;
-                                    font-size:11px; font-weight:700; white-space:nowrap;
-                                    border:1.5px solid ${dest.color}60;
-                                    box-shadow:0 2px 8px rgba(0,0,0,0.1);
-                                ">→ ${dest.name}</div>`,
-                                iconSize: [80, 20], iconAnchor: [40, 10]
-                            }), interactive: false
-                        }).addTo(map);
+                            const line = L.polyline(coords, {
+                                color: dest.color, weight: 5, opacity: 0.8,
+                                lineCap: 'round', lineJoin: 'round'
+                            }).addTo(map);
 
-                        searchRouteLayers.push(line, endLabel);
-                        results.push({ ...dest, walkDuration, routeDistance });
+                            const endPt = coords[coords.length - 1];
+                            const endLabel = L.marker(endPt, {
+                                icon: L.divIcon({
+                                    className: '',
+                                    html: `<div style="
+                                        background:white; color:${dest.color};
+                                        padding:3px 10px; border-radius:8px;
+                                        font-size:11px; font-weight:700; white-space:nowrap;
+                                        border:1.5px solid ${dest.color}60;
+                                        box-shadow:0 2px 8px rgba(0,0,0,0.1);
+                                    ">→ ${dest.name}</div>`,
+                                    iconSize: [80, 20], iconAnchor: [40, 10]
+                                }), interactive: false
+                            }).addTo(map);
+
+                            searchRouteLayers.push(line, endLabel);
+                            results.push({ ...dest, walkDuration, routeDistance });
+                            break; // 成功，退出重试循环
+                        }
+                    } catch (e) {
+                        retries--;
+                        console.warn(`路线获取失败，剩余重试次数: ${retries}`, dest.name, e);
+                        if (retries > 0) {
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        }
                     }
-                } catch (e) { console.warn('Route failed:', dest.name, e); }
+                }
             }));
             return results;
         }
