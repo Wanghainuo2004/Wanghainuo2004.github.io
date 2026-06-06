@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harness工程搭建式业务Agent评测方案</title>
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --text-secondary: #636e72;
+            --accent: #6c5ce7;
+            --accent-light: #f0edff;
+            --danger: #d63031;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --border: #dfe6e9;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1a2e;
+                --card-bg: #16213e;
+                --text: #eee;
+                --text-secondary: #a0a0b0;
+                --accent: #a29bfe;
+                --accent-light: #1e1a3f;
+                --border: #2d3a5e;
+                --shadow: 0 2px 12px rgba(0,0,0,0.3);
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed; top: 0; left: 0;
+            height: 3px; background: linear-gradient(90deg, var(--accent), #00b894);
+            z-index: 1000; transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* TOC Sidebar */
+        .toc-sidebar {
+            position: fixed; left: 0; top: 0;
+            width: 280px; height: 100vh;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+        .toc-sidebar.open { transform: translateX(0); }
+        .toc-sidebar h3 { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .toc-sidebar a {
+            display: block; padding: 8px 12px;
+            color: var(--text-secondary); text-decoration: none;
+            border-radius: 6px; font-size: 14px;
+            transition: all 0.2s; margin-bottom: 2px;
+        }
+        .toc-sidebar a:hover, .toc-sidebar a.active {
+            background: var(--accent-light); color: var(--accent);
+        }
+        .toc-toggle {
+            position: fixed; left: 16px; top: 16px;
+            width: 44px; height: 44px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer; z-index: 101;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; box-shadow: var(--shadow);
+        }
+
+        /* Hero */
+        .hero {
+            max-width: 800px; margin: 0 auto;
+            padding: 80px 24px 40px;
+            text-align: center;
+        }
+        .hero .meta {
+            display: flex; gap: 16px; justify-content: center;
+            flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .hero .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 13px; background: var(--accent-light); color: var(--accent);
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 700; line-height: 1.3;
+            margin-bottom: 16px;
+        }
+        .hero .desc {
+            color: var(--text-secondary); font-size: 15px;
+            max-width: 600px; margin: 0 auto;
+        }
+
+        /* Main Content */
+        .content {
+            max-width: 800px; margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 0; cursor: pointer;
+            user-select: none;
+        }
+        .section-header .icon {
+            width: 40px; height: 40px;
+            background: var(--accent-light);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .section-header h2 {
+            font-size: 20px; font-weight: 600;
+        }
+        .section-header .chevron {
+            margin-left: auto; transition: transform 0.3s;
+            color: var(--text-secondary);
+        }
+        .section.collapsed .section-body { display: none; }
+        .section.collapsed .chevron { transform: rotate(-90deg); }
+        .section-body {
+            padding: 0 0 16px 52px;
+        }
+
+        /* Concept Card */
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        .concept-card .label {
+            display: inline-block;
+            padding: 2px 10px; border-radius: 4px;
+            font-size: 12px; font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .concept-card .label.core { background: #dfe6e9; color: #2d3436; }
+        .concept-card .label.key { background: #ffeaa7; color: #6c5ce7; }
+        .concept-card .label.risk { background: #fab1a0; color: #d63031; }
+        .concept-card .label.logic { background: #81ecec; color: #00b894; }
+        .concept-card h3 { font-size: 16px; margin-bottom: 8px; }
+        .concept-card p, .concept-card ul { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+        .concept-card ul { padding-left: 20px; margin-top: 8px; }
+        .concept-card ul li { margin-bottom: 4px; }
+        .concept-card strong { color: var(--text); }
+
+        /* Callout */
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .callout.warning { border-left-color: var(--warning); background: #ffeaa733; }
+        .callout.danger { border-left-color: var(--danger); background: #fab1a033; }
+        .callout.success { border-left-color: var(--success); background: #00b89422; }
+        .callout .callout-title { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap; justify-content: center;
+            padding: 20px; background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 16px 0;
+        }
+        .flow-step {
+            padding: 8px 16px; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            background: var(--accent-light); color: var(--accent);
+        }
+        .flow-arrow { font-size: 18px; color: var(--text-secondary); }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .comparison-table th {
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .comparison-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .comparison-table tr:last-child td { border-bottom: none; }
+        .comparison-table tr:hover td { background: var(--accent-light); }
+
+        /* Quiz */
+        .quiz {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px; margin: 16px 0;
+        }
+        .quiz h4 { font-size: 15px; margin-bottom: 12px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-option {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; font-size: 14px;
+        }
+        .quiz-option:hover { border-color: var(--accent); }
+        .quiz-option.correct {
+            border-color: var(--success); background: #00b89422;
+        }
+        .quiz-option.wrong {
+            border-color: var(--danger); background: #d6303122;
+        }
+        .quiz-feedback {
+            margin-top: 12px; padding: 12px;
+            border-radius: 8px; font-size: 14px;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct-fb { background: #00b89422; color: var(--success); }
+        .quiz-feedback.wrong-fb { background: #d6303122; color: var(--danger); }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin: 16px 0;
+        }
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .summary-card .emoji { font-size: 32px; margin-bottom: 8px; }
+        .summary-card h4 { font-size: 15px; margin-bottom: 4px; }
+        .summary-card p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Checklist */
+        .checklist { list-style: none; }
+        .checklist li {
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; cursor: pointer;
+        }
+        .checklist li::before {
+            content: ""; width: 20px; height: 20px;
+            border: 2px solid var(--border); border-radius: 4px;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .checklist li.checked::before {
+            background: var(--accent); border-color: var(--accent);
+            content: "\2713"; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Metric Level Tags */
+        .metric-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .metric-tag.l1 { background: #74b9ff; color: #fff; }
+        .metric-tag.l2 { background: #a29bfe; color: #fff; }
+        .metric-tag.l3 { background: #fd79a8; color: #fff; }
+
+        /* Role Badge */
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .role-badge.architect { background: #dfe6e9; color: #2d3436; }
+        .role-badge.engineer { background: #ffeaa7; color: #6c5ce7; }
+        .role-badge.harness { background: #81ecec; color: #00b894; }
+        .role-badge.analyst { background: #fab1a0; color: #d63031; }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .stat-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-item .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-item .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Bug Card */
+        .bug-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--danger);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+        }
+        .bug-card h4 { font-size: 14px; color: var(--danger); margin-bottom: 4px; }
+        .bug-card p { font-size: 13px; color: var(--text-secondary); }
+        .bug-card .fix { color: var(--success); font-weight: 600; font-size: 13px; margin-top: 6px; }
+
+        /* Footer */
+        .footer {
+            max-width: 800px; margin: 0 auto;
+            padding: 40px 24px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toc-sidebar { width: 100%; }
+            .section-body { padding-left: 0; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section { animation: fadeIn 0.4s ease-out; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <button class="toc-toggle" onclick="toggleTOC()" aria-label="Toggle TOC">
+        <span id="tocIcon">&#9776;</span>
+    </button>
+
+    <nav class="toc-sidebar" id="tocSidebar">
+        <h3>目录导航</h3>
+        <a href="#hero">文章概览</a>
+        <a href="#s1">一、开篇与核心问题</a>
+        <a href="#s2">二、Harness 工程搭建式评测</a>
+        <a href="#s3">三、Harness 工程整体架构</a>
+        <a href="#s4">四、统一评测指标框架</a>
+        <a href="#s5">五、四角色模型搭建方法</a>
+        <a href="#s6">六、关键实践经验</a>
+        <a href="#s7">七、效率对比与质量保障</a>
+        <a href="#s8">八、适用场景与局限</a>
+        <a href="#s9">九、可复用资产与快速上手</a>
+        <a href="#summary">学习总结</a>
+    </nav>
+
+    <header class="hero" id="hero">
+        <div class="meta">
+            <span class="badge">阿里云开发者</span>
+            <span class="badge">Agent评测</span>
+            <span class="badge">约 20 分钟阅读</span>
+        </div>
+        <h1>基于顶级Agent的Harness工程搭建式业务Agent评测方案</h1>
+        <p class="desc">用一个强Agent（Claude Code）搭建评测Harness工程，将评测逻辑从"代码"升级为"Prompt"，实现业务Agent的系统性快速评测，单Agent全流程从约1.5周压缩到1-2天。</p>
+    </header>
+
+    <main class="content">
+
+        <!-- Section 1: 开篇与核心问题 -->
+        <div class="section" id="s1">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128161;</div>
+                <h2>一、开篇与核心问题</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心背景</span>
+                    <h3>业务Agent协作链路的评测困境</h3>
+                    <p>某业务系统的内容生成链路由多个子Agent协作完成——<strong>图片理解、内容审核、文案生成、风格匹配</strong>等。这些Agent的prompt方案频繁迭代，每次变更后需要快速验证效果。核心矛盾在于：<strong>业务Agent迭代快（天级），但传统评测工程搭建慢（周级）</strong>。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">传统评测痛点</span>
+                    <h3>六大难题</h3>
+                    <ul>
+                        <li><strong>启动成本高</strong>——搭建评测工程、写脚本、部署服务花一周</li>
+                        <li><strong>人力密集</strong>——标注数据集、写分析脚本、出报告，每环节都需人工介入</li>
+                        <li><strong>迭代慢</strong>——prompt改一行想看效果要等半天</li>
+                        <li><strong>可复现性差</strong>——评测逻辑散落在各种脚本和Notebook里</li>
+                        <li><strong>指标不统一</strong>——不同Agent各搞一套，无法横向对比</li>
+                        <li><strong>工程化沉重</strong>——每换一个Agent就要新写一套评测代码</li>
+                    </ul>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">核心问题</div>
+                    <p>如何用一种<strong>轻量、快速、可复用</strong>的方式，系统性地评测多个业务Agent？</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">业务Agent频繁迭代</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">需要快速验证效果</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">传统评测太慢太重</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">寻找轻量解法</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: 核心解法 -->
+        <div class="section" id="s2">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128640;</div>
+                <h2>二、核心解法：Harness工程搭建式评测</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心定义</span>
+                    <h3>Harness 工程搭建式评测</h3>
+                    <p>用一个<strong>顶级Agent（Claude Code）</strong>作为Harness工程的搭建者和运行者，系统性地对业务Agent进行评测。评测Harness的本质是一套<strong>结构化的评估规则 + 执行流程</strong>。传统做法把它编码为Python脚本，而Harness式做法把它编码为<strong>Agent提示词</strong>——更灵活、更可读、更易迭代。</p>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-title">范式转变的核心洞察</div>
+                    <p>评测Harness的本质是一套结构化的评估规则+执行流程。传统做法编码为Python脚本，Harness式做法编码为Agent提示词，由此获得5-10倍的效率提升和更高的分析质量。</p>
+                </div>
+
+                <h3 style="margin: 20px 0 12px; font-size: 16px;">传统做法 vs Harness式做法</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>对比维度</th>
+                            <th>传统做法</th>
+                            <th>Harness式做法</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>工作流</td>
+                            <td>人写评测代码 &rarr; 跑脚本 &rarr; 看结果 &rarr; 改代码 &rarr; 再跑</td>
+                            <td>顶级Agent搭建评测骨架，人只提供被测对象+做关键决策</td>
+                        </tr>
+                        <tr>
+                            <td>启动周期</td>
+                            <td>周级</td>
+                            <td>天级</td>
+                        </tr>
+                        <tr>
+                            <td>迭代速度</td>
+                            <td>天级</td>
+                            <td>小时级</td>
+                        </tr>
+                        <tr>
+                            <td>核心编码</td>
+                            <td>Python脚本</td>
+                            <td>Agent提示词</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="concept-card">
+                    <span class="label key">关键优势</span>
+                    <h3>为什么Claude Code是合适的Harness搭建者？</h3>
+                    <ul>
+                        <li><strong>深度理解prompt</strong>——分析被测Agent逻辑，设计针对性评测维度</li>
+                        <li><strong>代码生成</strong>——数据获取/处理脚本</li>
+                        <li><strong>结构化输出</strong>——评测方案文档、评测Agent提示词、评测报告</li>
+                        <li><strong>多轮协作</strong>——跨版本持续迭代保持上下文连贯</li>
+                        <li><strong>数据分析</strong>——对跑批结果做统计归因对比</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: 整体架构 -->
+        <div class="section" id="s3">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127959;</div>
+                <h2>三、Harness工程整体架构</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">三层架构</span>
+                    <h3>Harness 的骨架</h3>
+                    <p>整体由三层构成：<strong>规则层</strong>（评测方案）&rarr; <strong>数据层</strong>（黄金评测集）&rarr; <strong>执行逻辑层</strong>（评测Agent提示词），加上<strong>输出层</strong>（结果分析与报告）。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">规则层：评测方案</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">数据层：黄金评测集</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">执行层：评测Agent提示词</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">输出层：结果分析与报告</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">搭建流程</span>
+                    <h3>Harness 搭建五步法</h3>
+                    <p>设计评测方案 &rarr; 构建评测集 &rarr; 编写评测Agent提示词 &rarr; 跑批执行 &rarr; 结果分析与报告</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">传统映射</span>
+                    <h3>与传统评测工程的类比</h3>
+                    <table class="comparison-table" style="margin-top: 8px;">
+                        <thead>
+                            <tr>
+                                <th>传统组件</th>
+                                <th>Harness对应物</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>test_config.yaml</td><td>评测方案.md（规则从配置文件变为自然语言文档）</td></tr>
+                            <tr><td>test_data.json</td><td>评测集Excel（数据格式统一，人可直接看懂）</td></tr>
+                            <tr><td>test_runner.py（数百行）</td><td>评测Agent提示词（数千字，执行逻辑从代码变为Prompt）</td></tr>
+                            <tr><td>conftest.py + fixtures</td><td>GT标注 + ground_truth字段（预期结果内嵌在数据中）</td></tr>
+                            <tr><td>report_generator.py</td><td>CC实时分析（报告生成从脚本变为交互）</td></tr>
+                            <tr><td>requirements.txt + CI</td><td>评测平台一键跑批（零部署成本）</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label core">职责分工</span>
+                    <h3>三方协作模型</h3>
+                    <ul>
+                        <li><strong>人</strong>：负责GT标注、方案审核、最终决策（不写评测脚本，不手动计算指标）</li>
+                        <li><strong>Claude Code</strong>：负责Harness全链路搭建 + 结果分析（不做批量推理主循环）</li>
+                        <li><strong>评测平台</strong>：负责批量执行引擎逐行调用（不做方案设计和指标汇总）</li>
+                    </ul>
+                </div>
+
+                <div class="quiz" data-answer="1">
+                    <h4>知识检查 1：Harness式评测的核心范式转变是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">用更强大的编程语言写评测脚本</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">把评测逻辑从"Python脚本"升级为"Agent提示词"，用Agent评Agent</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">用人工标注替代自动化测试</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">把所有评测工作交给评测平台完成</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: 统一评测指标框架 -->
+        <div class="section" id="s4">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128202;</div>
+                <h2>四、统一评测指标框架</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">指标体系</span>
+                    <h3>三层指标体系（L1 / L2 / L3）</h3>
+                    <p>为实现不同Agent之间的标准化横向对比，设计了三层递进的指标体系：</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="metric-tag l1">L1</span>
+                    <h3 style="display: inline;">通用基础指标（所有Agent必报）</h3>
+                    <ul>
+                        <li><strong>输出格式合规率</strong>——JSON可成功解析的比例</li>
+                        <li><strong>字段完整率</strong>——必要字段均存在的比例</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <span class="metric-tag l2">L2</span>
+                    <h3 style="display: inline;">按能力类型选用</h3>
+                    <ul>
+                        <li><strong>分类判断</strong> &rarr; 分类准确率</li>
+                        <li><strong>二元决策</strong> &rarr; 召回率/精确率</li>
+                        <li><strong>数值提取</strong> &rarr; 精确匹配率</li>
+                        <li><strong>连续评分</strong> &rarr; MAE + 分档一致率</li>
+                        <li><strong>文本生成</strong> &rarr; LLM-as-Judge 1-5分</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <span class="metric-tag l3">L3</span>
+                    <h3 style="display: inline;">Agent专属指标</h3>
+                    <p>每个Agent可在L1+L2基础上追加专有指标。例如：文案生成Agent的<strong>违禁词清洁率</strong>、<strong>关键信息保留率</strong>。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">确定Agent能力类型</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">从L2菜单勾选指标</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">追加L3专属指标</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">设定目标阈值</span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">新Agent接入指标选型流程</div>
+                    <p>新Agent接入时，按"确定能力类型 &rarr; 勾选L2指标 &rarr; 追加L3指标 &rarr; 设定阈值"四步完成指标配置，实现即插即用的标准化评测。</p>
+                </div>
+
+                <div class="quiz" data-answer="2">
+                    <h4>知识检查 2：三层指标体系中，L2指标的核心特征是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">所有Agent必须强制使用</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">由评测平台自动生成</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">按Agent的能力类型（分类、二元决策、文本生成等）选用</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">仅用于最终报告输出</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: 四角色模型 -->
+        <div class="section" id="s5">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128101;</div>
+                <h2>五、Harness各层的搭建方法——四角色模型</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">Claude Code在Harness搭建过程中扮演四个角色，分别对应四层架构的搭建任务。</p>
+
+                <!-- Role 1 -->
+                <div class="concept-card">
+                    <span class="role-badge architect">角色一：方案架构师</span>
+                    <span class="label key">规则层</span>
+                    <h3>评测方案设计</h3>
+                    <p><strong>输入：</strong>被测Agent的prompt文件 + 业务上下文描述</p>
+                    <p style="margin-top: 8px;"><strong>CC输出：</strong>完整的评测方案文档（含维度、指标、阈值、数据集要求、错误分类体系）+ 边界用例建议（CC分析prompt逻辑后主动提出应覆盖的场景）</p>
+                    <p style="margin-top: 8px;"><strong>实际效果：</strong>从一个prompt文件到一份完整评测方案，大约<strong>10分钟</strong>的交互。</p>
+                </div>
+
+                <!-- Role 2 -->
+                <div class="concept-card">
+                    <span class="role-badge engineer">角色二：数据工程师</span>
+                    <span class="label core">数据层</span>
+                    <h3>黄金评测集构建</h3>
+                    <p>CC在数据层承担四件事：</p>
+                    <ul>
+                        <li><strong>数据获取</strong>——编写脚本调用业务接口批量拉取候选数据</li>
+                        <li><strong>数据处理</strong>——格式化为评测所需的JSON结构</li>
+                        <li><strong>GT辅助标注</strong>——对分类型指标CC先给建议标注，人工复核</li>
+                        <li><strong>评测集打包</strong>——生成评测平台可直接消费的Excel（含system.question列）</li>
+                    </ul>
+                    <div class="callout success" style="margin-top: 12px;">
+                        <div class="callout-title">关键设计：system.question列</div>
+                        <p>每行数据包含被测Agent所需的<strong>全部输入字段 + ground_truth</strong>（人工标注的黄金答案）。评测Agent读取这一列即可获得输入和预期输出，无需额外配置。</p>
+                    </div>
+                </div>
+
+                <!-- Role 3 -->
+                <div class="concept-card">
+                    <span class="role-badge harness">角色三：Harness工程师</span>
+                    <span class="label core">执行逻辑层</span>
+                    <h3>评测Agent提示词编写（最核心的创新）</h3>
+                    <p><strong>核心思路：</strong>把传统的评测脚本（Python/Java）替换为一份<strong>评测Agent提示词</strong>。评测逻辑从"代码"变为"自然语言指令"，一个Agent来评测另一个Agent。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">读取system.question</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">调用被测Agent</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">解析输出</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">硬规则检查</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">LLM打分</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">输出JSON</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">提示词结构模板</span>
+                    <h3>评测Agent提示词的五段式结构</h3>
+                    <p>角色定义 &rarr; 工具声明 &rarr; 约束 &rarr; 工作流程 &rarr; 输出Schema</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">设计优势</span>
+                    <h3>四大优势</h3>
+                    <ul>
+                        <li><strong>逻辑可读</strong>——评测逻辑以自然语言写在提示词里，无需读代码</li>
+                        <li><strong>快速迭代</strong>——发现评测逻辑有误，改一段文字就行，不用改代码重部署</li>
+                        <li><strong>统一执行</strong>——所有Agent的评测逻辑结构一致，只改内容不改框架</li>
+                        <li><strong>评测即文档</strong>——提示词本身就是评测标准的完整说明</li>
+                    </ul>
+                </div>
+
+                <!-- Role 4 -->
+                <div class="concept-card">
+                    <span class="role-badge analyst">角色四：数据分析师</span>
+                    <span class="label risk">输出层</span>
+                    <h3>结果分析与报告</h3>
+                    <p>CC在分析中的增值体现在三方面：</p>
+                    <ul>
+                        <li><strong>自动识别pattern</strong>——不只报数字还归因。例如："18条误过滤中12条都是把某评分维度&lt;60当过滤条件"</li>
+                        <li><strong>跨批次对比</strong>——和上一版结果对比，明确哪些指标进步/退步</li>
+                        <li><strong>给出可操作建议</strong>——不只是"分数低"，而是"建议在prompt第三段加入明确的过滤条件边界"</li>
+                    </ul>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-title">注意：角色三"评测Agent"是整个方案最核心的创新</div>
+                    <p>用Agent评Agent，评测逻辑从Python脚本变为提示词——这不仅是工具的变化，更是思维范式的升级。评测即Prompt，Prompt即文档。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: 关键实践经验 -->
+        <div class="section" id="s6">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128295;</div>
+                <h2>六、关键实践经验</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <!-- 评测集设计原则 -->
+                <div class="concept-card">
+                    <span class="label key">评测集设计</span>
+                    <h3>四大原则</h3>
+                    <ul>
+                        <li><strong>小而精</strong>——20-55条足够覆盖所有边界场景；200+条但都是简单case反而是反例</li>
+                        <li><strong>分布均衡</strong>——正/负例比例合理，边界场景必须有</li>
+                        <li><strong>GT可复核</strong>——每条GT标注有据可查</li>
+                        <li><strong>版本化管理</strong>——评测集跟随被测prompt版本变更</li>
+                    </ul>
+                </div>
+
+                <!-- 评测Agent提示词迭代 -->
+                <div class="concept-card">
+                    <span class="label risk">常见Bug</span>
+                    <h3>评测系统四大常见问题及修复</h3>
+                </div>
+
+                <div class="bug-card">
+                    <h4>Bug 1：匹配逻辑过严</h4>
+                    <p>语义等价的判定原因被判错</p>
+                    <div class="fix">修复：GT &sube; AI超集匹配</div>
+                </div>
+                <div class="bug-card">
+                    <h4>Bug 2：硬编码规则误报</h4>
+                    <p>排除列表不全导致误判</p>
+                    <div class="fix">修复：改为动态语义比对</div>
+                </div>
+                <div class="bug-card">
+                    <h4>Bug 3：Token截断</h4>
+                    <p>输出超长被评测平台截断</p>
+                    <div class="fix">修复：正则容错提取关键字段</div>
+                </div>
+                <div class="bug-card">
+                    <h4>Bug 4：GT覆盖缺口</h4>
+                    <p>新增选项未在GT中体现</p>
+                    <div class="fix">修复：更新GT标注</div>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">迭代节奏</span>
+                    <h3>三阶段迭代策略</h3>
+                    <ul>
+                        <li><strong>v1</strong>：基本逻辑跑通（调试模式带推导过程）</li>
+                        <li><strong>v2</strong>：切换为跑批模式（纯JSON输出），修复首批评测逻辑bug</li>
+                        <li><strong>v3+</strong>：基于实际结果持续调优</li>
+                    </ul>
+                </div>
+
+                <!-- LLM-as-Judge -->
+                <div class="concept-card">
+                    <span class="label key">LLM-as-Judge</span>
+                    <h3>文本生成类Agent的评审方法</h3>
+                    <p>对文本生成类Agent无法精确匹配GT时，用LLM做评委。在评测Agent提示词中嵌入评分标准（1-5分rubric），评测Agent同时扮演"执行者"和"评委"。</p>
+                    <p style="margin-top: 8px;"><strong>有效的rubric设计要求：</strong>每个分值必须有具体可区分的判定标准，避免"好/较好/一般"这类主观描述，分值之间的差异应该一个正常人也能判断。</p>
+                </div>
+
+                <!-- 踩坑 -->
+                <div class="concept-card">
+                    <span class="label risk">实际踩坑</span>
+                    <h3>"评测Agent调被测Agent"的四大坑</h3>
+                    <ul>
+                        <li><strong>评测Agent忘记调用工具</strong>——在Constraints中强调"必须先调用工具"</li>
+                        <li><strong>工具参数传递失败</strong>——在提示词中显式写明参数构造逻辑</li>
+                        <li><strong>评测Agent重试耗尽token</strong>——添加"禁止重试"约束</li>
+                        <li><strong>输出截断</strong>——减少推导过程，只输出最终JSON</li>
+                    </ul>
+                </div>
+
+                <div class="quiz" data-answer="3">
+                    <h4>知识检查 3：评测Agent提示词迭代中，"匹配逻辑过严"的正确修复方式是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">增加更多硬编码排除规则</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">直接跳过匹配失败的case</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">人工逐条审核所有结果</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">采用GT &sube; AI超集匹配，允许语义等价的变体</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz" data-answer="1">
+                    <h4>知识检查 4：关于评测集设计，以下哪项是正确的？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">评测集越大越好，至少200条以上</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">20-55条小而精即可，关键是覆盖所有边界场景</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">只用正例即可，负例不重要</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">评测集一旦完成就无需更新</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: 效率对比与质量保障 -->
+        <div class="section" id="s7">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128200;</div>
+                <h2>七、效率对比与质量保障</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">效率数据</span>
+                    <h3>关键时间投入对比</h3>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">~10x</div>
+                        <div class="stat-label">评测方案设计加速</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">~5x</div>
+                        <div class="stat-label">评测集构建加速</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">~10x</div>
+                        <div class="stat-label">评测脚本开发加速</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">~5x</div>
+                        <div class="stat-label">结果分析加速</div>
+                    </div>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>环节</th>
+                            <th>传统耗时</th>
+                            <th>Harness耗时</th>
+                            <th>加速比</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>评测方案设计</td>
+                            <td>1-2天</td>
+                            <td>10-30分钟</td>
+                            <td>~10x</td>
+                        </tr>
+                        <tr>
+                            <td>评测集构建</td>
+                            <td>2-3天</td>
+                            <td>半天（含人工标注）</td>
+                            <td>~5x</td>
+                        </tr>
+                        <tr>
+                            <td>评测脚本/Agent开发</td>
+                            <td>2-3天</td>
+                            <td>1-2小时</td>
+                            <td>~10x</td>
+                        </tr>
+                        <tr>
+                            <td>结果分析+报告</td>
+                            <td>半天-1天</td>
+                            <td>10-20分钟</td>
+                            <td>~5x</td>
+                        </tr>
+                        <tr style="font-weight: 600;">
+                            <td>单Agent全流程</td>
+                            <td>~1.5周</td>
+                            <td>~1-2天</td>
+                            <td>~5x</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="concept-card">
+                    <span class="label success">质量保障</span>
+                    <h3>四个维度的保障</h3>
+                    <ul>
+                        <li><strong>覆盖性</strong>——CC不会遗漏任何数据行</li>
+                        <li><strong>一致性</strong>——同样的评测标准，CC不会因疲劳而评分漂移</li>
+                        <li><strong>溯源性</strong>——每条评测结果都可追溯到prompt中的具体逻辑</li>
+                        <li><strong>可复现</strong>——同一份评测Agent提示词 + 同一份评测集 = 结果可复现</li>
+                    </ul>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-title">核心结论</div>
+                    <p>单Agent全流程从约<strong>1.5周</strong>压缩到<strong>1-2天</strong>，约<strong>5倍</strong>效率提升。第二个Agent起复用率极高。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: 适用场景与局限 -->
+        <div class="section" id="s8">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#9878;</div>
+                <h2>八、适用场景与局限</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label key">适用场景</span>
+                    <h3>四大场景及推荐程度</h3>
+                    <ul>
+                        <li><strong>Prompt迭代验证</strong> &mdash; &starf;&starf;&starf;&starf;&starf; &mdash; 改prompt &rarr; 跑批 &rarr; 看报告，闭环最快</li>
+                        <li><strong>多Agent横向对比</strong> &mdash; &starf;&starf;&starf;&starf;&starf; &mdash; 统一指标框架 + 相同评测流程</li>
+                        <li><strong>新Agent上线前验收</strong> &mdash; &starf;&starf;&starf;&starf; &mdash; 系统性覆盖，不依赖人工抽检</li>
+                        <li><strong>线上问题复盘</strong> &mdash; &starf;&starf;&starf; &mdash; 可快速构造问题用例验证</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">局限性</span>
+                    <h3>四个需要关注的局限</h3>
+                    <ul>
+                        <li><strong>LLM-as-Judge本身有偏差</strong>——对关键决策用人工抽检兜底</li>
+                        <li><strong>评测集规模受限于人工GT</strong>——小而精优于大而糙，20-55条覆盖边界即可</li>
+                        <li><strong>依赖评测平台稳定性</strong>——token截断、API超时需做容错</li>
+                        <li><strong>首次搭建有学习成本</strong>——第二个Agent起复用率很高</li>
+                    </ul>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-title">重要提醒</div>
+                    <p>LLM-as-Judge并非万能。对于<strong>关键决策场景</strong>（如内容安全审核），务必保留人工抽检环节作为兜底机制。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9: 可复用资产与快速上手 -->
+        <div class="section" id="s9">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128640;</div>
+                <h2>九、可复用资产与快速上手</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">可复用资产</span>
+                    <h3>已沉淀的七大资产</h3>
+                    <ul>
+                        <li>三层指标框架模板（L1/L2/L3）</li>
+                        <li>评测方案文档模板</li>
+                        <li>评测Agent提示词模板</li>
+                        <li>评测集Excel格式（system.question列规范）</li>
+                        <li>评测报告模板</li>
+                        <li>错误分类体系（FORMAT_ERROR / WRONG_CHOICE / ...）</li>
+                        <li>Agent平台调用经验</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">快速上手</span>
+                    <h3>五步法（总耗时约1-2天）</h3>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">1. 准备工作<br><small>5分钟</small></span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">2. 设计评测方案<br><small>10-30分钟</small></span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">3. 构建评测集<br><small>半天</small></span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">4. 编写评测Agent<br><small>1-2小时</small></span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">5. 跑批+出报告<br><small>30分钟</small></span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">各步骤详情</span>
+                    <h3>五步法详解</h3>
+                    <ul>
+                        <li><strong>Step 1 准备工作（5分钟）</strong>：准备prompt文件 + 确认接口信息</li>
+                        <li><strong>Step 2 设计评测方案（10-30分钟）</strong>：CC输出维度、指标、阈值、数据集要求、错误分类</li>
+                        <li><strong>Step 3 构建评测集（半天含人工标注）</strong>：CC拉取候选数据，人做GT标注，CC打包</li>
+                        <li><strong>Step 4 编写评测Agent提示词（1-2小时）</strong>：CC输出完整System Prompt，上传到平台调试2-3轮</li>
+                        <li><strong>Step 5 跑批+出报告（30分钟）</strong>：CC分析结果，输出完整评测报告+优化建议</li>
+                    </ul>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-title">关键提醒</div>
+                    <p>首次搭建有学习成本，但所有模板和资产都可复用。<strong>第二个Agent起，复用率极高</strong>，边际成本大幅下降。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section" id="summary">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127891;</div>
+                <h2>学习总结</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="emoji">&#128640;</div>
+                        <h4>Harness工程搭建式</h4>
+                        <p>用顶级Agent搭建评测骨架，而非人工写评测代码</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128172;</div>
+                        <h4>评测即Prompt</h4>
+                        <p>评测脚本替换为评测Agent提示词，更灵活更可读更易迭代</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128202;</div>
+                        <h4>三层指标框架</h4>
+                        <p>L1通用 + L2按能力选用 + L3专属指标，标准化横向对比</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128101;</div>
+                        <h4>四角色模型</h4>
+                        <p>方案架构师 + 数据工程师 + Harness工程师 + 数据分析师</p>
+                    </div>
+                </div>
+
+                <div class="callout" style="margin: 20px 0;">
+                    <div class="callout-title">一句话概括</div>
+                    <p>用一个强Agent（Claude Code）搭建评测Harness工程，将评测逻辑从"代码"升级为"Prompt"，实现业务Agent的系统性快速评测，<strong>单Agent全流程从约1.5周压缩到1-2天</strong>。</p>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">三个关键词</h3>
+                <div class="concept-card">
+                    <span class="label core">关键词一</span>
+                    <h3>Harness工程搭建式评测</h3>
+                    <p>用顶级Agent搭建评测骨架，而非人工写评测代码</p>
+                </div>
+                <div class="concept-card">
+                    <span class="label key">关键词二</span>
+                    <h3>评测即Prompt</h3>
+                    <p>把传统评测脚本替换为评测Agent提示词，更灵活更可读更易迭代</p>
+                </div>
+                <div class="concept-card">
+                    <span class="label logic">关键词三</span>
+                    <h3>三层指标框架</h3>
+                    <p>L1通用基础指标 + L2按能力类型选用 + L3 Agent专属指标，实现标准化横向对比</p>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">读完要带走的主线</h3>
+                <div class="concept-card">
+                    <span class="label core">核心范式</span>
+                    <h3>用 Agent 评 Agent</h3>
+                    <p>让Claude Code承担方案架构师、数据工程师、Harness工程师、数据分析师四个角色，将评测从工程问题降维为Prompt问题。最关键的实操洞察是：评测Harness的本质是一套结构化的评估规则+执行流程，传统做法编码为Python脚本，而Harness式做法编码为Agent提示词，由此获得<strong>5-10倍的效率提升</strong>和更高的分析质量。</p>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">学完自检</h3>
+                <ul class="checklist">
+                    <li onclick="this.classList.toggle('checked')">理解"用Agent评Agent"的核心范式转变</li>
+                    <li onclick="this.classList.toggle('checked')">能说出Harness三层架构（规则层、数据层、执行逻辑层）</li>
+                    <li onclick="this.classList.toggle('checked')">理解三层指标框架（L1/L2/L3）的递进逻辑</li>
+                    <li onclick="this.classList.toggle('checked')">能解释评测Agent提示词的五段式结构</li>
+                    <li onclick="this.classList.toggle('checked')">了解评测集设计的四大原则（小而精、分布均衡、GT可复核、版本化）</li>
+                    <li onclick="this.classList.toggle('checked')">掌握四大常见评测bug及修复方法</li>
+                    <li onclick="this.classList.toggle('checked')">理解LLM-as-Judge的rubric设计要点</li>
+                    <li onclick="this.classList.toggle('checked')">能说出四角色模型各自的职责</li>
+                    <li onclick="this.classList.toggle('checked')">记住单Agent全流程从~1.5周压缩到~1-2天的关键数据</li>
+                    <li onclick="this.classList.toggle('checked')">了解适用场景（Prompt迭代验证最适用）和局限性（LLM-as-Judge需人工兜底）</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>来源：<a href="https://mp.weixin.qq.com/s/n9zkbKTi3Q1j-L2vgmO1Vw" target="_blank">阿里云开发者</a> | 基于顶级Agent的Harness工程搭建式业务Agent评测方案</p>
+        <p style="margin-top: 4px;">本文为教学用途的交互式阅读版本 | 生成于 2026-06-06</p>
+    </footer>
+
+    <script>
+        // Toggle TOC
+        function toggleTOC() {
+            document.getElementById('tocSidebar').classList.toggle('open');
+        }
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('tocSidebar');
+            const toggle = document.querySelector('.toc-toggle');
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Toggle Section
+        function toggleSection(header) {
+            header.closest('.section').classList.toggle('collapsed');
+        }
+
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+
+        // Quiz
+        function checkQuiz(option, correct) {
+            const quiz = option.closest('.quiz');
+            const feedback = quiz.querySelector('.quiz-feedback');
+            const options = quiz.querySelectorAll('.quiz-option');
+
+            // Reset
+            options.forEach(o => { o.classList.remove('correct', 'wrong'); });
+            feedback.classList.remove('show', 'correct-fb', 'wrong-fb');
+
+            if (correct) {
+                option.classList.add('correct');
+                feedback.textContent = '正确！回答正确，继续加油！';
+                feedback.classList.add('show', 'correct-fb');
+            } else {
+                option.classList.add('wrong');
+                // Show correct answer
+                options.forEach((o, i) => {
+                    if (quiz.dataset.answer == i) o.classList.add('correct');
+                });
+                feedback.textContent = '再想想，正确答案已标出。';
+                feedback.classList.add('show', 'wrong-fb');
+            }
+        }
+
+        // TOC active state
+        const sections = document.querySelectorAll('.section[id]');
+        const tocLinks = document.querySelectorAll('.toc-sidebar a');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+        sections.forEach(s => observer.observe(s));
+    </script>
+</body>
+</html>

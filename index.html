@@ -34,11 +34,7 @@
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
+            padding: 60px 20px 40px;
         }
         h1 {
             font-size: clamp(24px, 5vw, 36px);
@@ -50,12 +46,23 @@
             margin-bottom: 40px;
             text-align: center;
         }
+        .section-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            padding-left: 4px;
+        }
+        .section-title:not(:first-of-type) {
+            margin-top: 40px;
+        }
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
-            max-width: 900px;
-            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
         }
         .card {
             background: var(--card);
@@ -72,27 +79,23 @@
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         }
-        .card .icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-        .card h2 {
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-        .card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
+        .card .icon { font-size: 32px; margin-bottom: 12px; }
+        .card h2 { font-size: 17px; margin-bottom: 8px; }
+        .card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .card .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
         .card .tag {
             display: inline-block;
             padding: 2px 10px;
             border-radius: 12px;
-            font-size: 12px;
-            margin-top: 12px;
+            font-size: 11px;
             background: var(--accent-light);
             color: var(--accent);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: var(--text-secondary);
+            font-size: 13px;
         }
     </style>
 </head>
@@ -100,21 +103,53 @@
     <h1>王海诺的网页项目</h1>
     <p class="subtitle">Interactive Web Projects</p>
 
-    <div class="grid">
+    <div class="grid" style="max-width:1000px;margin:0 auto;">
         <a href="hk-housing-map.html" class="card">
             <div class="icon">&#127968;</div>
             <h2>香港找房指南</h2>
             <p>香港各区租房信息交互地图，帮助快速了解各区域租金、交通、生活配套等情况。</p>
-            <span class="tag">地图可视化</span>
-        </a>
-
-        <a href="vx-wechat-articles/jianghu-laoshifu-xixingdafa.html" class="card">
-            <div class="icon">&#128218;</div>
-            <h2>江湖老师傅和"吸星大法"</h2>
-            <p>付鹏财经世界文章的交互式学习版本，包含概念卡片、知识测验、因果链条可视化等互动元素。</p>
-            <span class="tag">交互式教学</span>
-            <span class="tag">金融分析</span>
+            <div class="tags"><span class="tag">地图可视化</span></div>
         </a>
     </div>
+
+    <div style="max-width:1000px;margin:40px auto 0;">
+        <p class="section-title">vx 公众号文章网页版解析</p>
+    </div>
+    <div class="grid" style="max-width:1000px;margin:0 auto;">
+        <a href="vx-wechat-articles/jianghu-laoshifu-xixingdafa.html" class="card">
+            <div class="icon">&#129527;</div>
+            <h2>江湖老师傅和"吸星大法"</h2>
+            <p>付鹏财经世界文章。索罗斯式反身性循环中的流动性虹吸效应，AI资产的"吸星大法"与"吃鸡缩圈"。</p>
+            <div class="tags"><span class="tag">金融分析</span><span class="tag">流动性</span></div>
+        </a>
+        <a href="vx-wechat-articles/ai-agent-core-concepts.html" class="card">
+            <div class="icon">&#129302;</div>
+            <h2>AI Agent 核心概念</h2>
+            <p>从 Model、Tool、Skill 到 Harness 工程，系统梳理 Agent 的12个核心概念与架构体系。</p>
+            <div class="tags"><span class="tag">AI Agent</span><span class="tag">工程架构</span></div>
+        </a>
+        <a href="vx-wechat-articles/world-model-explained.html" class="card">
+            <div class="icon">&#127760;</div>
+            <h2>世界模型科普级综述</h2>
+            <p>从认知科学到现代AI工程，世界模型如何连接大模型与现实行动，五条技术路线全面解析。</p>
+            <div class="tags"><span class="tag">世界模型</span><span class="tag">具身智能</span></div>
+        </a>
+        <a href="vx-wechat-articles/cicc-hk-stock-outlook-2026h2.html" class="card">
+            <div class="icon">&#128200;</div>
+            <h2>中金港股2026下半年展望</h2>
+            <p>中国信用周期K型分化下的港股配置策略，科技看海外、外需看油价、内需看政策。</p>
+            <div class="tags"><span class="tag">港股</span><span class="tag">宏观策略</span></div>
+        </a>
+        <a href="vx-wechat-articles/harness-agent-evaluation.html" class="card">
+            <div class="icon">&#128736;</div>
+            <h2>Harness工程搭建式Agent评测</h2>
+            <p>用顶级Agent搭建评测Harness，将评测逻辑从代码升级为Prompt，单Agent全流程从1.5周压缩到1-2天。</p>
+            <div class="tags"><span class="tag">Agent评测</span><span class="tag">Harness工程</span></div>
+        </a>
+    </div>
+
+    <footer class="footer">
+        <p>Wanghainuo2004.github.io</p>
+    </footer>
 </body>
 </html>

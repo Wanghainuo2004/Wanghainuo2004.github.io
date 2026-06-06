@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent 核心概念：从 Model、Tool、Skill 到 Harness 工程</title>
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --text-secondary: #636e72;
+            --accent: #6c5ce7;
+            --accent-light: #f0edff;
+            --danger: #d63031;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --border: #dfe6e9;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1a2e;
+                --card-bg: #16213e;
+                --text: #eee;
+                --text-secondary: #a0a0b0;
+                --accent: #a29bfe;
+                --accent-light: #2d2655;
+                --border: #2d3a5e;
+                --shadow: 0 2px 12px rgba(0,0,0,0.3);
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed; top: 0; left: 0;
+            height: 3px; background: linear-gradient(90deg, var(--accent), #00b894);
+            z-index: 1000; transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* TOC Sidebar */
+        .toc-sidebar {
+            position: fixed; left: 0; top: 0;
+            width: 280px; height: 100vh;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+        .toc-sidebar.open { transform: translateX(0); }
+        .toc-sidebar h3 { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .toc-sidebar a {
+            display: block; padding: 8px 12px;
+            color: var(--text-secondary); text-decoration: none;
+            border-radius: 6px; font-size: 14px;
+            transition: all 0.2s; margin-bottom: 2px;
+        }
+        .toc-sidebar a:hover, .toc-sidebar a.active {
+            background: var(--accent-light); color: var(--accent);
+        }
+        .toc-toggle {
+            position: fixed; left: 16px; top: 16px;
+            width: 44px; height: 44px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer; z-index: 101;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; box-shadow: var(--shadow);
+        }
+
+        /* Hero */
+        .hero {
+            max-width: 800px; margin: 0 auto;
+            padding: 80px 24px 40px;
+            text-align: center;
+        }
+        .hero .meta {
+            display: flex; gap: 16px; justify-content: center;
+            flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .hero .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 13px; background: var(--accent-light); color: var(--accent);
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 700; line-height: 1.3;
+            margin-bottom: 16px;
+        }
+        .hero .desc {
+            color: var(--text-secondary); font-size: 15px;
+            max-width: 600px; margin: 0 auto;
+        }
+
+        /* Main Content */
+        .content {
+            max-width: 800px; margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 0; cursor: pointer;
+            user-select: none;
+        }
+        .section-header .icon {
+            width: 40px; height: 40px;
+            background: var(--accent-light);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .section-header h2 {
+            font-size: 20px; font-weight: 600;
+        }
+        .section-header .chevron {
+            margin-left: auto; transition: transform 0.3s;
+            color: var(--text-secondary);
+        }
+        .section.collapsed .section-body { display: none; }
+        .section.collapsed .chevron { transform: rotate(-90deg); }
+        .section-body {
+            padding: 0 0 16px 52px;
+        }
+
+        /* Concept Card */
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        .concept-card .label {
+            display: inline-block;
+            padding: 2px 10px; border-radius: 4px;
+            font-size: 12px; font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .concept-card .label.core { background: #dfe6e9; color: #2d3436; }
+        .concept-card .label.key { background: #ffeaa7; color: #6c5ce7; }
+        .concept-card .label.risk { background: #fab1a0; color: #d63031; }
+        .concept-card .label.logic { background: #81ecec; color: #00b894; }
+        .concept-card .label.arch { background: #dfe6e9; color: #636e72; }
+        .concept-card h3 { font-size: 16px; margin-bottom: 8px; }
+        .concept-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+
+        @media (prefers-color-scheme: dark) {
+            .concept-card .label.core { background: #2d3a5e; color: #a0a0b0; }
+            .concept-card .label.key { background: #3d3520; color: #fdcb6e; }
+            .concept-card .label.risk { background: #3d2020; color: #fab1a0; }
+            .concept-card .label.logic { background: #1a3d35; color: #81ecec; }
+            .concept-card .label.arch { background: #2d3a5e; color: #a0a0b0; }
+        }
+
+        /* Callout */
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 16px 0;
+        }
+        .callout.warning { border-left-color: var(--warning); background: rgba(253,203,110,0.15); }
+        .callout.danger { border-left-color: var(--danger); background: rgba(250,177,160,0.15); }
+        .callout .callout-title { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap; justify-content: center;
+            padding: 20px; background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 16px 0;
+        }
+        .flow-step {
+            padding: 8px 16px; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            background: var(--accent-light); color: var(--accent);
+        }
+        .flow-arrow { font-size: 18px; color: var(--text-secondary); }
+
+        /* Layer Diagram */
+        .layer-diagram {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        .layer {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+            transition: background 0.2s;
+        }
+        .layer:last-child { border-bottom: none; }
+        .layer:hover { background: var(--accent-light); }
+        .layer .layer-emoji { font-size: 24px; flex-shrink: 0; }
+        .layer .layer-info h4 { font-size: 14px; font-weight: 600; }
+        .layer .layer-info p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Quiz */
+        .quiz {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px; margin: 16px 0;
+        }
+        .quiz h4 { font-size: 15px; margin-bottom: 12px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-option {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; font-size: 14px;
+        }
+        .quiz-option:hover { border-color: var(--accent); }
+        .quiz-option.correct {
+            border-color: var(--success); background: rgba(0,184,148,0.12);
+        }
+        .quiz-option.wrong {
+            border-color: var(--danger); background: rgba(214,48,49,0.12);
+        }
+        .quiz-feedback {
+            margin-top: 12px; padding: 12px;
+            border-radius: 8px; font-size: 14px;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct-fb { background: rgba(0,184,148,0.12); color: var(--success); }
+        .quiz-feedback.wrong-fb { background: rgba(214,48,49,0.12); color: var(--danger); }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin: 16px 0;
+        }
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .summary-card .emoji { font-size: 32px; margin-bottom: 8px; }
+        .summary-card h4 { font-size: 15px; margin-bottom: 4px; }
+        .summary-card p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Checklist */
+        .checklist { list-style: none; }
+        .checklist li {
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; cursor: pointer;
+        }
+        .checklist li::before {
+            content: ""; width: 20px; height: 20px;
+            border: 2px solid var(--border); border-radius: 4px;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .checklist li.checked::before {
+            background: var(--accent); border-color: var(--accent);
+            content: "\2713"; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Analogy Box */
+        .analogy-box {
+            background: var(--card-bg);
+            border: 2px dashed var(--accent);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .analogy-box h4 { font-size: 14px; color: var(--accent); margin-bottom: 8px; }
+        .analogy-box p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+        /* Expandable Detail */
+        .expandable {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin: 12px 0;
+            overflow: hidden;
+        }
+        .expandable-header {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 14px; font-weight: 500;
+            user-select: none;
+        }
+        .expandable-header .expand-icon {
+            transition: transform 0.3s;
+            font-size: 12px; color: var(--text-secondary);
+        }
+        .expandable.open .expandable-header .expand-icon { transform: rotate(90deg); }
+        .expandable-body {
+            display: none;
+            padding: 0 20px 16px;
+            font-size: 14px; color: var(--text-secondary); line-height: 1.7;
+        }
+        .expandable.open .expandable-body { display: block; }
+
+        /* Footer */
+        .footer {
+            max-width: 800px; margin: 0 auto;
+            padding: 40px 24px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toc-sidebar { width: 100%; }
+            .section-body { padding-left: 0; }
+            .flow-diagram { padding: 12px; }
+            .flow-step { font-size: 12px; padding: 6px 10px; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section { animation: fadeIn 0.4s ease-out; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <button class="toc-toggle" onclick="toggleTOC()" aria-label="Toggle TOC">
+        <span id="tocIcon">&#9776;</span>
+    </button>
+
+    <nav class="toc-sidebar" id="tocSidebar">
+        <h3>目录导航</h3>
+        <a href="#hero">文章概览</a>
+        <a href="#s0">全景：Agent 架构总览</a>
+        <a href="#s1">Model：基础大模型</a>
+        <a href="#s2">Scaffolding &amp; Policy</a>
+        <a href="#s3">Harness：调度执行层</a>
+        <a href="#s4">Context Engineering</a>
+        <a href="#s5">Tool Use &amp; Skill</a>
+        <a href="#s6">Sub-agent &amp; Environment</a>
+        <a href="#s7">Rollout、Reward &amp; Trainer</a>
+        <a href="#s8">完整生命周期</a>
+        <a href="#summary">学习总结</a>
+    </nav>
+
+    <header class="hero" id="hero">
+        <div class="meta">
+            <span class="badge">AI Agent</span>
+            <span class="badge">教学版</span>
+            <span class="badge">约 15 分钟阅读</span>
+        </div>
+        <h1>一篇文章讲清楚 AI Agent 的核心概念</h1>
+        <p class="desc">从 Model、Tool、Skill 到 Harness 工程——理解 AI Agent 的完整技术栈，搞懂每个组件的定位、职责与协作关系。</p>
+    </header>
+
+    <main class="content">
+
+        <!-- Section 0: Overview -->
+        <div class="section" id="s0">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127968;</div>
+                <h2>全景：AI Agent 架构总览</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心框架</span>
+                    <h3>什么是 AI Agent？</h3>
+                    <p>AI Agent 不是一个单一的模型，而是一个<strong>完整的系统</strong>。它由多个层次的组件协作组成：基础模型提供"思考能力"，工具提供"行动能力"，框架层提供"行为规则"，训练系统提供"进化能力"。理解 Agent，就是理解这些组件如何各司其职、协同工作。</p>
+                </div>
+
+                <div class="layer-diagram">
+                    <div class="layer">
+                        <span class="layer-emoji">&#127968;</span>
+                        <div class="layer-info">
+                            <h4>Scaffolding（框架层）</h4>
+                            <p>最外层，定义 Agent 整体运行规则与边界</p>
+                        </div>
+                    </div>
+                    <div class="layer">
+                        <span class="layer-emoji">&#9989;</span>
+                        <div class="layer-info">
+                            <h4>Policy（决策策略）</h4>
+                            <p>规定 Agent 从可选动作中挑选执行方案的规则</p>
+                        </div>
+                    </div>
+                    <div class="layer">
+                        <span class="layer-emoji">&#9654;&#65039;</span>
+                        <div class="layer-info">
+                            <h4>Harness（调度执行层）</h4>
+                            <p>负责调用模型、解析工具请求、判定任务终止</p>
+                        </div>
+                    </div>
+                    <div class="layer">
+                        <span class="layer-emoji">&#128230;</span>
+                        <div class="layer-info">
+                            <h4>Context Engineering（上下文工程）</h4>
+                            <p>动态管控送入模型的 prompt 内容</p>
+                        </div>
+                    </div>
+                    <div class="layer">
+                        <span class="layer-emoji">&#128295;</span>
+                        <div class="layer-info">
+                            <h4>Tool Use &amp; Skill（工具与技能）</h4>
+                            <p>Agent 对接外部接口的执行逻辑与复用化任务单元</p>
+                        </div>
+                    </div>
+                    <div class="layer">
+                        <span class="layer-emoji">&#129504;</span>
+                        <div class="layer-info">
+                            <h4>Model（基础大模型）</h4>
+                            <p>核心引擎，输入文本、输出文本，无长时记忆、无法自主循环</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">关键认知</div>
+                    <p>Model 本身只是"一步推理"的引擎。赋予它记忆、循环、工具调用、任务规划能力的，是外层的 Scaffolding、Harness 和 Context Engineering。这就是为什么"Agent 工程"比"模型训练"更复杂。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Model -->
+        <div class="section" id="s1">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#129504;</div>
+                <h2>一、Model：基础大模型</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">定义</span>
+                    <h3>Model 是什么？</h3>
+                    <p>Model 即基础大模型（LLM），是 Agent 的"大脑"。它的核心能力是<strong>输入文本、输出文本</strong>——给定一段 prompt，返回一段补全。但 Model 本身有两个关键限制：<strong>无长时记忆</strong>（每次调用都是独立的）、<strong>无法自主循环</strong>（不会自己决定"再想一步"）。</p>
+                </div>
+
+                <div class="analogy-box">
+                    <h4>类比理解</h4>
+                    <p>把 Model 想象成一个<strong>超级聪明但失忆的顾问</strong>。你每次找他咨询，他都能给出极高质量的回答，但他完全不记得上次你们聊了什么。而且，他不会主动联系你——你不找他，他就不工作。Agent 的其他组件，就是帮这个顾问"恢复记忆"和"主动工作"的系统。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">Prompt 输入</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Model 推理</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">文本输出</span>
+                </div>
+
+                <div class="expandable" onclick="this.classList.toggle('open')">
+                    <div class="expandable-header">
+                        <span class="expand-icon">&#9654;</span>
+                        为什么 Model 不能直接当 Agent？
+                    </div>
+                    <div class="expandable-body">
+                        <p>因为 Model 缺少三个关键能力：<strong>（1）循环执行</strong>——它不会自己决定"结果不满意，再来一轮"；<strong>（2）外部感知</strong>——它无法读取文件、调用API、访问数据库；<strong>（3）状态管理</strong>——它不记得之前做了什么。这些能力全部由外层组件提供。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Scaffolding & Policy -->
+        <div class="section" id="s2">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127968;</div>
+                <h2>二、Scaffolding 与 Policy：框架与策略</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label arch">框架层</span>
+                    <h3>Scaffolding（脚手架）</h3>
+                    <p>Scaffolding 是 Agent 的"宪法"——它约束、定义 Agent 的整体运行规则。包括：Agent 可以使用哪些工具、在什么条件下允许执行什么操作、任务的边界在哪里、安全红线是什么。它是<strong>静态配置</strong>，在 Agent 启动前就已确定。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">决策层</span>
+                    <h3>Policy（决策策略）</h3>
+                    <p>Policy 是 Agent 的"决策规则手册"。当 Agent 面对多个可选动作时，Policy 规定它如何挑选执行方案。例如：当工具调用失败时是重试还是换一个工具？当用户意图模糊时是追问还是猜测？Policy 可以是硬编码规则，也可以由模型动态生成。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">任务输入</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Scaffolding 设定边界</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Policy 选择策略</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">执行动作</span>
+                </div>
+
+                <div class="analogy-box">
+                    <h4>类比理解</h4>
+                    <p>Scaffolding 相当于公司的<strong>规章制度</strong>（不能做假账、不能泄露客户数据），Policy 相当于<strong>业务流程SOP</strong>（遇到客户投诉先道歉再调查再补偿）。前者是底线，后者是方法。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Harness -->
+        <div class="section" id="s3">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#9654;&#65039;</div>
+                <h2>三、Harness：调度执行层</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label key">核心组件</span>
+                    <h3>Harness 是 Agent 的"操作系统"</h3>
+                    <p>Harness 是整个 Agent 系统的调度中枢，负责三件核心事情：<strong>（1）调模型</strong>——组装 prompt、调用 Model、获取返回；<strong>（2）解析工具请求</strong>——当 Model 输出中包含工具调用指令时，Harness 负责解析参数、实际执行工具、将结果回填；<strong>（3）终止判定</strong>——判断任务是否完成、是否需要继续循环、是否超时或异常。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">组装 Prompt</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">调用 Model</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">解析返回</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">执行工具 / 终止</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">关键循环</span>
+                    <h3>Agent Loop：Harness 的核心机制</h3>
+                    <p>Harness 驱动着 Agent 的核心循环——<strong>思考-行动-观察</strong>（Think-Act-Observe）。每一轮循环中：Model 生成思考和行动决策，Harness 执行行动并将结果作为观察反馈给 Model，如此反复直到任务完成。这个循环是 Agent 区别于单次 Model 调用的根本特征。</p>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">Harness 工程的复杂性</div>
+                    <p>Harness 是 Agent 工程中最复杂的部分。它需要处理：并发工具调用、错误重试、超时控制、上下文窗口管理、token 预算控制、安全拦截等。一个优秀的 Harness，能让普通模型发挥出远超预期的 Agent 能力。</p>
+                </div>
+
+                <div class="quiz" data-answer="2">
+                    <h4>知识检查：Harness 的核心职责是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">训练大模型参数</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">提供 GPU 算力</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">调度 Model、解析工具请求、判定任务终止</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">存储用户数据</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Context Engineering -->
+        <div class="section" id="s4">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128230;</div>
+                <h2>四、Context Engineering：上下文工程</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label key">核心概念</span>
+                    <h3>不是 Prompt Engineering，是 Context Engineering</h3>
+                    <p>Context Engineering 是动态管控<strong>送入模型的 prompt 内容</strong>的工程实践。它不只是写一个好的 prompt（那是 Prompt Engineering），而是决定<strong>每一次调用时，模型应该看到什么信息</strong>：系统指令、对话历史、工具返回结果、检索到的文档、用户画像等。在上下文窗口有限的情况下，选择"放什么"和"不放什么"是核心挑战。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">关键策略</span>
+                    <h3>上下文管理的三个维度</h3>
+                    <p><strong>（1）选择</strong>——哪些信息需要进入上下文？<strong>（2）压缩</strong>——如何在有限窗口内塞入更多信息？（摘要、滑动窗口、关键信息提取）<strong>（3）排序</strong>——信息放在 prompt 的哪个位置？（模型对开头和结尾的信息更敏感）</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">用户输入</span>
+                    <span class="flow-arrow">+</span>
+                    <span class="flow-step">对话历史</span>
+                    <span class="flow-arrow">+</span>
+                    <span class="flow-step">工具结果</span>
+                    <span class="flow-arrow">+</span>
+                    <span class="flow-step">检索文档</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">最终 Prompt</span>
+                </div>
+
+                <div class="expandable" onclick="this.classList.toggle('open')">
+                    <div class="expandable-header">
+                        <span class="expand-icon">&#9654;</span>
+                        为什么 Context Engineering 如此重要？
+                    </div>
+                    <div class="expandable-body">
+                        <p>因为模型的输出质量<strong>完全取决于输入的质量</strong>。即使是最强的模型，给它错误的、过时的、不相关的信息，也会输出糟糕的结果。Context Engineering 决定了模型"看到的世界"，也就决定了它的"判断力"。很多 Agent 失败的案例，不是模型不行，而是上下文管理出了问题。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Tool Use & Skill -->
+        <div class="section" id="s5">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128295;</div>
+                <h2>五、Tool Use 与 Skill：工具与技能</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label logic">执行能力</span>
+                    <h3>Tool Use（工具调用）</h3>
+                    <p>Tool Use 是 Agent 对接外部接口和软件的执行逻辑。工具可以是：搜索引擎、代码执行器、文件系统、API 接口、数据库查询等。Model 在推理过程中决定"我需要用什么工具"，Harness 负责实际执行工具调用并将结果返回给 Model。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">复用单元</span>
+                    <h3>Skill（技能模块）</h3>
+                    <p>Skill 是封装好的、可复用的<strong>多步骤任务单元</strong>。与 Tool 不同，Skill 通常包含多个工具调用的编排逻辑、错误处理、条件分支等。例如"搜索并总结文档"是一个 Skill，它内部可能调用搜索工具、读取工具、总结工具。Skill 是 Agent 能力的模块化封装，可以跨任务复用。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">单个原子操作</span>
+                    <span class="flow-arrow">=</span>
+                    <span class="flow-step">Tool</span>
+                    <span class="flow-arrow">&nbsp;&nbsp;&nbsp;</span>
+                    <span class="flow-step">多步骤编排</span>
+                    <span class="flow-arrow">=</span>
+                    <span class="flow-step">Skill</span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">Tool vs Skill 的关键区别</div>
+                    <p><strong>Tool</strong> 是原子操作（搜索、读文件、执行SQL），<strong>Skill</strong> 是复合任务（写一份市场分析报告、部署一个Web应用）。Tool 是 Skill 的构建块，Skill 是 Tool 的编排。一个成熟的 Agent 生态中，Tool 数量可能上百，但 Skill 数量通常更精炼。</p>
+                </div>
+
+                <div class="quiz" data-answer="1">
+                    <h4>知识检查：Skill 和 Tool 的本质区别是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Skill 比 Tool 更快</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">Skill 是封装好的多步骤任务单元，Tool 是原子操作</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Skill 只能由人类定义，Tool 由模型自动生成</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Skill 需要联网，Tool 不需要</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Sub-agent & Environment -->
+        <div class="section" id="s6">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128101;</div>
+                <h2>六、Sub-agent 与 Environment</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label key">多智能体</span>
+                    <h3>Sub-agent（子智能体）</h3>
+                    <p>Sub-agent 是被主 Agent 调度的、独立承接细分任务的子系统。每个 Sub-agent 有自己的 Model、Tool 集合和 Policy。主 Agent 将复杂任务分解后分配给不同的 Sub-agent，各自独立执行后汇总结果。这是处理复杂任务的关键架构模式。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">外部世界</span>
+                    <h3>Environment（交互环境）</h3>
+                    <p>Environment 是 Agent 感知和操作的外部场景。它包括：用户界面、文件系统、网络环境、其他软件系统等。Agent 通过 Tool 与 Environment 交互——读取环境状态、执行改变环境的操作。Environment 的反馈是 Agent 决策的重要输入。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">主 Agent</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Sub-agent A</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Environment</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">反馈</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">主 Agent 汇总</span>
+                </div>
+
+                <div class="expandable" onclick="this.classList.toggle('open')">
+                    <div class="expandable-header">
+                        <span class="expand-icon">&#9654;</span>
+                        什么时候需要 Sub-agent？
+                    </div>
+                    <div class="expandable-body">
+                        <p>当任务具有<strong>可并行性</strong>或<strong>需要不同专业能力</strong>时，Sub-agent 架构最有价值。例如："帮我做一份竞品分析"——一个 Sub-agent 负责搜索竞品信息，一个负责分析财务数据，一个负责生成报告。它们可以并行工作，各自使用不同的工具和策略。</p>
+                    </div>
+                </div>
+
+                <div class="quiz" data-answer="0">
+                    <h4>知识检查：Sub-agent 架构的核心价值是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">将复杂任务分解，让独立子系统各司其职并行执行</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">减少模型的 token 消耗</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">让 Agent 能够联网</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">存储用户历史对话</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: Rollout, Reward, Trainer -->
+        <div class="section" id="s7">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128200;</div>
+                <h2>七、Rollout、Reward 与 Trainer：进化闭环</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label logic">运行记录</span>
+                    <h3>Rollout（完整轨迹）</h3>
+                    <p>Rollout 是 Agent 单次任务的<strong>全流程运行记录</strong>。它记录了从任务开始到结束的每一个步骤：模型的每一次推理、每一次工具调用、每一次环境反馈、每一步决策。Rollout 是分析 Agent 行为、发现问题、优化策略的基础数据。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">评估信号</span>
+                    <h3>Reward（奖励值）</h3>
+                    <p>Reward 是量化单次任务执行优劣的评分。它可以来自：人工评估（用户满意度）、自动指标（任务是否完成、耗时多少、token 消耗）、环境反馈（代码是否通过测试）。Reward 是 Agent 进化的方向信号——告诉系统"什么行为是好的"。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label core">进化引擎</span>
+                    <h3>Trainer（训练器）</h3>
+                    <p>Trainer 依托 Rollout 轨迹和 Reward 评分，迭代优化模型参数。这就是 Agent 的"学习"过程：通过大量的任务执行（Rollout）和效果评估（Reward），不断改进模型的决策能力。典型的训练方法包括 RLHF、DPO 等。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">任务执行</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Rollout 记录</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Reward 评估</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Trainer 优化</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">更强的 Model</span>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-title">进化闭环的意义</div>
+                    <p>Rollout + Reward + Trainer 构成了 Agent 的<strong>自我进化闭环</strong>。这使得 Agent 不再是静态的系统——它会随着使用变得越来越强。这也是为什么数据飞轮（越多使用 &rarr; 越多数据 &rarr; 越好模型 &rarr; 越多使用）是 Agent 竞争的核心壁垒。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: Full Lifecycle -->
+        <div class="section" id="s8">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128279;</div>
+                <h2>完整生命周期：12个概念如何协作</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">全局视角</span>
+                    <h3>一次完整的 Agent 任务执行</h3>
+                    <p>当用户发出一个任务请求时，12个概念按以下顺序协作：Environment 接收请求 &rarr; Scaffolding 设定边界 &rarr; Policy 选择策略 &rarr; Context Engineering 组装上下文 &rarr; Harness 调度 Model 推理 &rarr; Model 生成决策 &rarr; Tool/Skill 执行动作 &rarr; Environment 返回反馈 &rarr; 循环直到完成 &rarr; Rollout 记录轨迹 &rarr; Reward 评估效果 &rarr; Trainer 优化模型。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">&#127758; Environment</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#127968; Scaffolding</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#9989; Policy</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#128230; Context</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#9654;&#65039; Harness</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#129504; Model</span>
+                </div>
+                <div class="flow-diagram">
+                    <span class="flow-step">&#128295; Tool/Skill</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#127758; 反馈</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#128260; 循环</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#128200; Rollout</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#11088; Reward</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">&#128200; Trainer</span>
+                </div>
+
+                <div class="expandable" onclick="this.classList.toggle('open')">
+                    <div class="expandable-header">
+                        <span class="expand-icon">&#9654;</span>
+                        概念之间的依赖关系
+                    </div>
+                    <div class="expandable-body">
+                        <p><strong>Model</strong> 是所有上层组件的基础——没有 Model，Harness 无法调度，Context Engineering 无处投喂。<strong>Harness</strong> 依赖 Context Engineering 来组装输入，依赖 Tool/Skill 来执行动作。<strong>Scaffolding 和 Policy</strong> 是 Harness 的配置参数。<strong>Sub-agent</strong> 是 Harness 的扩展——主 Harness 调度子 Harness。<strong>Rollout/Reward/Trainer</strong> 是整个系统的进化层，依赖前面所有组件产生的数据。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section" id="summary">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127891;</div>
+                <h2>学习总结</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="emoji">&#129504;</div>
+                        <h4>Model</h4>
+                        <p>输入文本输出文本，无长时记忆、无法自主循环——是 Agent 的"大脑"</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#127968;</div>
+                        <h4>Scaffolding</h4>
+                        <p>约束定义 Agent 整体运行规则——是 Agent 的"宪法"</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#9989;</div>
+                        <h4>Policy</h4>
+                        <p>规定从可选动作中挑选执行方案——是 Agent 的"SOP"</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#9654;&#65039;</div>
+                        <h4>Harness</h4>
+                        <p>调度 Model、解析工具请求、判定终止——是 Agent 的"操作系统"</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128230;</div>
+                        <h4>Context Engineering</h4>
+                        <p>动态管控送入模型的 prompt——决定模型"看到什么世界"</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128295;</div>
+                        <h4>Tool Use</h4>
+                        <p>Agent 对接外部接口的执行逻辑——原子操作</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128230;</div>
+                        <h4>Skill</h4>
+                        <p>封装好的可复用多步骤任务单元——复合能力</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128101;</div>
+                        <h4>Sub-agent</h4>
+                        <p>被主 Agent 调度的独立子系统——分工协作</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#127758;</div>
+                        <h4>Environment</h4>
+                        <p>Agent 感知和操作的外部场景——交互界面</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128200;</div>
+                        <h4>Rollout</h4>
+                        <p>单次任务全流程运行记录——行为数据</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#11088;</div>
+                        <h4>Reward</h4>
+                        <p>量化任务执行优劣的评分——方向信号</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128200;</div>
+                        <h4>Trainer</h4>
+                        <p>依托轨迹和奖励迭代优化模型——进化引擎</p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">学完自检</h3>
+                <ul class="checklist">
+                    <li onclick="this.classList.toggle('checked')">能区分 Model 与 Agent 的本质区别</li>
+                    <li onclick="this.classList.toggle('checked')">理解 Scaffolding、Policy、Harness 三者的关系</li>
+                    <li onclick="this.classList.toggle('checked')">知道 Context Engineering 为什么比 Prompt Engineering 更重要</li>
+                    <li onclick="this.classList.toggle('checked')">能区分 Tool（原子操作）和 Skill（复合任务）</li>
+                    <li onclick="this.classList.toggle('checked')">理解 Sub-agent 架构的适用场景</li>
+                    <li onclick="this.classList.toggle('checked')">掌握 Rollout + Reward + Trainer 的进化闭环</li>
+                    <li onclick="this.classList.toggle('checked')">能描述一次完整的 Agent 任务执行流程</li>
+                    <li onclick="this.classList.toggle('checked')">理解 Harness 为什么是 Agent 工程中最复杂的部分</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>来源：<a href="https://mp.weixin.qq.com/s/RCEGqAvfJxbzaPJIJDOKwA" target="_blank">一篇文章讲清楚 AI Agent 的核心概念</a></p>
+        <p style="margin-top: 4px;">本文为教学用途的交互式阅读版本 | 生成于 2026-06-05</p>
+    </footer>
+
+    <script>
+        // Toggle TOC
+        function toggleTOC() {
+            document.getElementById('tocSidebar').classList.toggle('open');
+        }
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('tocSidebar');
+            const toggle = document.querySelector('.toc-toggle');
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Toggle Section
+        function toggleSection(header) {
+            header.closest('.section').classList.toggle('collapsed');
+        }
+
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+
+        // Quiz
+        function checkQuiz(option, correct) {
+            const quiz = option.closest('.quiz');
+            const feedback = quiz.querySelector('.quiz-feedback');
+            const options = quiz.querySelectorAll('.quiz-option');
+
+            // Reset
+            options.forEach(o => { o.classList.remove('correct', 'wrong'); });
+            feedback.classList.remove('show', 'correct-fb', 'wrong-fb');
+
+            if (correct) {
+                option.classList.add('correct');
+                feedback.textContent = '✅ 正确！';
+                feedback.classList.add('show', 'correct-fb');
+            } else {
+                option.classList.add('wrong');
+                // Show correct answer
+                options.forEach((o, i) => {
+                    if (quiz.dataset.answer == i) o.classList.add('correct');
+                });
+                feedback.textContent = '❌ 再想想，正确答案已标出。';
+                feedback.classList.add('show', 'wrong-fb');
+            }
+        }
+
+        // TOC active state
+        const sections = document.querySelectorAll('.section[id]');
+        const tocLinks = document.querySelectorAll('.toc-sidebar a');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+        sections.forEach(s => observer.observe(s));
+    </script>
+</body>
+</html>

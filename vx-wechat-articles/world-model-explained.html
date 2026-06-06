@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界模型：从认知科学到AI工程的科普级综述</title>
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --text-secondary: #636e72;
+            --accent: #0984e3;
+            --accent-light: #e8f4fd;
+            --danger: #d63031;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --border: #dfe6e9;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1a2e;
+                --card-bg: #16213e;
+                --text: #eee;
+                --text-secondary: #a0a0b0;
+                --accent: #74b9ff;
+                --accent-light: #1e3a5f;
+                --border: #2d3a5e;
+                --shadow: 0 2px 12px rgba(0,0,0,0.3);
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed; top: 0; left: 0;
+            height: 3px; background: linear-gradient(90deg, var(--accent), #a29bfe);
+            z-index: 1000; transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* TOC Sidebar */
+        .toc-sidebar {
+            position: fixed; left: 0; top: 0;
+            width: 280px; height: 100vh;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+        .toc-sidebar.open { transform: translateX(0); }
+        .toc-sidebar h3 { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .toc-sidebar a {
+            display: block; padding: 8px 12px;
+            color: var(--text-secondary); text-decoration: none;
+            border-radius: 6px; font-size: 14px;
+            transition: all 0.2s; margin-bottom: 2px;
+        }
+        .toc-sidebar a:hover, .toc-sidebar a.active {
+            background: var(--accent-light); color: var(--accent);
+        }
+        .toc-toggle {
+            position: fixed; left: 16px; top: 16px;
+            width: 44px; height: 44px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer; z-index: 101;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; box-shadow: var(--shadow);
+        }
+
+        /* Hero */
+        .hero {
+            max-width: 800px; margin: 0 auto;
+            padding: 80px 24px 40px;
+            text-align: center;
+        }
+        .hero .meta {
+            display: flex; gap: 16px; justify-content: center;
+            flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .hero .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 13px; background: var(--accent-light); color: var(--accent);
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 700; line-height: 1.3;
+            margin-bottom: 16px;
+        }
+        .hero .desc {
+            color: var(--text-secondary); font-size: 15px;
+            max-width: 600px; margin: 0 auto;
+        }
+
+        /* Main Content */
+        .content {
+            max-width: 800px; margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 0; cursor: pointer;
+            user-select: none;
+        }
+        .section-header .icon {
+            width: 40px; height: 40px;
+            background: var(--accent-light);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .section-header h2 {
+            font-size: 20px; font-weight: 600;
+        }
+        .section-header .chevron {
+            margin-left: auto; transition: transform 0.3s;
+            color: var(--text-secondary);
+        }
+        .section.collapsed .section-body { display: none; }
+        .section.collapsed .chevron { transform: rotate(-90deg); }
+        .section-body {
+            padding: 0 0 16px 52px;
+        }
+
+        /* Concept Card */
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        .concept-card .label {
+            display: inline-block;
+            padding: 2px 10px; border-radius: 4px;
+            font-size: 12px; font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .concept-card .label.core { background: #dfe6e9; color: #2d3436; }
+        .concept-card .label.key { background: #ffeaa7; color: #6c5ce7; }
+        .concept-card .label.risk { background: #fab1a0; color: #d63031; }
+        .concept-card .label.logic { background: #81ecec; color: #00b894; }
+        @media (prefers-color-scheme: dark) {
+            .concept-card .label.core { background: #3d4a5c; color: #dfe6e9; }
+            .concept-card .label.key { background: #4a3d00; color: #ffeaa7; }
+            .concept-card .label.risk { background: #4a1a1a; color: #fab1a0; }
+            .concept-card .label.logic { background: #0a3d3d; color: #81ecec; }
+        }
+        .concept-card h3 { font-size: 16px; margin-bottom: 8px; }
+        .concept-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+
+        /* Callout */
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 16px 0;
+        }
+        .callout.warning { border-left-color: var(--warning); background: rgba(253,203,110,0.2); }
+        .callout.danger { border-left-color: var(--danger); background: rgba(250,177,160,0.2); }
+        .callout .callout-title { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap; justify-content: center;
+            padding: 20px; background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 16px 0;
+        }
+        .flow-step {
+            padding: 8px 16px; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            background: var(--accent-light); color: var(--accent);
+        }
+        .flow-arrow { font-size: 18px; color: var(--text-secondary); }
+
+        /* Quiz */
+        .quiz {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px; margin: 16px 0;
+        }
+        .quiz h4 { font-size: 15px; margin-bottom: 12px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-option {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; font-size: 14px;
+        }
+        .quiz-option:hover { border-color: var(--accent); }
+        .quiz-option.correct {
+            border-color: var(--success); background: rgba(0,184,148,0.13);
+        }
+        .quiz-option.wrong {
+            border-color: var(--danger); background: rgba(214,48,49,0.13);
+        }
+        .quiz-feedback {
+            margin-top: 12px; padding: 12px;
+            border-radius: 8px; font-size: 14px;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct-fb { background: rgba(0,184,148,0.13); color: var(--success); }
+        .quiz-feedback.wrong-fb { background: rgba(214,48,49,0.13); color: var(--danger); }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin: 16px 0;
+        }
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .summary-card .emoji { font-size: 32px; margin-bottom: 8px; }
+        .summary-card h4 { font-size: 15px; margin-bottom: 4px; }
+        .summary-card p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Checklist */
+        .checklist { list-style: none; }
+        .checklist li {
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; cursor: pointer;
+        }
+        .checklist li::before {
+            content: ""; width: 20px; height: 20px;
+            border: 2px solid var(--border); border-radius: 4px;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .checklist li.checked::before {
+            background: var(--accent); border-color: var(--accent);
+            content: "\2713"; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+        .comparison-table th {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .comparison-table td {
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            max-width: 800px; margin: 0 auto;
+            padding: 40px 24px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toc-sidebar { width: 100%; }
+            .section-body { padding-left: 0; }
+            .flow-diagram { padding: 12px; }
+            .flow-step { font-size: 12px; padding: 6px 10px; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section { animation: fadeIn 0.4s ease-out; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <button class="toc-toggle" onclick="toggleTOC()" aria-label="Toggle TOC">
+        <span id="tocIcon">&#9776;</span>
+    </button>
+
+    <nav class="toc-sidebar" id="tocSidebar">
+        <h3>目录导航</h3>
+        <a href="#hero">文章概览</a>
+        <a href="#s1">一、开篇：为什么世界模型成为高频词</a>
+        <a href="#s2">二、概念定义：世界模型是什么</a>
+        <a href="#s3">三、认知科学源头</a>
+        <a href="#s4">四、世界模型的三大关键价值</a>
+        <a href="#s5">五、技术路线演进</a>
+        <a href="#s6">六、五条代表性技术路线</a>
+        <a href="#s7">七、2024-2025年再次爆火</a>
+        <a href="#s8">八、争议：AGI的必经之路？</a>
+        <a href="#s9">九、结语：连接大模型与现实行动</a>
+        <a href="#summary">学习总结</a>
+    </nav>
+
+    <header class="hero" id="hero">
+        <div class="meta">
+            <span class="badge">Datawhale / 大数据文摘</span>
+            <span class="badge">2026-06-03</span>
+            <span class="badge">约 15 分钟阅读</span>
+        </div>
+        <h1>世界模型：从认知科学到AI工程的科普级综述</h1>
+        <p class="desc">Yann LeCun、Demis Hassabis、李飞飞团队都在关注的"世界模型"到底是什么？它如何连接大语言模型与现实世界的行动能力？一篇帮你彻底理清脉络的完整导读。</p>
+    </header>
+
+    <main class="content">
+
+        <!-- Section 1: 开篇 -->
+        <div class="section" id="s1">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127758;</div>
+                <h2>一、开篇：为什么世界模型成为高频词</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心背景</span>
+                    <h3>多方向研究者同时关注</h3>
+                    <p>Yann LeCun、Demis Hassabis、李飞飞团队等不同方向的研究者，都在以各自方式讨论或推进"世界模型"相关问题。这说明它不是一个孤立的新术语，而是和大模型、强化学习、机器人、具身智能等多个方向同时发生连接。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">关键直觉</span>
+                    <h3>人类如何理解世界</h3>
+                    <p>人理解世界并不只是看见眼前画面。在熟悉房间里闭上眼，也能知道桌椅、门窗的位置，以及往前走可能碰到什么——说明人脑内部保留着空间和物体关系模型。当房间发生变化，人会自动补出解释：椅子不见了可能是被挪走，桌上多了杯子说明有人放上去。这种对状态变化的推断，而非仅对当前画面的识别，正是世界模型的核心直觉。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">闭眼感知空间</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">脑内保留物体关系</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">自动解释变化</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">预演未来结果</span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">开篇结论</div>
+                    <p>世界模型要让 AI 拥有某种内部的环境理解与预测机制，使它不只识别眼前输入，还能解释变化、预测后果、辅助行动。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: 概念定义 -->
+        <div class="section" id="s2">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128218;</div>
+                <h2>二、概念定义：世界模型是什么</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心定义</span>
+                    <h3>世界模型 = 外部环境动态规律的内部表征</h3>
+                    <p>世界模型是智能体对外部环境动态规律的内部表征。它不是静态知识库（知道"有哪些东西"），而是关心"这些东西之间如何变化"。例如杯子不只是一个对象，它还可能被推动、被拿起、被遮挡、掉落，或与其他物体发生关系。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">关键区分</span>
+                    <h3>不只是图像/视频生成模型</h3>
+                    <p>能生成逼真画面，不等于知道动作会怎样改变环境。世界模型更重视<strong>状态转移</strong>：当前是什么状态 &rarr; 做出某个动作后会变成什么状态 &rarr; 这种变化能否支持下一步决策。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">三层能力</span>
+                    <h3>记住状态 → 预测变化 → 模拟未来</h3>
+                    <p><strong>1. 记住状态：</strong>智能体要知道当前和过去的环境状态，包括物体位置、场景结构、任务进度、自身姿态等。<br>
+                    <strong>2. 预测变化：</strong>智能体要能推测动作之后的结果，例如推动物体、转弯、抓取后环境会如何变化——这是世界模型区别于静态识别系统的关键。<br>
+                    <strong>3. 模拟未来：</strong>智能体要能在内部展开可能的未来分支，在真实行动前先比较方案，不必完全依赖现实世界试错。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">状态观察</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">内部表征</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">动作预测</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">未来模拟</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">决策/规划</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">常见误解</span>
+                    <h3>世界模型 ≠ 大语言模型</h3>
+                    <p>LLM 的目标是预测下一个 token，擅长在文本空间中压缩知识、生成语言；世界模型的目标是预测环境中的状态转移——物体、场景、动作、反馈、时间变化之间如何相互影响。只会语言预测，不等于已经掌握世界动态。</p>
+                </div>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>对比维度</th>
+                        <th>大语言模型 (LLM)</th>
+                        <th>世界模型</th>
+                    </tr>
+                    <tr>
+                        <td>核心目标</td>
+                        <td>预测下一个 token</td>
+                        <td>预测环境状态转移</td>
+                    </tr>
+                    <tr>
+                        <td>擅长领域</td>
+                        <td>语言生成、知识压缩、文本推理</td>
+                        <td>物理直觉、因果理解、行动规划</td>
+                    </tr>
+                    <tr>
+                        <td>关键局限</td>
+                        <td>缺乏物理世界动态理解</td>
+                        <td>需要大量环境交互数据</td>
+                    </tr>
+                </table>
+
+                <div class="quiz" data-answer="1">
+                    <h4>知识检查 1：世界模型与图像/视频生成模型的核心区别是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">世界模型生成的画面更逼真</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">世界模型重视状态转移——动作如何改变环境，而非仅生成画面</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">世界模型使用更大的参数量</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">世界模型只能处理视频数据</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: 认知科学源头 -->
+        <div class="section" id="s3">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#129504;</div>
+                <h2>三、认知科学源头：不是新概念</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">历史脉络</span>
+                    <h3>从认知科学到AI工程</h3>
+                    <p>早期认知科学中已有类似思想：人脑不是被动接收外部刺激，而是在内部建立一个关于世界的模型。内部模型让人能预测现实、解释变化、指导行动。人不是每次都"重新看懂世界"，而是在已有内部模型上不断修正。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">跨学科延伸</span>
+                    <h3>神经科学 / 心理学 / 控制论</h3>
+                    <p><strong>神经科学：</strong>大脑会主动预测输入，并用预测和现实之间的误差来更新理解。<br>
+                    <strong>智能体理论：</strong>要有效行动，必须预判环境反馈。<br>
+                    <strong>控制论：</strong>行动不是孤立输出，而是建立在"如果我这样做，世界会怎样回应"的预期上。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">认知科学思想</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">强化学习/智能体研究</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">深度学习+多模态成熟</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">具体工程路线</span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">本节意义</div>
+                    <p>今天 AI 研究者重新谈世界模型，并不是造一个新名词，而是在新技术条件下重新工程化一个长期存在的认知假设。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: 三大关键价值 -->
+        <div class="section" id="s4">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#11088;</div>
+                <h2>四、世界模型的三大关键价值</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label logic">价值一</span>
+                    <h3>样本效率：减少真实环境试错</h3>
+                    <p>传统强化学习依赖大量交互经验。在游戏里这可以接受，但在机器人、自动驾驶、工业控制等真实环境中，试错既慢又贵，还可能损坏设备或带来安全风险。世界模型的解决思路：智能体先学习环境动态模型，再在模型中生成模拟经验，把一部分真实试错转移到内部模拟中完成。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">真实数据</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">学习环境变化</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">生成想象轨迹</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">训练策略</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">减少真实试错</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">价值二</span>
+                    <h3>规划能力：行动前比较多种可能</h3>
+                    <p>没有世界模型时，智能体停留在"看到状态 &rarr; 输出动作"的层面，遇到新情况时不知道动作背后的后果。有世界模型后，智能体可以在内部模拟多条路径：向左走会遇到什么？先停下来观察会不会更安全？世界模型让智能体能问"如果我这样做，会发生什么"——这就是反事实推理。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">价值三</span>
+                    <h3>泛化能力：学习可迁移的环境规律</h3>
+                    <p>如果模型只是记住训练数据中的表面模式，换一个场景就容易失效。如果学到的是更底层的环境规律——物体可以被推动、会被遮挡、没有支撑会掉落——就更可能迁移到新场景。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">学到世界动态结构</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">组合旧经验处理新任务</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">泛化能力更强</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">通向通用智能</span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">核心结论</div>
+                    <p>世界模型不是为了"想象得好看"，而是为了让智能体用更少真实样本学会行动、在行动前比较方案、并把经验迁移到新场景。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: 技术路线演进 -->
+        <div class="section" id="s5">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128640;</div>
+                <h2>五、技术路线演进：从 Dyna 到 Dreamer</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">里程碑 1</span>
+                    <h3>Dyna：模型学习与规划结合</h3>
+                    <p>智能体从真实环境中获得经验，同时学习一个环境模型，再用这个模型生成模拟经验来改进策略。Dyna 把模型学习、规划和强化学习连接起来，说明智能体不一定只能从真实交互中学习，也可以依靠内部模型进行"想象"和计划。这是后来很多世界模型方法的思想源头。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">里程碑 2</span>
+                    <h3>World Models：在潜在空间中预测未来</h3>
+                    <p>Ha 和 Schmidhuber 的工作把视觉编码器、动态模型和控制器结合起来：先把高维图像压缩成潜在表示，再在潜在空间中预测未来状态，最后基于这些状态学习控制策略。关键启发：世界模型不一定要在原始像素空间中理解一切，可以把环境压缩成更紧凑的隐变量空间。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">里程碑 3</span>
+                    <h3>PlaNet / Dreamer：在想象轨迹中学习策略</h3>
+                    <p>PlaNet、Dreamer 等方法继续推进潜在空间世界模型。模型预测出的未来不只是可视化结果，而是直接参与策略学习。Dreamer 系列把世界模型从概念演示推进到强化学习系统中的核心训练机制，并通过潜在空间预测提升样本效率和连续控制能力。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">里程碑 4</span>
+                    <h3>MuZero：学习对决策有用的内部模型</h3>
+                    <p>MuZero 不显式学习完整游戏规则，也不一定复原真实环境的全部细节，而是学习足够支持搜索和决策的内部动态模型。关键结论：世界模型未必必须"完美还原现实"，关键在于它是否能支持智能体进行有效规划和决策。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">Dyna (1991)</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">World Models (2018)</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">PlaNet/Dreamer</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">MuZero (2020)</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">多模态时代</span>
+                </div>
+
+                <div class="quiz" data-answer="2">
+                    <h4>知识检查 2：MuZero 的关键创新是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">在像素级别完美还原游戏画面</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">使用最大的神经网络参数量</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">不追求完美还原现实，而是学习对决策有用的内部动态模型</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">完全抛弃了强化学习框架</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: 五条技术路线 -->
+        <div class="section" id="s6">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128295;</div>
+                <h2>六、五条代表性技术路线</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label logic">路线 1</span>
+                    <h3>潜在空间强化学习（PlaNet、Dreamer）</h3>
+                    <p>把高维观察压缩成潜在状态，在潜在状态中预测未来，再用预测出的轨迹训练策略。重点不是生成每个像素，而是在较紧凑的表示空间里学习环境动态。优势是样本效率较高，适合连续控制和机器人任务；难点是模型误差会在长期预测中积累。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">路线 2</span>
+                    <h3>搜索和规划（MuZero）</h3>
+                    <p>不追求生成逼真的未来画面，而是学习对决策有用的状态转移、价值估计和可用于搜索的内部表示。适合棋类、游戏和目标明确、规则较清楚的任务；但离开放式真实世界还有距离，因为现实场景往往没有清晰边界。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">路线 3</span>
+                    <h3>自监督表征（JEPA / V-JEPA）</h3>
+                    <p>不以像素级重建为主要目标，而是在抽象表征空间中预测缺失信息或未来信息。这样可以避免模型把大量能力消耗在低层细节上。世界模型不一定要生成每个像素，它也可以在更抽象的层面预测世界。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">路线 4</span>
+                    <h3>视频生成 / 交互式生成世界（Genie、STORM）</h3>
+                    <p>从视频或游戏帧中学习环境动态，给定当前状态和动作后生成后续画面。模型预测的未来可以直接被看见，世界模型从抽象概念变成可视化的交互环境。但关键限制是：画面生成逼真不等于动态规律可靠，视觉真实和可控规划之间仍有差距。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label core">路线 5</span>
+                    <h3>机器人和具身智能（IRASim、DreamDojo）</h3>
+                    <p>让机器人从视频、模拟数据或人类示范中学习动作后果，在内部模型中预演操作，再迁移到真实世界。机器人不能无限真实试错，真实操作成本高，世界模型可以提供更低成本的练习环境。这个方向把世界模型从"预测画面"推进到"辅助行动"。</p>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-title">路线 4 的核心风险</div>
+                    <p>视觉真实和可控规划之间仍有差距，模型可能学到表面运动，而不是稳健的因果结构。能生成连续视频，不代表能在长期规划中保持一致。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: 再次爆火 -->
+        <div class="section" id="s7">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128293;</div>
+                <h2>七、2024-2025年为什么再次爆火</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心判断</span>
+                    <h3>多个条件同时成熟</h3>
+                    <p>世界模型重新变热，是因为多个条件同时成熟，而不是单点技术突然出现。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">条件一</span>
+                    <h3>大模型和多模态模型提供更强底座</h3>
+                    <p>过去世界模型受限于模型容量、数据规模和表示能力。现在大模型和多模态模型可以同时处理文本、图像、视频、动作和环境状态，使学习复杂世界动态变得更可行。大模型提供强表征 + 多模态数据提供丰富世界变化信息 &rarr; 世界模型有机会把这些能力转化为预测和行动能力。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">条件二</span>
+                    <h3>视频生成让"预测未来"更直观</h3>
+                    <p>Sora、Genie 等方向说明，模型可以从大量视频中学习物体运动、场景变化和时间结构。但限制在于：视频生成不等于完整物理理解，看起来连续、逼真的画面不必然代表模型掌握了稳定因果规律。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">条件三</span>
+                    <h3>机器人、自动驾驶等应用需要行动预测</h3>
+                    <p>真实世界应用需要判断动作后果、评估风险、进行长期规划。世界模型把静态感知推进到动态预测，因此和具身智能、自动驾驶、智能体研究关系密切。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">条件四</span>
+                    <h3>单纯扩大语言模型可能不够</h3>
+                    <p>业界开始意识到，只扩大语言模型可能无法解决所有智能问题。语言模型在物理直觉、因果理解、长期规划、行动反馈和现实环境闭环交互方面仍可能不足。世界模型不是替代语言模型，而是补上语言模型较难直接覆盖的环境预测和行动规划能力。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">大模型强底座</span>
+                    <span class="flow-arrow">+</span>
+                    <span class="flow-step">多模态数据</span>
+                    <span class="flow-arrow">+</span>
+                    <span class="flow-step">视频生成进展</span>
+                    <span class="flow-arrow">+</span>
+                    <span class="flow-step">具身智能需求</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">世界模型爆火</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: 争议 -->
+        <div class="section" id="s8">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#9878;&#65039;</div>
+                <h2>八、争议：AGI 的必经之路？</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">支持者观点</span>
+                    <h3>世界模型可能是更强智能的核心条件</h3>
+                    <p>人类智能离不开内部模拟。人会预测行动后果，会在脑中比较未来方案，也会根据预测修正行动。AI 不能只停留在"会回答"或"会生成"，还要理解环境、预测变化、在现实中行动——世界模型正好指向这个缺口。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">谨慎观点</span>
+                    <h3>当前世界模型未必真的理解世界</h3>
+                    <p>当前很多所谓世界模型，可能只是更强的生成模型、预测模型或表征学习系统。它们看起来能模拟环境，但未必真正掌握因果结构、物理规律和可迁移的动态机制。<strong>画面生成得像，不等于理解得深。</strong></p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">务实判断</span>
+                    <h3>即使不谈 AGI，也有工程意义</h3>
+                    <p>即使暂时不讨论 AGI，世界模型也可以帮助机器人减少真实试错、帮助自动驾驶预测风险、提升游戏智能体规划能力、降低工业控制训练成本、让多模态智能体更好理解环境变化。</p>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-title">还需要结合的能力</div>
+                    <p>世界模型解决的是内部模拟和环境预测问题，但完整智能还需要目标设定、长期记忆、规划、行动执行、反馈学习、安全约束、价值判断等能力协同。世界模型不是"已经解决 AGI"，而是更强智能的重要拼图。</p>
+                </div>
+
+                <div class="quiz" data-answer="2">
+                    <h4>知识检查 3：对于世界模型与 AGI 的关系，文章持什么态度？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">世界模型已经解决了 AGI 问题</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">世界模型与 AGI 无关，只是工程工具</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">世界模型是更强智能的重要拼图，但需要与其他能力结合才能形成完整智能</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">只有世界模型才能通向 AGI，其他路线都不可行</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9: 结语 -->
+        <div class="section" id="s9">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128161;</div>
+                <h2>九、结语：连接大模型与现实行动</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心结论</span>
+                    <h3>世界模型触及当前 AI 的关键瓶颈</h3>
+                    <p>当前 AI 已经很强的地方：生成文本、生成图像、识别对象、总结知识、回答问题。进入真实行动场景还需要的能力：理解环境怎样变化、预测动作后果、在行动前模拟未来、根据模拟进行规划、把经验迁移到新场景。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">最终定位</span>
+                    <h3>三重连接</h3>
+                    <p>世界模型连接<strong>大模型与现实行动</strong>，连接<strong>生成能力与规划能力</strong>，也连接<strong>认知科学中的"内部模型"思想与现代 AI 工程</strong>。它不是万能答案，但解释了为什么"理解世界如何变化"会成为下一阶段 AI 研究的重要问题。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">大语言模型</span>
+                    <span class="flow-arrow">&harr;</span>
+                    <span class="flow-step">世界模型</span>
+                    <span class="flow-arrow">&harr;</span>
+                    <span class="flow-step">现实行动</span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">一句话概括</div>
+                    <p>世界模型想解决的，是让 AI 不只会根据过去数据回答眼前问题，而是能在内部模拟未来、评估行动后果，并把这种模拟用于规划和决策。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section" id="summary">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127891;</div>
+                <h2>学习总结</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="emoji">&#129504;</div>
+                        <h4>内部模拟</h4>
+                        <p>AI 在内部维护一个关于世界的模型，用来预演可能发生的变化</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#127919;</div>
+                        <h4>行动后果</h4>
+                        <p>重点学习动作会怎样改变环境，而不只是识别当前画面或生成逼真内容</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128260;</div>
+                        <h4>可迁移规律</h4>
+                        <p>目标不是背训练数据，而是学到能迁移到新场景的动态结构</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128279;</div>
+                        <h4>三重连接</h4>
+                        <p>连接大模型与行动、生成与规划、认知科学与AI工程</p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">三个关键词</h3>
+                <div class="concept-card">
+                    <span class="label core">主线</span>
+                    <h3>读完要带走的主线</h3>
+                    <p>大语言模型把"语言智能"推到很高位置后，下一步问题自然变成"AI 如何理解并作用于现实世界"。世界模型正是围绕这个问题展开：它试图把感知、预测、规划和行动连接起来。</p>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">学完自检</h3>
+                <ul class="checklist">
+                    <li onclick="this.classList.toggle('checked')">理解世界模型的核心定义：外部环境动态规律的内部表征</li>
+                    <li onclick="this.classList.toggle('checked')">能区分世界模型与 LLM、视频生成模型的差异</li>
+                    <li onclick="this.classList.toggle('checked')">掌握世界模型的三层能力：记住状态、预测变化、模拟未来</li>
+                    <li onclick="this.classList.toggle('checked')">理解世界模型的三大价值：样本效率、规划能力、泛化能力</li>
+                    <li onclick="this.classList.toggle('checked')">了解从 Dyna 到 Dreamer 再到 MuZero 的技术演进脉络</li>
+                    <li onclick="this.classList.toggle('checked')">认识五条代表性技术路线及其各自优势与局限</li>
+                    <li onclick="this.classList.toggle('checked')">理解 2024-2025 年世界模型再次爆火的四个条件</li>
+                    <li onclick="this.classList.toggle('checked')">能辩证看待世界模型与 AGI 的关系</li>
+                    <li onclick="this.classList.toggle('checked')">理解世界模型作为"连接大模型与现实行动"的桥梁定位</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>来源：<a href="https://mp.weixin.qq.com/s/oPyYUf7bu5D1zUIOwKHKUw" target="_blank">Datawhale / 大数据文摘</a> | 原作者：Luna | 发布于 2026-06-03</p>
+        <p style="margin-top: 4px;">本文为教学用途的交互式阅读版本 | 生成于 2026-06-06</p>
+    </footer>
+
+    <script>
+        // Toggle TOC
+        function toggleTOC() {
+            document.getElementById('tocSidebar').classList.toggle('open');
+        }
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('tocSidebar');
+            const toggle = document.querySelector('.toc-toggle');
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Toggle Section
+        function toggleSection(header) {
+            header.closest('.section').classList.toggle('collapsed');
+        }
+
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+
+        // Quiz
+        function checkQuiz(option, correct) {
+            const quiz = option.closest('.quiz');
+            const feedback = quiz.querySelector('.quiz-feedback');
+            const options = quiz.querySelectorAll('.quiz-option');
+
+            // Reset
+            options.forEach(o => { o.classList.remove('correct', 'wrong'); });
+            feedback.classList.remove('show', 'correct-fb', 'wrong-fb');
+
+            if (correct) {
+                option.classList.add('correct');
+                feedback.textContent = '正确！';
+                feedback.classList.add('show', 'correct-fb');
+            } else {
+                option.classList.add('wrong');
+                // Show correct answer
+                options.forEach((o, i) => {
+                    if (quiz.dataset.answer == i) o.classList.add('correct');
+                });
+                feedback.textContent = '再想想，正确答案已标出。';
+                feedback.classList.add('show', 'wrong-fb');
+            }
+        }
+
+        // TOC active state
+        const sections = document.querySelectorAll('.section[id]');
+        const tocLinks = document.querySelectorAll('.toc-sidebar a');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+        sections.forEach(s => observer.observe(s));
+    </script>
+</body>
+</html>

@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中金2026下半年展望：港股，热闹是他们的？</title>
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --text-secondary: #636e72;
+            --accent: #0984e3;
+            --accent-light: #e8f4fd;
+            --danger: #d63031;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --border: #dfe6e9;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1a2e;
+                --card-bg: #16213e;
+                --text: #eee;
+                --text-secondary: #a0a0b0;
+                --accent: #74b9ff;
+                --accent-light: #1e3a5f;
+                --border: #2d3a5e;
+                --shadow: 0 2px 12px rgba(0,0,0,0.3);
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed; top: 0; left: 0;
+            height: 3px; background: linear-gradient(90deg, var(--accent), #a29bfe);
+            z-index: 1000; transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* TOC Sidebar */
+        .toc-sidebar {
+            position: fixed; left: 0; top: 0;
+            width: 280px; height: 100vh;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+        .toc-sidebar.open { transform: translateX(0); }
+        .toc-sidebar h3 { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .toc-sidebar a {
+            display: block; padding: 8px 12px;
+            color: var(--text-secondary); text-decoration: none;
+            border-radius: 6px; font-size: 14px;
+            transition: all 0.2s; margin-bottom: 2px;
+        }
+        .toc-sidebar a:hover, .toc-sidebar a.active {
+            background: var(--accent-light); color: var(--accent);
+        }
+        .toc-toggle {
+            position: fixed; left: 16px; top: 16px;
+            width: 44px; height: 44px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer; z-index: 101;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; box-shadow: var(--shadow);
+        }
+
+        /* Hero */
+        .hero {
+            max-width: 800px; margin: 0 auto;
+            padding: 80px 24px 40px;
+            text-align: center;
+        }
+        .hero .meta {
+            display: flex; gap: 16px; justify-content: center;
+            flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .hero .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 13px; background: var(--accent-light); color: var(--accent);
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 700; line-height: 1.3;
+            margin-bottom: 16px;
+        }
+        .hero .desc {
+            color: var(--text-secondary); font-size: 15px;
+            max-width: 600px; margin: 0 auto;
+        }
+
+        /* Main Content */
+        .content {
+            max-width: 800px; margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 0; cursor: pointer;
+            user-select: none;
+        }
+        .section-header .icon {
+            width: 40px; height: 40px;
+            background: var(--accent-light);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .section-header h2 {
+            font-size: 20px; font-weight: 600;
+        }
+        .section-header .chevron {
+            margin-left: auto; transition: transform 0.3s;
+            color: var(--text-secondary);
+        }
+        .section.collapsed .section-body { display: none; }
+        .section.collapsed .chevron { transform: rotate(-90deg); }
+        .section-body {
+            padding: 0 0 16px 52px;
+        }
+
+        /* Concept Card */
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        .concept-card .label {
+            display: inline-block;
+            padding: 2px 10px; border-radius: 4px;
+            font-size: 12px; font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .concept-card .label.core { background: #dfe6e9; color: #2d3436; }
+        .concept-card .label.key { background: #ffeaa7; color: #6c5ce7; }
+        .concept-card .label.risk { background: #fab1a0; color: #d63031; }
+        .concept-card .label.logic { background: #81ecec; color: #00b894; }
+        @media (prefers-color-scheme: dark) {
+            .concept-card .label.core { background: #3d4f6f; color: #b8c5d6; }
+            .concept-card .label.key { background: #5a4a20; color: #fdcb6e; }
+            .concept-card .label.risk { background: #5a2020; color: #fab1a0; }
+            .concept-card .label.logic { background: #1a4a4a; color: #81ecec; }
+        }
+        .concept-card h3 { font-size: 16px; margin-bottom: 8px; }
+        .concept-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+
+        /* Callout */
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 16px 0;
+        }
+        .callout.warning { border-left-color: var(--warning); background: #ffeaa733; }
+        .callout.danger { border-left-color: var(--danger); background: #fab1a033; }
+        .callout .callout-title { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap; justify-content: center;
+            padding: 20px; background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 16px 0;
+        }
+        .flow-step {
+            padding: 8px 16px; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            background: var(--accent-light); color: var(--accent);
+        }
+        .flow-arrow { font-size: 18px; color: var(--text-secondary); }
+
+        /* Quiz */
+        .quiz {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px; margin: 16px 0;
+        }
+        .quiz h4 { font-size: 15px; margin-bottom: 12px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-option {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; font-size: 14px;
+        }
+        .quiz-option:hover { border-color: var(--accent); }
+        .quiz-option.correct {
+            border-color: var(--success); background: #00b89422;
+        }
+        .quiz-option.wrong {
+            border-color: var(--danger); background: #d6303122;
+        }
+        .quiz-feedback {
+            margin-top: 12px; padding: 12px;
+            border-radius: 8px; font-size: 14px;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct-fb { background: #00b89422; color: var(--success); }
+        .quiz-feedback.wrong-fb { background: #d6303122; color: var(--danger); }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin: 16px 0;
+        }
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .summary-card .emoji { font-size: 32px; margin-bottom: 8px; }
+        .summary-card h4 { font-size: 15px; margin-bottom: 4px; }
+        .summary-card p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Checklist */
+        .checklist { list-style: none; }
+        .checklist li {
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; cursor: pointer;
+        }
+        .checklist li::before {
+            content: ""; width: 20px; height: 20px;
+            border: 2px solid var(--border); border-radius: 4px;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .checklist li.checked::before {
+            background: var(--accent); border-color: var(--accent);
+            content: "\2713"; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Scenario Table */
+        .scenario-table {
+            width: 100%; border-collapse: collapse;
+            margin: 16px 0; font-size: 14px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .scenario-table th, .scenario-table td {
+            padding: 12px 16px; text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .scenario-table th {
+            background: var(--accent-light);
+            font-weight: 600; font-size: 13px;
+            color: var(--accent);
+        }
+        .scenario-table tr:last-child td { border-bottom: none; }
+        .scenario-table tr:hover td { background: var(--accent-light); }
+
+        /* Footer */
+        .footer {
+            max-width: 800px; margin: 0 auto;
+            padding: 40px 24px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toc-sidebar { width: 100%; }
+            .section-body { padding-left: 0; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section { animation: fadeIn 0.4s ease-out; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <button class="toc-toggle" onclick="toggleTOC()" aria-label="Toggle TOC">
+        <span id="tocIcon">&#9776;</span>
+    </button>
+
+    <nav class="toc-sidebar" id="tocSidebar">
+        <h3>目录导航</h3>
+        <a href="#hero">文章概览</a>
+        <a href="#s1">一、开篇与核心问题</a>
+        <a href="#s2">二、港股落寞的背后</a>
+        <a href="#s3">三、外需与实际利率</a>
+        <a href="#s4">四、流动性堵点：油价与中期选举</a>
+        <a href="#s5">五、K型分化的宏观环境</a>
+        <a href="#s6">六、信用周期走向判断</a>
+        <a href="#s7">七、结构市的历史特征</a>
+        <a href="#s8">八、AI产业趋势走到哪了</a>
+        <a href="#s9">九、市场趋势与指数空间</a>
+        <a href="#s10">十、资金面：延续紧平衡</a>
+        <a href="#s11">十一、配置建议</a>
+        <a href="#summary">学习总结</a>
+    </nav>
+
+    <header class="hero" id="hero">
+        <div class="meta">
+            <span class="badge">中金点睛</span>
+            <span class="badge">2026-06-01</span>
+            <span class="badge">约 20 分钟阅读</span>
+        </div>
+        <h1>中金2026下半年展望：港股，热闹是他们的？</h1>
+        <p class="desc">2026上半年市场核心主线只有一个——有AI和没有AI。港股显得"落寞"，核心矛盾是中国信用周期的K型分化。配置要紧跟信用扩张方向：科技 > 周期 > 外需 > 消费。</p>
+    </header>
+
+    <main class="content">
+
+        <!-- Section 1: 开篇与核心问题 -->
+        <div class="section" id="s1">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128200;</div>
+                <h2>一、开篇与核心问题</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心背景</span>
+                    <h3>有AI和没有AI——2026上半年的唯一主线</h3>
+                    <p>2026上半年市场的核心主线只有一个——有AI和没有AI。前者如A股创业板和韩国，后者如港股恒科。港股显得"落寞"，内有A股创业板对比，外有韩国美股衬托，资金与关注度大不如前。中金去年底的多项判断（整体指数空间有限、年初亢奋时提示风险、不建议用人民币升值与港股表现划等号、不建议因没涨就切换到消费）多数得到验证。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">核心问题</span>
+                    <h3>K型的经济与K型的市场能否收敛？</h3>
+                    <p>作者要回答三个关键问题：当前K型的经济与K型的市场能否收敛、谁向谁收敛？港股还能否迎来机会，机会来自哪个方向？不同板块的赔率和胜率如何？</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">中国信用周期K型分化</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">港股权重股暴露于消费内需</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">缺少AI硬件与外需</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">港股前景取决于信用周期收敛</span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">核心逻辑线</div>
+                    <p>港股落寞的本质不是港股本身的问题，而是港股"更直接"地反映了中国基本面强者更强、弱者更弱的K型分化。港股指数权重股与消费大盘紧密联系，缺少AI硬件与外需。港股的前景取决于信用周期能否收敛以及流动性堵点（油价/中期选举）能否缓解。</p>
+                </div>
+
+                <div class="quiz" data-answer="2">
+                    <h4>知识检查：港股2026上半年表现落寞的本质原因是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">港股上市公司质量下降</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">外资大规模撤离港股</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">港股更直接地反映了中国信用周期K型分化——科技外需强、消费内需弱，而港股权重股集中在消费内需侧</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">美联储加息导致港股承压</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: 港股落寞的背后 -->
+        <div class="section" id="s2">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128202;</div>
+                <h2>二、港股落寞的背后：K型分化</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">基本面分化</span>
+                    <h3>看似强劲的一季度增长掩盖了内部分化</h3>
+                    <p>科技和外需强，消费和内需弱。港股恰有大批与消费内需大盘相关的权重股（互联网、电商、电动车、新消费），但指数中缺少AI硬件与外需标的。这种结构使得港股在"有AI vs 没AI"的主线中天然处于劣势。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">流动性收紧</span>
+                    <h3>去年底的广泛共识多数落空</h3>
+                    <p>去年底市场对2026年的几大共识——美元走弱、海外央行持续宽松、人民币升值吸引外资、南向资金延续——多数落空。港股反而成了内外部流动性收紧"最受伤"的交汇点：美元没有如期走弱，四大央行有两个将走向紧缩，南向与海外资金都明显缩水。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">科技+外需强</span>
+                    <span class="flow-arrow">vs</span>
+                    <span class="flow-step">消费+内需弱</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">港股权重股偏消费内需</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">港股"更直接"暴露K型分化</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: 外需与实际利率 -->
+        <div class="section" id="s3">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128269;</div>
+                <h2>三、中国周期走向的抓手：外需与实际利率</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label key">关键数据</span>
+                    <h3>两个"转折点"数据诠释K型分化</h3>
+                    <p>两个数据揭示了K型分化的本质：(1) 居民信贷增速首次转负（2017年地产见顶后下行已延续10年）；(2) Wind全A和创业板指均创历史新高。两者共同诠释了中国信用周期的分化——居民信用收缩与科技企业信用扩张并行。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">外需窗口</span>
+                    <h3>2021年后的外需"宝贵"窗口</h3>
+                    <p>2021年后大量信贷资金流向制造业，全球环境三个重要变化提供了外需窗口：两次地缘冲突造成的能源转型需求；两次贸易摩擦带来的新兴市场供应链重构对中间品需求；AI崛起拉动的新增投资。加上成本优势，出口和顺差不断扩大，支撑增长企稳。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">出口强劲</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">政策有腾挪空间</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">发展科技与产业升级</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">除非外需失控，否则不急于加码内需</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label core">实际利率洞察</span>
+                    <h3>整体通胀下行掩盖下的流动性过剩和局部通胀上行</h3>
+                    <p>名义利率走低（10年国债1.7%）、PPI中生产资料走高、CPI中猪价不断下行，构成"有意思"的组合——外需与科技通胀上行、内需尤其是消费修复偏慢。前者面临更高回报（5.4%）和较低实际利率（3.7%），后者面临低迷回报（消费3%、购房-3%）和更高实际利率（消费2.6%、购房2.1%）。</p>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">核心结论</div>
+                    <p>不能只用通胀下行来概括中国经济，更恰当的总结是整体通胀下行掩盖下的流动性过剩和局部通胀上行，与市场结构性分化一致。内外需与科技的分化或仍将延续，整体信用周期震荡和结构分化不仅未收敛，反而可能进一步加大。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: 流动性堵点 -->
+        <div class="section" id="s4">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128161;</div>
+                <h2>四、流动性变化的堵点：油价与中期选举</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心特征</span>
+                    <h3>港股对流动性更敏感</h3>
+                    <p>流动性强时（2025年南向大举流入1.4万亿港元、海外资金一度超配、美联储降息）港股表现领先；流动性弱时（今年南向资金流入不到3000亿港元、海外资金配置下降、美联储紧缩预期升温）港股明显落后。港股是流动性敏感型市场。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">关键门槛</span>
+                    <h3>美联储加息门槛很高</h3>
+                    <p>油价需要冲击150美元并维持在120美元以上直至年底，才可能触发美联储加息。这对选情已较紧张的特朗普（整体支持率降至39.8%，通胀议题低至28%）可能是难以承受的，且越临近年底风险越大。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">伊朗局势缓和</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">油价回落</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">美债利率下行</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">缓解港股分母端压力</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">资金配置正循环</span>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-title">流动性堵点的因果链</div>
+                    <p>流动性堵点来自油价，背后是中期选举的压力。油价回落是港股分母端压力缓解的关键变量。</p>
+                </div>
+
+                <div class="quiz" data-answer="1">
+                    <h4>知识检查：港股流动性堵点的核心变量是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">美联储加息预期</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">油价走势——背后是伊朗局势与中期选举的压力传导</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">南向资金流入规模</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">人民币汇率波动</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: K型分化宏观环境 -->
+        <div class="section" id="s5">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128202;</div>
+                <h2>五、宏观环境：强者更强、弱者更弱</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">生产 vs 需求</span>
+                    <h3>生产强于需求</h3>
+                    <p>1-4月规上工业增加值同比增长5.6%，高技术制造业1-4月同比增长12.6%。投资端分化明显，高技术产业投资增长6.1%，计算机及办公设备制造业、信息服务业投资分别增长13.9%和18.1%。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">外需 vs 内需</span>
+                    <h3>外需强于内需</h3>
+                    <p>前4个月出口累计同比增长11.3%，机电产品出口同比增长17.6%。电动汽车、锂电池、风力发电机组等绿色低碳产品出口分别增长68.1%、43.2%和40.7%。外需成为增长的核心支撑。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">消费和地产</span>
+                    <h3>消费和地产依然偏弱</h3>
+                    <p>1-4月社零同比增长1.9%（低于去年同期4.7%），4月单月仅增0.2%。居民人均可支配收入名义增长4.9%但消费支出仅增3.6%，预防性储蓄仍强。地产1-4月开发投资同比下降13.7%，个人按揭贷款下降31.7%。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">价格结构</span>
+                    <h3>价格回升偏成本型</h3>
+                    <p>PPI中生产资料价格上涨3.8%，生活资料价格下降1.0%。价格上行主要来自上游能源和原材料成本，向中下游和终端消费传导仍不顺畅。</p>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">上半年两大特征</div>
+                    <p>"K型分化"（AI产业链在外需拉动和国内资本开支驱动下发展，传统内需侧居民信贷脉冲走弱）+ "政策前置发力"（一季度超前发力助推开门红，二季度力度自然退坡叠加外部扰动）。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: 信用周期走向判断 -->
+        <div class="section" id="s6">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128260;</div>
+                <h2>六、信用周期走向判断：K型分化继续</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心框架</span>
+                    <h3>信用扩张的原动力来自相对回报</h3>
+                    <p>预期回报要高于成本，流动性充裕、储蓄较高和利率下行并不必然带来居民消费和地产销售的大幅提振。中国实际利率0.55%与自然利率0.34%之差为0.21ppt（已大幅收缩2.3ppt但仍高于美国的-0.09ppt）。要让信用周期全面扩张，需要新增6万亿元以上赤字，但现实中很难达到。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">关键门槛</span>
+                    <h3>什么会迫使政策偏离战略目标？</h3>
+                    <p>增长明显走弱（类似924之前），在当前主要是外需出问题。否则外需继续强劲+内需企稳就可构成相对温和增速，政策重心依然放在产业与科技上。短期增长并不差也不急于新增刺激。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">居民信用</span>
+                    <h3>居民信贷脉冲回到924之前</h3>
+                    <p>消费实际回报（收入实际同比）从5.0%下滑至3.2%，与实际成本差值从1.15ppt收敛至0.56ppt。购房实际回报从-0.57%下滑至-3.03%，与购房成本差值从-3.93ppt进一步下行至-4.78ppt。房价预期企稳大概率是渐进、分层、由核心城市向外扩散的过程。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">企业信用</span>
+                    <h3>企业扩张集中在有回报的方向</h3>
+                    <p>企业信用整体好于居民，但扩张集中在经营回报能覆盖实际融资成本的方向（外需和科技）。企业实际融资成本从6%高位回落至3.7%，经营回报从5.1%改善至5.4%，回报-成本差值从-0.9%上行至1.5%，对应企业信贷脉冲由负转正。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">政策取向</span>
+                    <h3>财政更可能是"托底型"和"结构型"</h3>
+                    <p>赤字率约4%，力度与2025年基本持平，资金投向重心在新质生产力和产业升级。政府杠杆率（含中央、地方、LGFV）已达113%，土地出让收入跌幅持续扩大（-16%左右），财政发力受限。关键看两道门槛：就业和外需。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">伊朗局势特殊性</span>
+                    <h3>对中国并非单向负面</h3>
+                    <p>中国具有"份额优势"——出口价格下降、能源结构以煤炭61%为主可维持更长时间正常生产。能源冲击可能催生"新三样"增量需求（3月出口同比增速71.8%，占比升至6.7%历史高点）。</p>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">下半年宏观核心判断</div>
+                    <p>总量有一定韧性，但信用难以全面扩张，私人部门修复仍不均衡，流动性也只愿流向少数有回报的资产。三季度是观察信用周期边际变化的重要窗口（7月政治局会议前后政策稳增长诉求可能边际增强）。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">回报 &gt; 成本</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">信用扩张</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">仅限科技+外需</span>
+                </div>
+                <div class="flow-diagram">
+                    <span class="flow-step">回报 &lt; 成本</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">信用收缩</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">消费+地产+居民端</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: 结构市的历史特征 -->
+        <div class="section" id="s7">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128209;</div>
+                <h2>七、中观视角：结构市的历史特征与拐点</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">历史可比阶段</span>
+                    <h3>两段高度相似的分化格局</h3>
+                    <p>2014年7月至2015年1月、2022年4月至2022年12月曾出现与当前高度相似的分化格局：居民脉冲从高位持续走低、企业脉冲仍在扩张趋势、新兴产业业绩增速高于传统部门。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">历史特征</span>
+                    <h3>结构市的三个规律</h3>
+                    <p>债市难持续走熊但波动率上行；权益呈现明显结构市；股债相关性较低，"股债跷跷板"效应不显著。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">本轮差异</span>
+                    <h3>本轮与历史的关键不同</h3>
+                    <p>外需韧性有效支撑了周期与制造板块（历史两轮外需都偏弱，当前外需仍有支撑）。AI产业趋势使电子与通信板块景气更强（2014年移动互联网已进入中后期，2022年新能源处于景气顶部，当前AI仍处于上行期）。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: AI产业趋势 -->
+        <div class="section" id="s8">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#129302;</div>
+                <h2>八、AI产业趋势走到哪了</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">历史规律</span>
+                    <h3>四轮新兴科技制造业复盘结论</h3>
+                    <p>超额收益集中在渗透率10-25%区间，"主升浪"通常在渗透率20%前后接近见顶。权益行情顶的出现大多领先于业绩增速顶（预期驱动，资金提前兑现增长）。自由现金流恶化是超额收益终结的关键信号，自由现金流vs.营收比值约-10%左右是重要阈值。行情见顶后伴随有息负债率的明显提升。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">当前位置</span>
+                    <h3>当前AI产业趋势位置</h3>
+                    <p>2026年一季度全球AI渗透率17.8%，中国16.4%。按增速线性外推，2026年中国AI渗透率约16-19%，距离超额收益"见顶"的20-25%阈值仍有一定距离。美股五大云厂商资本开支与经营性现金流比例已升至94%接近需外部融资临界点（亚马逊自由现金流转负、甲骨文面临较大偿债压力），国内三大头部云厂商自由现金流仍相对健康。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">判断结论</span>
+                    <h3>短期与长远判断</h3>
+                    <p>AI产业趋势仍将持续成为市场投资主线（渗透率未达阈值+年内现金流较难恶化至不可维系水平）。长远关键：全球AI需求能否持续超预期涌现新应用场景；科技龙头业绩是否继续超预期、经营性现金流能否覆盖高增资本开支。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">渗透率 16-19%</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">距20-25%阈值有距离</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">AI主线仍将持续</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">但需以业绩期为检验点</span>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-title">关键信号</div>
+                    <p>自由现金流恶化是超额收益终结的关键信号。美股云厂商资本开支/经营性现金流比例已升至94%，接近需外部融资临界点。需密切关注每个业绩期的现金流表现。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9: 市场趋势与指数空间 -->
+        <div class="section" id="s9">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128200;</div>
+                <h2>九、市场趋势与指数空间</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <table class="scenario-table">
+                    <thead>
+                        <tr>
+                            <th>情形</th>
+                            <th>恒指目标</th>
+                            <th>关键假设</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>基准情形</strong></td>
+                            <td>27,000-28,000</td>
+                            <td>盈利增长3-4%，伊朗局势Q2缓和+美联储年内降息1次推动10年美债小幅下行至4.1%，中债降至1.6%，南向交易占比30%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>乐观情形</strong></td>
+                            <td>突破30,000</td>
+                            <td>财政发力超预期，盈利增速提升至6-7%，风格切换至高权重互联网乃至泛消费板块，美债回到3.9%，外资加快流入</td>
+                        </tr>
+                        <tr>
+                            <td><strong>悲观情形</strong></td>
+                            <td>下探21,500</td>
+                            <td>伊朗局势持续紧张导致油价高企加息预期升温，中美贸易摩擦反复，盈利零增长，美债重返4.5%+，风险溢价抬升至7.5%</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="concept-card">
+                    <span class="label core">盈利预测</span>
+                    <h3>预计2026年港股盈利增长3-4%</h3>
+                    <p>非金融6-7%，金融1-2%，低于市场一致预期5-6%。收入端出口高增但难充分对冲内需拖累，利润率端CPI-PPI差值扩大是压制因素。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">估值判断</span>
+                    <h3>风险溢价进一步修复空间有限</h3>
+                    <p>风险溢价整体并不高（当前ERP 5.7%处于历史低位），进一步修复空间有限。短期估值修复主要依靠美债利率回落（2-3%空间），乐观情形需风格切换推动互联网与泛消费板块情绪修复。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">内部新老分化</span>
+                    <h3>港股三大板块的估值特征</h3>
+                    <p>"老经济"高分红标的可参考AH溢价，未来更多公司H会比A更贵。"老科技"估值与风险溢价已在历史低位具备安全边际。"新科技"大模型公司短期涨幅显著存在一定透支。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 10: 资金面 -->
+        <div class="section" id="s10">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128176;</div>
+                <h2>十、资金面：延续紧平衡</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label risk">南向资金</span>
+                    <h3>南向资金大幅缩水</h3>
+                    <p>2025年创纪录流入1.4万亿港元，今年年初至今仅流入2740亿港元（不足去年同期一半）。原因：港股赚钱效应走弱、机构持续减配（公募港股超配比例从15%回落至5-7%）、人民币走强加剧跨市场跷跷板。基准预计全年南向累计流入5500-6500亿港元。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">海外资金</span>
+                    <h3>外资配置中国意愿仍较弱</h3>
+                    <p>韩国、中国台湾依托半导体算力硬件在MSCI新兴市场权重持续抬升（分别约19%、25%），已超越中国大陆占比（19%）。外资低配空间已有限，若趋势反转可能被动回补标配。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">IPO与解禁</span>
+                    <h3>港股IPO打新热潮与解禁压力</h3>
+                    <p>年初至今主板IPO首发募资达1654亿港元（超2025年全年一半以上）。二级市场缺乏赚钱效应倒逼存量资金转向一级打新。下半年将迎解禁高峰（7月与9月解禁规模位居历史前两位），解禁前1个月区间内跌幅最大（平均3.4%）。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 11: 配置建议 -->
+        <div class="section" id="s11">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127919;</div>
+                <h2>十一、配置建议：被迫的抱团</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">配置逻辑</span>
+                    <h3>紧跟信用结构性扩张方向</h3>
+                    <p>市场极致分化是信用周期分化的直接映射。科技一枝独秀则内需疲弱，资金难以轮动。配置要紧跟信用结构性扩张方向。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">科技成长</span>
+                    <h3>基准核心主线</h3>
+                    <p>AI产业未到普遍泡沫程度（渗透率16-19%距20-25%阈值有距离），需以每一个业绩期作为关键检验点。半导体胜率较高，拥挤带来的回撤反而可能是加仓窗口。互联网与创新药赔率相对更好（估值处较低水位，对美债利率敏感）。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">周期板块</span>
+                    <h3>偏左侧布局</h3>
+                    <p>AI投资深化+美债利率回落+海外财政增量是未来信用扩张潜在催化。若信号逐步兑现，周期有望承接从科技外溢的配置资金。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">泛外需板块</span>
+                    <h3>需要更多全球基本面修复拉动</h3>
+                    <p>能源转型"新三样"确定性更高，成本优势类传统外需更多是阶段性交易机会。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">内需消费板块</span>
+                    <h3>缺乏基本面支撑</h3>
+                    <p>估值预期虽处历史低位但难以形成持续共识。超预期政策刺激下或有短暂交易性机会，需警惕"静态估值陷阱"。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">红利资产</span>
+                    <h3>阶段性对冲工具</h3>
+                    <p>在AI板块拥挤度抬升、地缘局势反复或风险偏好回落时有效规避尾部风险。</p>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">胜率 vs 赔率矩阵</div>
+                    <p>互联网、医疗设备、汽车与零部件赔率与胜率都相对较好。半导体、周期品、创新药、机械、电气设备胜率较好但赔率不高。消费板块整体赔率靠前。科技硬件、公用事业、贸易公司胜率与赔率均不占优。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">科技看海外</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">外需看油价</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">内需看政策</span>
+                </div>
+
+                <div class="quiz" data-answer="0">
+                    <h4>知识检查：中金对港股配置的核心主线是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">科技成长 > 周期 > 泛外需 > 内需消费，紧跟信用结构性扩张方向</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">重仓内需消费板块，等待政策刺激</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">均衡配置，分散风险</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">全部配置红利资产，防御为主</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section" id="summary">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127891;</div>
+                <h2>学习总结</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="emoji">&#128200;</div>
+                        <h4>K型信用分化</h4>
+                        <p>居民信贷增速首次转负与创业板创历史新高的并存，整体通胀下行掩盖下的流动性过剩和局部通胀上行</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128161;</div>
+                        <h4>流动性堵点</h4>
+                        <p>油价/中期选举是分母端核心变量，油价回落 -> 美债利率下行 -> 港股估值修复是关键传导链</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#129302;</div>
+                        <h4>AI渗透率窗口期</h4>
+                        <p>中国AI渗透率16-19%距20-25%阈值仍有距离，自由现金流恶化是终结信号</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#127919;</div>
+                        <h4>配置主线</h4>
+                        <p>科技看海外、外需看油价、内需看政策。三季度是关键观察窗口</p>
+                    </div>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">一句话概括</div>
+                    <p>2026下半年港股维持中性震荡（基准恒指27,000-28,000），核心矛盾是中国信用周期的K型分化——科技外需强、消费内需弱，港股因指数权重结构"更直接"地暴露了这一分化，配置要紧跟信用扩张方向（科技>周期>外需>消费）。</p>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">核心框架</h3>
+                <div class="concept-card">
+                    <span class="label core">底层逻辑</span>
+                    <h3>信用周期决定配置方向，流动性决定估值弹性</h3>
+                    <p>当前的极致分化（有AI vs 没AI）不是市场情绪问题，而是中国信用周期K型分化的直接映射。只要外需不出大问题，政策重心仍在科技产业，消费内需难以接棒。对港股而言，指数层面难有系统性行情，但科技（特别是半导体）、互联网（赔率好）、周期（左侧布局）在不同情景下各有配置价值。</p>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">学完自检</h3>
+                <ul class="checklist">
+                    <li onclick="this.classList.toggle('checked')">理解K型信用分化的基本框架（科技外需强 vs 消费内需弱）</li>
+                    <li onclick="this.classList.toggle('checked')">能解释港股落寞的本质原因（权重股结构暴露K型分化）</li>
+                    <li onclick="this.classList.toggle('checked')">理解实际利率洞察（整体通胀下行掩盖局部通胀上行）</li>
+                    <li onclick="this.classList.toggle('checked')">掌握流动性堵点的因果链（油价 -> 美债 -> 港股估值）</li>
+                    <li onclick="this.classList.toggle('checked')">了解信用扩张的核心框架（回报 > 成本才有扩张动力）</li>
+                    <li onclick="this.classList.toggle('checked')">认识AI产业趋势的位置（渗透率16-19%，距阈值有距离）</li>
+                    <li onclick="this.classList.toggle('checked')">掌握恒指三种情形的假设条件与目标位</li>
+                    <li onclick="this.classList.toggle('checked')">理解配置优先级（科技 > 周期 > 外需 > 消费）</li>
+                    <li onclick="this.classList.toggle('checked')">记住核心判断：科技看海外、外需看油价、内需看政策</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>来源：<a href="https://mp.weixin.qq.com/s/T_JVcUbySL5lIbHZXz7AeA" target="_blank">中金点睛</a> | 发布于 2026-06-01</p>
+        <p style="margin-top: 4px;">本文为教学用途的交互式阅读版本 | 生成于 2026-06-06</p>
+    </footer>
+
+    <script>
+        // Toggle TOC
+        function toggleTOC() {
+            document.getElementById('tocSidebar').classList.toggle('open');
+        }
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('tocSidebar');
+            const toggle = document.querySelector('.toc-toggle');
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Toggle Section
+        function toggleSection(header) {
+            header.closest('.section').classList.toggle('collapsed');
+        }
+
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+
+        // Quiz
+        function checkQuiz(option, correct) {
+            const quiz = option.closest('.quiz');
+            const feedback = quiz.querySelector('.quiz-feedback');
+            const options = quiz.querySelectorAll('.quiz-option');
+
+            // Reset
+            options.forEach(o => { o.classList.remove('correct', 'wrong'); });
+            feedback.classList.remove('show', 'correct-fb', 'wrong-fb');
+
+            if (correct) {
+                option.classList.add('correct');
+                feedback.textContent = '正确！分析到位，你已经掌握了这个核心概念。';
+                feedback.classList.add('show', 'correct-fb');
+            } else {
+                option.classList.add('wrong');
+                // Show correct answer
+                options.forEach((o, i) => {
+                    if (quiz.dataset.answer == i) o.classList.add('correct');
+                });
+                feedback.textContent = '再想想，正确答案已标出。注意回到对应章节复习核心逻辑。';
+                feedback.classList.add('show', 'wrong-fb');
+            }
+        }
+
+        // TOC active state
+        const sections = document.querySelectorAll('.section[id]');
+        const tocLinks = document.querySelectorAll('.toc-sidebar a');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+        sections.forEach(s => observer.observe(s));
+    </script>
+</body>
+</html>
