@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你不知道的 Agent：原理、架构与工程实践</title>
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --text-secondary: #636e72;
+            --accent: #6c5ce7;
+            --accent-light: #f0edff;
+            --danger: #d63031;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --border: #dfe6e9;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1a2e;
+                --card-bg: #16213e;
+                --text: #eee;
+                --text-secondary: #a0a0b0;
+                --accent: #a29bfe;
+                --accent-light: #1e2a4a;
+                --border: #2d3a5e;
+                --shadow: 0 2px 12px rgba(0,0,0,0.3);
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed; top: 0; left: 0;
+            height: 3px; background: linear-gradient(90deg, var(--accent), #00b894);
+            z-index: 1000; transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* TOC Sidebar */
+        .toc-sidebar {
+            position: fixed; left: 0; top: 0;
+            width: 300px; height: 100vh;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 80px 16px 20px;
+            overflow-y: auto;
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+        .toc-sidebar.open { transform: translateX(0); }
+        .toc-sidebar h3 { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .toc-sidebar a {
+            display: block; padding: 7px 12px;
+            color: var(--text-secondary); text-decoration: none;
+            border-radius: 6px; font-size: 13px;
+            transition: all 0.2s; margin-bottom: 1px;
+        }
+        .toc-sidebar a:hover, .toc-sidebar a.active {
+            background: var(--accent-light); color: var(--accent);
+        }
+        .toc-sidebar .toc-divider { border-top: 1px solid var(--border); margin: 8px 0; }
+        .toc-toggle {
+            position: fixed; left: 16px; top: 16px;
+            width: 44px; height: 44px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer; z-index: 101;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; box-shadow: var(--shadow);
+        }
+
+        /* Hero */
+        .hero {
+            max-width: 800px; margin: 0 auto;
+            padding: 80px 24px 40px;
+            text-align: center;
+        }
+        .hero .meta {
+            display: flex; gap: 16px; justify-content: center;
+            flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .hero .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 13px; background: var(--accent-light); color: var(--accent);
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 700; line-height: 1.3;
+            margin-bottom: 16px;
+        }
+        .hero .desc {
+            color: var(--text-secondary); font-size: 15px;
+            max-width: 600px; margin: 0 auto;
+        }
+
+        /* Main Content */
+        .content {
+            max-width: 800px; margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 0; cursor: pointer;
+            user-select: none;
+        }
+        .section-header .icon {
+            width: 40px; height: 40px;
+            background: var(--accent-light);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .section-header h2 {
+            font-size: 20px; font-weight: 600;
+        }
+        .section-header .chevron {
+            margin-left: auto; transition: transform 0.3s;
+            color: var(--text-secondary);
+        }
+        .section.collapsed .section-body { display: none; }
+        .section.collapsed .chevron { transform: rotate(-90deg); }
+        .section-body {
+            padding: 0 0 16px 52px;
+        }
+
+        /* Concept Card */
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        .concept-card .label {
+            display: inline-block;
+            padding: 2px 10px; border-radius: 4px;
+            font-size: 12px; font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .concept-card .label.core { background: #dfe6e9; color: #2d3436; }
+        .concept-card .label.key { background: #ffeaa7; color: #6c5ce7; }
+        .concept-card .label.risk { background: #fab1a0; color: #d63031; }
+        .concept-card .label.logic { background: #81ecec; color: #00b894; }
+        @media (prefers-color-scheme: dark) {
+            .concept-card .label.core { background: #3d4f6f; color: #dfe6e9; }
+            .concept-card .label.key { background: #5a4a20; color: #ffeaa7; }
+            .concept-card .label.risk { background: #5a2a20; color: #fab1a0; }
+            .concept-card .label.logic { background: #1a4a40; color: #81ecec; }
+        }
+        .concept-card h3 { font-size: 16px; margin-bottom: 8px; }
+        .concept-card p, .concept-card ul { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+        .concept-card ul { padding-left: 18px; }
+        .concept-card ul li { margin-bottom: 4px; }
+        .concept-card code {
+            background: var(--accent-light); color: var(--accent);
+            padding: 1px 6px; border-radius: 4px; font-size: 13px;
+            font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 16px 0;
+        }
+        @media (prefers-color-scheme: dark) {
+            .code-block { background: #0d1117; }
+        }
+        .code-block .kw { color: #c792ea; }
+        .code-block .fn { color: #82aaff; }
+        .code-block .str { color: #c3e88d; }
+        .code-block .cmt { color: #636e72; font-style: italic; }
+        .code-block .op { color: #89ddff; }
+
+        /* Callout */
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        .callout.warning { border-left-color: var(--warning); background: rgba(253,203,110,0.15); }
+        .callout.danger { border-left-color: var(--danger); background: rgba(214,48,49,0.1); }
+        .callout.success { border-left-color: var(--success); background: rgba(0,184,148,0.1); }
+        .callout .callout-title { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap; justify-content: center;
+            padding: 20px; background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 16px 0;
+        }
+        .flow-step {
+            padding: 8px 16px; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            background: var(--accent-light); color: var(--accent);
+            white-space: nowrap;
+        }
+        .flow-arrow { font-size: 18px; color: var(--text-secondary); }
+
+        /* Flow Diagram Vertical */
+        .flow-vertical {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 20px; background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 16px 0;
+        }
+        .flow-vertical .flow-step { width: 100%; max-width: 320px; text-align: center; }
+        .flow-vertical .flow-arrow { transform: rotate(90deg); }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%; border-collapse: collapse;
+            margin: 16px 0; font-size: 14px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .comparison-table th {
+            background: var(--accent-light); color: var(--accent);
+            padding: 12px 16px; text-align: left; font-weight: 600;
+        }
+        .comparison-table td {
+            padding: 10px 16px; border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .comparison-table tr:hover td { background: var(--accent-light); }
+
+        /* Quiz */
+        .quiz {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px; margin: 16px 0;
+        }
+        .quiz h4 { font-size: 15px; margin-bottom: 12px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-option {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; font-size: 14px;
+        }
+        .quiz-option:hover { border-color: var(--accent); }
+        .quiz-option.correct {
+            border-color: var(--success); background: rgba(0,184,148,0.12);
+        }
+        .quiz-option.wrong {
+            border-color: var(--danger); background: rgba(214,48,49,0.12);
+        }
+        .quiz-feedback {
+            margin-top: 12px; padding: 12px;
+            border-radius: 8px; font-size: 14px;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct-fb { background: rgba(0,184,148,0.12); color: var(--success); }
+        .quiz-feedback.wrong-fb { background: rgba(214,48,49,0.12); color: var(--danger); }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin: 16px 0;
+        }
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .summary-card .emoji { font-size: 32px; margin-bottom: 8px; }
+        .summary-card h4 { font-size: 15px; margin-bottom: 4px; }
+        .summary-card p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Checklist */
+        .checklist { list-style: none; }
+        .checklist li {
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; cursor: pointer;
+        }
+        .checklist li::before {
+            content: ""; width: 20px; height: 20px;
+            border: 2px solid var(--border); border-radius: 4px;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .checklist li.checked::before {
+            background: var(--accent); border-color: var(--accent);
+            content: "\2713"; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Footer */
+        .footer {
+            max-width: 800px; margin: 0 auto;
+            padding: 40px 24px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toc-sidebar { width: 100%; }
+            .section-body { padding-left: 0; }
+            .summary-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section { animation: fadeIn 0.4s ease-out; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <button class="toc-toggle" onclick="toggleTOC()" aria-label="Toggle TOC">
+        <span id="tocIcon">&#9776;</span>
+    </button>
+
+    <nav class="toc-sidebar" id="tocSidebar">
+        <h3>目录导航</h3>
+        <a href="#hero">文章概览</a>
+        <div class="toc-divider"></div>
+        <a href="#s1">1. Agent Loop 基本运转</a>
+        <a href="#s2">2. Workflow vs Agent</a>
+        <a href="#s3">3. Harness 比模型更关键</a>
+        <a href="#s4">4. 上下文工程</a>
+        <a href="#s5">5. 工具设计</a>
+        <a href="#s6">6. 记忆系统</a>
+        <a href="#s7">7. 逐步放开自主度</a>
+        <a href="#s8">8. 多 Agent 组织</a>
+        <a href="#s9">9. Agent 评测</a>
+        <a href="#s10">10. 执行过程追踪</a>
+        <a href="#s11">11. OpenClaw 落地实践</a>
+        <a href="#s12">12. 常见反模式</a>
+        <div class="toc-divider"></div>
+        <a href="#summary">学习总结</a>
+    </nav>
+
+    <header class="hero" id="hero">
+        <div class="meta">
+            <span class="badge">阿里云开发者</span>
+            <span class="badge">2026-04-28</span>
+            <span class="badge">约 25 分钟阅读</span>
+        </div>
+        <h1>你不知道的 Agent：原理、架构与工程实践</h1>
+        <p class="desc">从 Agent Loop 到多 Agent 协作，从工具设计到评测追踪——一篇覆盖 Agent 工程全链路的深度指南。不是教你调 API，而是教你建系统。</p>
+    </header>
+
+    <main class="content">
+
+        <!-- ==================== Section 1: Agent Loop ==================== -->
+        <div class="section" id="s1">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128260;</div>
+                <h2>一、Agent Loop 的基本运转方式</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心概念</span>
+                    <h3>Agent 的本质：一个永不疲倦的循环</h3>
+                    <p>Agent 不是一个智能体，而是一个<strong>循环</strong>。它的核心是一个 <code>while True</code>：感知环境 → 思考决策 → 执行动作 → 获取反馈 → 再次感知。所有复杂的 Agent 系统，拆到底层都是这个简单循环的不同变体。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">感知 (Perceive)</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">决策 (Decide)</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">行动 (Act)</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">反馈 (Observe)</span>
+                    <span class="flow-arrow">&#8634;</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">代码实现</span>
+                    <h3>不到 20 行的核心代码</h3>
+                    <p>一个最简 Agent Loop 的 Python 实现，展现了感知-决策-行动-反馈的完整循环：</p>
+                </div>
+
+                <div class="code-block">
+<span class="kw">def</span> <span class="fn">agent_loop</span>(model, tools, task):
+    messages = [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: task}]
+
+    <span class="kw">while</span> <span class="str">True</span>:
+        <span class="cmt"># 决策：让模型思考下一步</span>
+        response = model.chat(messages, tools=tools)
+        messages.append(response)
+
+        <span class="cmt"># 如果模型认为任务完成，退出循环</span>
+        <span class="kw">if</span> response.finish_reason == <span class="str">"stop"</span>:
+            <span class="kw">return</span> response.content
+
+        <span class="cmt"># 行动：执行工具调用</span>
+        <span class="kw">for</span> call <span class="kw">in</span> response.tool_calls:
+            result = execute_tool(call)
+            messages.append(tool_result(call, result))
+        </div>
+
+                <div class="callout">
+                    <div class="callout-title">关键洞察</div>
+                    <p>Agent Loop 的复杂度不在循环本身，而在循环的<strong>终止条件</strong>和<strong>错误处理</strong>。一个没有退出条件的 Agent 是一个无限循环炸弹。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">运行机制</span>
+                    <h3>三个关键设计决策</h3>
+                    <ul>
+                        <li><strong>何时停止</strong>：模型输出 <code>finish_reason == "stop"</code>，或者达到最大轮次</li>
+                        <li><strong>何时重试</strong>：工具调用失败时的重试策略与退避机制</li>
+                        <li><strong>何时放弃</strong>：连续失败 N 次后优雅降级，而非死循环</li>
+                    </ul>
+                </div>
+
+                <div class="quiz" data-answer="1">
+                    <h4>知识检查：Agent Loop 的核心本质是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">一个复杂的神经网络模型</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">一个感知-决策-行动-反馈的循环结构</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">一个调用 API 的函数</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">一个数据库查询引擎</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 2: Workflow vs Agent ==================== -->
+        <div class="section" id="s2">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128064;</div>
+                <h2>二、Workflow 和 Agent 的区别</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心区分</span>
+                    <h3>控制权在谁手里？</h3>
+                    <p>Workflow 和 Agent 的本质区别不在于是否有 LLM 参与，而在于<strong>控制权归属</strong>：Workflow 的控制权在开发者手里（预定义路径），Agent 的控制权在模型手里（动态决策）。</p>
+                </div>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>维度</th>
+                        <th>Workflow</th>
+                        <th>Agent</th>
+                    </tr>
+                    <tr>
+                        <td>控制流</td>
+                        <td>开发者预定义</td>
+                        <td>模型动态决策</td>
+                    </tr>
+                    <tr>
+                        <td>确定性</td>
+                        <td>高，可预测</td>
+                        <td>低，有随机性</td>
+                    </tr>
+                    <tr>
+                        <td>灵活性</td>
+                        <td>受限于预定义路径</td>
+                        <td>理论上无限</td>
+                    </tr>
+                    <tr>
+                        <td>调试难度</td>
+                        <td>低，路径固定</td>
+                        <td>高，需要 Trace</td>
+                    </tr>
+                    <tr>
+                        <td>适用场景</td>
+                        <td>流程明确的重复任务</td>
+                        <td>开放性、探索性任务</td>
+                    </tr>
+                </table>
+
+                <div class="concept-card">
+                    <span class="label key">五种控制模式</span>
+                    <h3>Anthropic 总结的五种 Workflow 模式</h3>
+                    <ul>
+                        <li><strong>Prompt Chaining（提示链）</strong>：任务分解为顺序步骤，前一步输出是后一步输入</li>
+                        <li><strong>Routing（路由）</strong>：根据输入分类，分发到不同的专用处理流程</li>
+                        <li><strong>Parallelization（并行）</strong>：多个子任务同时执行，汇总结果</li>
+                        <li><strong>Orchestrator-Worker（编排器-工作者）</strong>：一个编排器动态分配任务给多个工作者</li>
+                        <li><strong>Evaluator-Optimizer（评估器-优化器）</strong>：生成-评估-优化的迭代循环</li>
+                    </ul>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">Prompt Chaining</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Routing</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Parallelization</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Orchestrator-Worker</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Evaluator-Optimizer</span>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-title">实践建议</div>
+                    <p>能用 Workflow 解决的问题，不要用 Agent。Agent 的灵活性是以可控性为代价的。先尝试最简单的 Prompt Chaining，不够再逐步升级到更复杂的模式。</p>
+                </div>
+
+                <div class="quiz" data-answer="2">
+                    <h4>知识检查：Workflow 和 Agent 最本质的区别是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Workflow 不用 LLM，Agent 用 LLM</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Workflow 更快，Agent 更慢</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">控制权在开发者手里（Workflow）还是在模型手里（Agent）</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Workflow 只能处理文本，Agent 能调用工具</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 3: Harness ==================== -->
+        <div class="section" id="s3">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128737;</div>
+                <h2>三、为什么 Harness 比模型更关键</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心论点</span>
+                    <h3>模型是引擎，Harness 是车身</h3>
+                    <p>Harness（驾驭层）是包裹在模型外面的工程系统：它决定模型能做什么、不能做什么、做错了怎么办。OpenAI 的实践表明：他们的 Agent 系统有<strong>100万行代码</strong>，其中模型调用只占极小一部分，绝大多数是 Harness 工程。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">四大支柱</span>
+                    <h3>Harness 的四个核心职责</h3>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="emoji">&#127919;</div>
+                        <h4>验收基线</h4>
+                        <p>定义"什么算完成"：输出格式校验、业务规则检查、质量门禁</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128683;</div>
+                        <h4>执行边界</h4>
+                        <p>定义"能做什么"：权限控制、操作白名单、资源配额限制</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128227;</div>
+                        <h4>反馈信号</h4>
+                        <p>定义"做得怎样"：错误信息、进度报告、质量评分</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128260;</div>
+                        <h4>回退手段</h4>
+                        <p>定义"做错了怎么办"：重试、降级、人工介入、事务回滚</p>
+                    </div>
+                </div>
+
+                <div class="flow-vertical">
+                    <span class="flow-step" style="background:#fab1a033; color:var(--danger);">用户请求</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#ffeaa733; color:#6c5ce7;">Harness：校验 &amp; 边界检查</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step">LLM 推理</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#ffeaa733; color:#6c5ce7;">Harness：输出校验 &amp; 质量门禁</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#00b89422; color:var(--success);">工具执行 &amp; 结果返回</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#ffeaa733; color:#6c5ce7;">Harness：结果验证 &amp; 反馈组装</span>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-title">OpenAI 的教训</div>
+                    <p>百万行代码中，模型调用只是一行 API 请求。其余 99.9% 是 Harness：输入清洗、输出校验、错误重试、权限控制、日志追踪、降级策略。模型能力越强，Harness 越重要——因为模型犯错的代价更大了。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">反直觉的认知</span>
+                    <h3>模型升级 ≠ 系统升级</h3>
+                    <p>很多人以为换个更强的模型就能解决问题。实际上，没有好的 Harness，更强的模型只会更高效地犯错。Harness 是 Agent 系统的"安全气囊"——平时看不见，出事时救命。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 4: Context Engineering ==================== -->
+        <div class="section" id="s4">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128218;</div>
+                <h2>四、上下文工程为什么决定稳定性</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心概念</span>
+                    <h3>Context Rot：上下文腐烂</h3>
+                    <p>当上下文窗口塞入过多信息时，模型的注意力会被稀释，导致"看到了但没理解"——这就是 <strong>Context Rot</strong>。不是窗口不够大，而是信息太多模型处理不过来。上下文工程的本质是：<strong>在有限窗口内放入最有价值的信息</strong>。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">分层管理</span>
+                    <h3>上下文的三层架构</h3>
+                    <ul>
+                        <li><strong>系统层（System）</strong>：角色定义、行为约束、工具说明——长期不变</li>
+                        <li><strong>会话层（Session）</strong>：对话历史、中间状态——随会话变化</li>
+                        <li><strong>任务层（Task）</strong>：当前任务的具体信息——每次调用可能不同</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">三种压缩策略</span>
+                    <h3>如何管理有限的上下文窗口</h3>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">截断 (Truncation)</span>
+                    <span class="flow-arrow">|</span>
+                    <span class="flow-step">摘要 (Summarization)</span>
+                    <span class="flow-arrow">|</span>
+                    <span class="flow-step">选择 (Selection)</span>
+                </div>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>策略</th>
+                        <th>原理</th>
+                        <th>优点</th>
+                        <th>缺点</th>
+                    </tr>
+                    <tr>
+                        <td>截断</td>
+                        <td>丢弃最早的消息</td>
+                        <td>简单高效</td>
+                        <td>可能丢失关键信息</td>
+                    </tr>
+                    <tr>
+                        <td>摘要</td>
+                        <td>用 LLM 压缩历史</td>
+                        <td>保留核心信息</td>
+                        <td>增加延迟和成本</td>
+                    </tr>
+                    <tr>
+                        <td>选择</td>
+                        <td>按相关性检索历史</td>
+                        <td>精准保留上下文</td>
+                        <td>实现复杂度高</td>
+                    </tr>
+                </table>
+
+                <div class="concept-card">
+                    <span class="label key">成本优化</span>
+                    <h3>Prompt Caching 与 Skills 延迟加载</h3>
+                    <ul>
+                        <li><strong>Prompt Caching</strong>：将不变的系统提示缓存，避免重复计算。可节省 50-90% 的 Token 成本</li>
+                        <li><strong>Skills 延迟加载</strong>：不把所有工具说明塞进系统提示，而是按需动态注入。只有当任务需要某个能力时，才加载对应的工具描述</li>
+                    </ul>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">工程实践</div>
+                    <p>上下文不是越大越好。一个精心组织的 4K 上下文，效果往往好于一个杂乱无章的 128K 上下文。质量 > 数量。</p>
+                </div>
+
+                <div class="quiz" data-answer="0">
+                    <h4>知识检查：什么是 Context Rot？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">上下文信息过多导致模型注意力稀释，理解能力下降</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">上下文窗口物理损坏导致数据丢失</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">模型忘记了之前的对话内容</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Token 数量超过限制导致报错</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 5: Tool Design ==================== -->
+        <div class="section" id="s5">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128295;</div>
+                <h2>五、工具设计决定 Agent 能做什么</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">演进历程</span>
+                    <h3>三代工具设计范式</h3>
+                    <p>工具设计经历了从"直接封装"到"为模型设计"的演进，每一代都在解决上一代的核心痛点。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">第一代：API 封装</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">第二代：ACI</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">第三代：Advanced Tool Use</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">ACI 设计原则</span>
+                    <h3>Agent-Computer Interface：为模型设计的接口</h3>
+                    <p>ACI（Agent-Computer Interface）的核心思想是：工具接口不应该按人类的习惯设计，而应该按<strong>模型的理解方式</strong>设计。关键原则包括：</p>
+                    <ul>
+                        <li><strong>语义清晰</strong>：工具名和参数名要自解释，让模型一看就懂</li>
+                        <li><strong>粒度适中</strong>：太粗的工具模型不知道怎么用，太细的工具需要太多调用步骤</li>
+                        <li><strong>错误友好</strong>：返回的错误信息要能帮模型理解问题并自我修正</li>
+                        <li><strong>幂等安全</strong>：相同调用多次执行的结果一致，避免模型重试时产生副作用</li>
+                        <li><strong>最小权限</strong>：每个工具只暴露完成任务所需的最少能力</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>代际</th>
+                        <th>设计思路</th>
+                        <th>典型问题</th>
+                    </tr>
+                    <tr>
+                        <td>第一代 API 封装</td>
+                        <td>直接把 REST API 包成工具</td>
+                        <td>参数太多、命名不直观、模型容易出错</td>
+                    </tr>
+                    <tr>
+                        <td>第二代 ACI</td>
+                        <td>为模型重新设计接口</td>
+                        <td>静态工具集，无法应对动态场景</td>
+                    </tr>
+                    <tr>
+                        <td>第三代 Advanced</td>
+                        <td>工具可组合、可发现、可学习</td>
+                        <td>复杂度高，需要更多工程投入</td>
+                    </tr>
+                </table>
+
+                <div class="callout">
+                    <div class="callout-title">Anthropic 的建议</div>
+                    <p>花在工具设计上的时间应该和花在 prompt engineering 上的时间一样多。一个设计良好的工具，比十段精心编写的提示词更有效。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">常见错误</span>
+                    <h3>工具设计的三个陷阱</h3>
+                    <ul>
+                        <li><strong>工具太多</strong>：给模型 50 个工具，它选择的准确率会大幅下降。精选 10-15 个核心工具</li>
+                        <li><strong>描述太差</strong>：工具描述写得像 API 文档而不是给人看的说明。要写成"这个工具做什么，什么时候用"</li>
+                        <li><strong>没有示例</strong>：在工具描述中加入输入输出示例，能显著提升模型调用准确率</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 6: Memory System ==================== -->
+        <div class="section" id="s6">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#129504;</div>
+                <h2>六、记忆系统如何设计</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心框架</span>
+                    <h3>四种记忆类型</h3>
+                    <p>Agent 的记忆系统借鉴了认知科学的记忆分类，分为四种类型，每种有不同的存储和检索机制。</p>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="emoji">&#128161;</div>
+                        <h4>工作记忆</h4>
+                        <p>当前任务的上下文信息，相当于上下文窗口。容量有限，生命周期短</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128170;</div>
+                        <h4>程序性记忆</h4>
+                        <p>"怎么做"的技能和流程。对应系统提示中的行为规则和工具使用规范</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128196;</div>
+                        <h4>情景记忆</h4>
+                        <p>过去经历的具体事件。存储对话历史、任务执行记录，可按时间检索</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128218;</div>
+                        <h4>语义记忆</h4>
+                        <p>抽象的知识和事实。存储在向量数据库或知识图谱中，可按语义检索</p>
+                    </div>
+                </div>
+
+                <div class="flow-vertical">
+                    <span class="flow-step">用户输入</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#81ecec22; color:var(--success);">工作记忆：加载相关上下文</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#ffeaa722; color:#6c5ce7;">语义记忆：检索相关知识</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#dfe6e922; color:var(--text);">程序性记忆：遵循行为规则</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step">LLM 生成响应</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#fab1a022; color:var(--danger);">情景记忆：记录本次经历</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">整合机制</span>
+                    <h3>记忆不是存储，而是检索</h3>
+                    <p>记忆系统的难点不在存储，而在<strong>何时检索什么</strong>。一个好的记忆系统需要：</p>
+                    <ul>
+                        <li><strong>相关性检索</strong>：基于当前任务语义，检索最相关的历史信息</li>
+                        <li><strong>时效性衰减</strong>：越久远的记忆权重越低，除非被频繁引用</li>
+                        <li><strong>冲突消解</strong>：当新旧记忆矛盾时，以最新且可信度高的为准</li>
+                        <li><strong>主动遗忘</strong>：定期清理过时或低价值的记忆，避免噪音积累</li>
+                    </ul>
+                </div>
+
+                <div class="callout warning">
+                    <div class="callout-title">工程现实</div>
+                    <p>大多数生产级 Agent 的记忆系统还停留在"对话历史 + RAG"阶段。真正实现四种记忆无缝整合的系统极少，这是一个开放的工程挑战。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 7: Autonomy ==================== -->
+        <div class="section" id="s7">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128640;</div>
+                <h2>七、如何逐步放开 Agent 自主度</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心挑战</span>
+                    <h3>长任务需要跨 Session 存活</h3>
+                    <p>当 Agent 的任务从"回答一个问题"演变为"完成一个项目"时，单个 Session 不够用了。任务可能持续数小时甚至数天，中间可能因为各种原因中断。这就需要：<strong>任务状态外化</strong>。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">三大机制</span>
+                    <h3>支撑长任务的技术基础</h3>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="emoji">&#128190;</div>
+                        <h4>任务状态外化</h4>
+                        <p>将任务进度、中间结果、决策记录持久化到外部存储，而非仅保存在内存中</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128268;</div>
+                        <h4>后台 I/O</h4>
+                        <p>工具调用不阻塞主循环：发邮件、部署代码、等待审批等异步操作在后台执行</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128259;</div>
+                        <h4>断点续传</h4>
+                        <p>Session 中断后能从上次断点恢复执行，而非从头开始</p>
+                    </div>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step">小任务：单 Session</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">中任务：状态外化</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">大任务：后台 I/O + 断点续传</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">持续任务：定时调度</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">自主度阶梯</span>
+                    <h3>不是一步到位，而是逐步放开</h3>
+                    <ul>
+                        <li><strong>Level 0</strong>：人在环中，每步确认（审批模式）</li>
+                        <li><strong>Level 1</strong>：人设目标，Agent 执行，异常时暂停</li>
+                        <li><strong>Level 2</strong>：Agent 自主执行，事后汇报</li>
+                        <li><strong>Level 3</strong>：Agent 持续运行，定期同步（cron/heartbeat 模式）</li>
+                    </ul>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-title">风险提示</div>
+                    <p>自主度每提升一级，风险指数级增长。Level 2 以上的 Agent 需要完善的监控、告警和回退机制。不要跳级——先在低风险场景验证，再逐步扩大权限。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 8: Multi-Agent ==================== -->
+        <div class="section" id="s8">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128101;</div>
+                <h2>八、多 Agent 如何组织</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">组织模式</span>
+                    <h3>指挥者 vs 统筹者</h3>
+                    <p>多 Agent 系统有两种基本组织模式，选择哪种取决于任务的复杂度和可分解性。</p>
+                </div>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>模式</th>
+                        <th>指挥者 (Commander)</th>
+                        <th>统筹者 (Orchestrator)</th>
+                    </tr>
+                    <tr>
+                        <td>控制方式</td>
+                        <td>直接分配任务，统一调度</td>
+                        <td>制定计划，让子 Agent 自主执行</td>
+                    </tr>
+                    <tr>
+                        <td>适用场景</td>
+                        <td>任务可明确分解</td>
+                        <td>任务需要探索和迭代</td>
+                    </tr>
+                    <tr>
+                        <td>通信方式</td>
+                        <td>星型拓扑，所有通信经过中心</td>
+                        <td>网状拓扑，Agent 间可直接通信</td>
+                    </tr>
+                    <tr>
+                        <td>故障影响</td>
+                        <td>中心挂了全挂</td>
+                        <td>单点故障影响有限</td>
+                    </tr>
+                </table>
+
+                <div class="concept-card">
+                    <span class="label key">子 Agent 设计</span>
+                    <h3>每个子 Agent 是一个独立的 Agent Loop</h3>
+                    <p>子 Agent 不是简单的函数调用，而是拥有自己的 Agent Loop、工具集和上下文的独立实体。它们通过<strong>协作协议</strong>进行通信，而非共享内存。</p>
+                    <ul>
+                        <li><strong>消息传递</strong>：通过结构化消息交换信息（类似 Actor 模型）</li>
+                        <li><strong>任务队列</strong>：通过任务队列异步协作，解耦生产者和消费者</li>
+                        <li><strong>共享黑板</strong>：所有 Agent 读写同一个"黑板"，通过状态变化触发协作</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">幻觉放大效应</span>
+                    <h3>多 Agent 系统的最大风险</h3>
+                    <p>单个 Agent 的幻觉率是 5%。三个 Agent 串联，每个的输出是下一个的输入，整体幻觉率会指数级放大。这不是简单的 5% x 3，而是<strong>误差的累积传播</strong>。</p>
+                </div>
+
+                <div class="flow-vertical">
+                    <span class="flow-step">Agent A 输出（5% 幻觉率）</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#fab1a022; color:var(--danger);">Agent B 处理（基于 A 的输出，10% 幻觉率）</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#fab1a033; color:var(--danger);">Agent C 处理（基于 B 的输出，15%+ 幻觉率）</span>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-title">对抗幻觉放大</div>
+                    <p>关键策略：每个 Agent 的输出必须经过<strong>独立验证</strong>后才传递给下游。不要让下游 Agent 盲信上游的输出。加入校验 Agent（Evaluator）作为"质检员"。</p>
+                </div>
+
+                <div class="quiz" data-answer="2">
+                    <h4>知识检查：多 Agent 系统中"幻觉放大"的原因是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Agent 之间通信延迟导致信息丢失</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">多个 Agent 同时产生相同的幻觉</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">上游 Agent 的幻觉作为输入传递给下游，误差累积传播</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">模型参数过多导致过拟合</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 9: Evaluation ==================== -->
+        <div class="section" id="s9">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128202;</div>
+                <h2>九、Agent 评测如何做</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心指标</span>
+                    <h3>Pass@k vs Pass^k：两种不同的成功定义</h3>
+                    <ul>
+                        <li><strong>Pass@k</strong>：运行 k 次，至少有一次成功的概率。衡量的是"能不能做对"</li>
+                        <li><strong>Pass^k</strong>：运行 k 次，每次都成功的概率。衡量的是"稳不稳定"</li>
+                    </ul>
+                    <p>Pass@k = 90% 看起来很好，但如果 Pass^k 只有 35%，意味着这个 Agent 10 次里有 6 次会出错。</p>
+                </div>
+
+                <div class="flow-diagram">
+                    <span class="flow-step" style="background:#00b89422; color:var(--success);">Pass@5 = 95%</span>
+                    <span class="flow-arrow">vs</span>
+                    <span class="flow-step" style="background:#fab1a022; color:var(--danger);">Pass^5 = 60%</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-step">Agent 不够稳定</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">三类评分器</span>
+                    <h3>如何判断 Agent 的输出好不好</h3>
+                </div>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>评分器类型</th>
+                        <th>原理</th>
+                        <th>适用场景</th>
+                    </tr>
+                    <tr>
+                        <td>规则评分器</td>
+                        <td>基于明确规则判定（格式、正则、断言）</td>
+                        <td>输出格式确定的任务</td>
+                    </tr>
+                    <tr>
+                        <td>模型评分器</td>
+                        <td>用另一个 LLM 评估输出质量</td>
+                        <td>开放式、需要语义理解的任务</td>
+                    </tr>
+                    <tr>
+                        <td>人工评分器</td>
+                        <td>人类专家打分</td>
+                        <td>高风险、需要领域判断的场景</td>
+                    </tr>
+                </table>
+
+                <div class="concept-card">
+                    <span class="label logic">方法论</span>
+                    <h3>先修评测，再改 Agent</h3>
+                    <p>很多人的做法是：先改 Agent 代码 → 看看效果好不好 → 再补测试。正确的做法是反过来：</p>
+                    <ul>
+                        <li>先建立评测基准（baseline）</li>
+                        <li>收集一批有代表性的测试用例</li>
+                        <li>跑出当前的通过率</li>
+                        <li>每次改动都重新评测，用数据说话</li>
+                    </ul>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-title">最佳实践</div>
+                    <p>评测集要包含三类用例：正常路径（happy path）、边界情况（edge case）、对抗样本（adversarial）。只测正常路径的评测集是自欺欺人。</p>
+                </div>
+
+                <div class="quiz" data-answer="1">
+                    <h4>知识检查：Pass@k 和 Pass^k 的区别是什么？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Pass@k 是通过率，Pass^k 是错误率</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">Pass@k 是"至少成功一次"的概率，Pass^k 是"每次都成功"的概率</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Pass@k 是单次测试，Pass^k 是多次测试</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">两者是同一个指标的不同写法</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 10: Tracing ==================== -->
+        <div class="section" id="s10">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128269;</div>
+                <h2>十、如何追踪 Agent 执行过程</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">核心概念</span>
+                    <h3>Trace：Agent 的黑匣子</h3>
+                    <p>Agent 的决策过程是不透明的——你不知道它为什么选择这个工具、为什么得出这个结论。Trace（追踪记录）就是 Agent 的"黑匣子飞行记录器"，记录每一步的输入、输出、决策和耗时。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">两层可观测性</span>
+                    <h3>宏观监控 + 微观调试</h3>
+                    <ul>
+                        <li><strong>宏观层</strong>：整体成功率、平均延迟、Token 消耗、工具调用分布——用于监控和告警</li>
+                        <li><strong>微观层</strong>：单次执行的完整 Trace——用于调试和优化。包含每轮循环的 messages、tool_calls、latency、token_usage</li>
+                    </ul>
+                </div>
+
+                <div class="flow-vertical">
+                    <span class="flow-step" style="background:#81ecec22; color:var(--success);">用户请求</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step">Trace 开始（span_id, timestamp）</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#ffeaa722; color:#6c5ce7;">Round 1: LLM 调用 + 工具执行</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#ffeaa722; color:#6c5ce7;">Round 2: LLM 调用 + 工具执行</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#ffeaa722; color:#6c5ce7;">Round N: 最终响应</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#00b89422; color:var(--success);">Trace 结束（total_tokens, total_latency）</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">事件流底座</span>
+                    <h3>基于事件流的统一追踪架构</h3>
+                    <p>所有可观测性都建立在一个<strong>事件流（Event Stream）</strong>之上。Agent 执行过程中的每个关键节点都会发出一个事件：</p>
+                    <ul>
+                        <li><code>agent.start</code> — Agent 开始执行</li>
+                        <li><code>llm.call</code> — 模型调用（输入 messages、输出 response、latency）</li>
+                        <li><code>tool.call</code> — 工具调用（工具名、参数、结果、耗时）</li>
+                        <li><code>agent.think</code> — 模型的推理过程</li>
+                        <li><code>agent.end</code> — Agent 执行结束（最终结果、总耗时）</li>
+                        <li><code>agent.error</code> — 异常和错误</li>
+                    </ul>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">工具选型</div>
+                    <p>主流的 Agent 可观测性工具：LangSmith（LangChain 生态）、Braintrust、Arize Phoenix、Helicone。选择标准：是否支持你用的框架、是否有好的 Trace 可视化、是否支持自定义事件。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 11: OpenClaw ==================== -->
+        <div class="section" id="s11">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#128736;</div>
+                <h2>十一、用 OpenClaw 看 Agent 如何落地</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label core">架构设计</span>
+                    <h3>五层解耦架构</h3>
+                    <p>OpenClaw 是一个开源的 Agent 框架，它的核心设计思想是<strong>五层解耦</strong>——每一层只关注自己的职责，层与层之间通过接口通信。</p>
+                </div>
+
+                <div class="flow-vertical">
+                    <span class="flow-step" style="background:#dfe6e933; color:var(--text);">L1: 接入层（API Gateway、认证、限流）</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#81ecec22; color:var(--success);">L2: 协调层（Agent Loop、任务调度）</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#ffeaa722; color:#6c5ce7;">L3: 能力层（工具、模型、记忆）</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#fab1a022; color:var(--danger);">L4: 数据层（状态持久化、Trace 存储）</span>
+                    <span class="flow-arrow">&#8595;</span>
+                    <span class="flow-step" style="background:#dfe6e933; color:var(--text);">L5: 基础设施层（消息队列、缓存、监控）</span>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label key">系统提示分层</span>
+                    <h3>把 Prompt 当代码管理</h3>
+                    <p>OpenClaw 的系统提示不是一坨文本，而是分层管理的模块：</p>
+                    <ul>
+                        <li><strong>身份层</strong>：角色定义和核心约束——几乎不变</li>
+                        <li><strong>能力层</strong>：工具说明和使用规范——随能力变化</li>
+                        <li><strong>任务层</strong>：当前任务的具体指令——每次不同</li>
+                        <li><strong>安全层</strong>：红线规则和合规约束——绝对不可绕过</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label logic">调度机制</span>
+                    <h3>Cron 与 Heartbeat</h3>
+                    <ul>
+                        <li><strong>Cron</strong>：定时触发 Agent 执行周期性任务（如每日报告、数据同步）</li>
+                        <li><strong>Heartbeat</strong>：Agent 定期发送心跳信号，报告自身状态。如果心跳中断，系统自动触发恢复流程</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">安全边界</span>
+                    <h3>Agent 的权限不是越少越好，而是刚刚好</h3>
+                    <p>OpenClaw 的安全设计遵循<strong>最小权限原则</strong>，但不是简单的"什么都禁止"：</p>
+                    <ul>
+                        <li><strong>沙箱执行</strong>：代码执行在隔离环境中，无法访问主机文件系统</li>
+                        <li><strong>操作审批</strong>：高风险操作（删除数据、发送邮件）需要人工确认</li>
+                        <li><strong>资源配额</strong>：Token 消耗、API 调用次数、执行时间都有上限</li>
+                        <li><strong>审计日志</strong>：所有操作都有完整记录，可追溯可审计</li>
+                    </ul>
+                </div>
+
+                <div class="callout success">
+                    <div class="callout-title">落地启示</div>
+                    <p>OpenClaw 的价值不在于它有多先进，而在于它展示了一个生产级 Agent 系统的真实面貌：大量枯燥但必要的工程细节。Agent 落地，80% 是工程，20% 是 AI。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Section 12: Anti-Patterns ==================== -->
+        <div class="section" id="s12">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#9888;&#65039;</div>
+                <h2>十二、常见反模式</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="concept-card">
+                    <span class="label risk">反模式 1</span>
+                    <h3>全能 Agent 妄想</h3>
+                    <p><strong>症状</strong>：试图用一个 Agent 解决所有问题，给它所有工具和所有权限。</p>
+                    <p><strong>后果</strong>：上下文爆炸、工具选择混乱、安全风险剧增。</p>
+                    <p><strong>修复</strong>：拆分为多个专用 Agent，每个 Agent 只负责一个领域。用 Orchestrator 模式协调。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">反模式 2</span>
+                    <h3>Prompt 堆砌</h3>
+                    <p><strong>症状</strong>：遇到问题就往系统提示里加规则，Prompt 越来越长。</p>
+                    <p><strong>后果</strong>：Context Rot，模型注意力稀释，规则之间相互矛盾。</p>
+                    <p><strong>修复</strong>：将规则结构化、分层化。用工具实现约束，而不是用文字描述约束。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">反模式 3</span>
+                    <h3>无 Trace 盲飞</h3>
+                    <p><strong>症状</strong>：只看最终结果，不记录中间过程。出了问题无法复现。</p>
+                    <p><strong>后果</strong>：调试效率极低，同类问题反复出现。</p>
+                    <p><strong>修复</strong>：从第一天就接入 Trace 系统。每个 Agent Loop 的每一轮都要记录。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">反模式 4</span>
+                    <h3>跳过评测直接优化</h3>
+                    <p><strong>症状</strong>：凭感觉改 Prompt、换模型，没有量化指标衡量效果。</p>
+                    <p><strong>后果</strong>：改了 A 好了但 B 变差，不知道到底有没有进步。</p>
+                    <p><strong>修复</strong>：先建评测集，跑出 baseline，每次改动都对比数据。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">反模式 5</span>
+                    <h3>过度自主</h3>
+                    <p><strong>症状</strong>：一开始就给 Agent 最高自主权，让它"自己决定一切"。</p>
+                    <p><strong>后果</strong>：Agent 在你不了解的场景做出高风险操作，造成不可逆损失。</p>
+                    <p><strong>修复</strong>：从 Level 0（人在环中）开始，验证稳定后再逐步放开。每个 Level 都要有对应的监控和回退机制。</p>
+                </div>
+
+                <div class="concept-card">
+                    <span class="label risk">反模式 6</span>
+                    <h3>工具泛滥</h3>
+                    <p><strong>症状</strong>：给 Agent 接入几十个工具，觉得"能力越强越好"。</p>
+                    <p><strong>后果</strong>：模型选择工具的准确率大幅下降，调用链路变长，调试困难。</p>
+                    <p><strong>修复</strong>：精选核心工具（10-15个），提供清晰的工具描述和示例。用"工具路由器"按需加载。</p>
+                </div>
+
+                <div class="callout danger">
+                    <div class="callout-title">反模式的共同特征</div>
+                    <p>所有反模式的根源都是同一个：<strong>低估了工程复杂度，高估了模型能力</strong>。Agent 不是"接个 API 就完事"，而是一个需要精心设计的软件系统。</p>
+                </div>
+
+                <div class="quiz" data-answer="3">
+                    <h4>知识检查：以下哪个不是 Agent 开发的常见反模式？</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">全能 Agent 妄想——用一个 Agent 解决所有问题</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">Prompt 堆砌——遇到问题就往系统提示加规则</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, false)">跳过评测直接优化——凭感觉改代码</div>
+                        <div class="quiz-option" onclick="checkQuiz(this, true)">渐进式放开自主度——从低权限开始逐步提升</div>
+                    </div>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Summary ==================== -->
+        <div class="section" id="summary">
+            <div class="section-header" onclick="toggleSection(this)">
+                <div class="icon">&#127891;</div>
+                <h2>学习总结</h2>
+                <span class="chevron">&#9660;</span>
+            </div>
+            <div class="section-body">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="emoji">&#128260;</div>
+                        <h4>Agent Loop</h4>
+                        <p>Agent 的本质是感知-决策-行动-反馈的循环，不到 20 行代码</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128064;</div>
+                        <h4>Workflow vs Agent</h4>
+                        <p>控制权在开发者手里是 Workflow，在模型手里是 Agent</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128737;</div>
+                        <h4>Harness > Model</h4>
+                        <p>99.9% 的代码是 Harness 工程，模型调用只是一行 API</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128218;</div>
+                        <h4>上下文工程</h4>
+                        <p>精心组织的 4K 好过杂乱无章的 128K</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128295;</div>
+                        <h4>工具设计</h4>
+                        <p>ACI 原则：为模型设计接口，而非为人类设计</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#129504;</div>
+                        <h4>记忆系统</h4>
+                        <p>四种记忆：工作/程序性/情景/语义，难点在检索而非存储</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128640;</div>
+                        <h4>自主度阶梯</h4>
+                        <p>从 Level 0 开始逐步放开，不要跳级</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128101;</div>
+                        <h4>多 Agent 协作</h4>
+                        <p>警惕幻觉放大效应，每个输出需要独立验证</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128202;</div>
+                        <h4>评测先行</h4>
+                        <p>Pass@k 表示能力上限，Pass^k 表示稳定性底线</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128269;</div>
+                        <h4>执行追踪</h4>
+                        <p>Trace 是 Agent 的黑匣子，两层可观测性缺一不可</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#128736;</div>
+                        <h4>工程落地</h4>
+                        <p>五层解耦架构，80% 是工程，20% 是 AI</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="emoji">&#9888;&#65039;</div>
+                        <h4>反模式警示</h4>
+                        <p>根源：低估工程复杂度，高估模型能力</p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 24px 0 12px; font-size: 16px;">学完自检</h3>
+                <ul class="checklist">
+                    <li onclick="this.classList.toggle('checked')">能画出 Agent Loop 的基本流程图并解释每一步</li>
+                    <li onclick="this.classList.toggle('checked')">理解 Workflow 和 Agent 的本质区别（控制权归属）</li>
+                    <li onclick="this.classList.toggle('checked')">能说出 Harness 的四个核心职责</li>
+                    <li onclick="this.classList.toggle('checked')">理解 Context Rot 的成因及三种压缩策略</li>
+                    <li onclick="this.classList.toggle('checked')">了解三代工具设计范式的演进</li>
+                    <li onclick="this.classList.toggle('checked')">能区分四种记忆类型及其作用</li>
+                    <li onclick="this.classList.toggle('checked')">理解任务状态外化和自主度阶梯</li>
+                    <li onclick="this.classList.toggle('checked')">能解释多 Agent 系统中的幻觉放大效应</li>
+                    <li onclick="this.classList.toggle('checked')">理解 Pass@k 和 Pass^k 的区别</li>
+                    <li onclick="this.classList.toggle('checked')">知道 Trace 系统的两层可观测性</li>
+                    <li onclick="this.classList.toggle('checked')">了解 OpenClaw 的五层解耦架构</li>
+                    <li onclick="this.classList.toggle('checked')">能识别并避免 6 个常见反模式</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>来源：<a href="https://mp.weixin.qq.com/s/cIQYl9Wr1Eov4ma-_bYh-w" target="_blank">阿里云开发者</a> | 发布于 2026-04-28</p>
+        <p style="margin-top: 4px;">本文为教学用途的交互式阅读版本 | 生成于 2026-06-07</p>
+    </footer>
+
+    <script>
+        // Toggle TOC
+        function toggleTOC() {
+            document.getElementById('tocSidebar').classList.toggle('open');
+        }
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('tocSidebar');
+            const toggle = document.querySelector('.toc-toggle');
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Toggle Section
+        function toggleSection(header) {
+            header.closest('.section').classList.toggle('collapsed');
+        }
+
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+
+        // Quiz
+        function checkQuiz(option, correct) {
+            const quiz = option.closest('.quiz');
+            const feedback = quiz.querySelector('.quiz-feedback');
+            const options = quiz.querySelectorAll('.quiz-option');
+
+            // Reset
+            options.forEach(o => { o.classList.remove('correct', 'wrong'); });
+            feedback.classList.remove('show', 'correct-fb', 'wrong-fb');
+
+            if (correct) {
+                option.classList.add('correct');
+                feedback.textContent = '✅ 正确！';
+                feedback.classList.add('show', 'correct-fb');
+            } else {
+                option.classList.add('wrong');
+                // Show correct answer
+                options.forEach((o, i) => {
+                    if (quiz.dataset.answer == i) o.classList.add('correct');
+                });
+                feedback.textContent = '❌ 再想想，正确答案已标出。';
+                feedback.classList.add('show', 'wrong-fb');
+            }
+        }
+
+        // TOC active state
+        const sections = document.querySelectorAll('.section[id]');
+        const tocLinks = document.querySelectorAll('.toc-sidebar a');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+        sections.forEach(s => observer.observe(s));
+    </script>
+</body>
+</html>
