@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港租房 Checklist（港大硕士适用）</title>
+    <style>
+        :root {
+            --bg: #f5f5f0;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #666;
+            --accent: #e74c3c;
+            --accent-light: #fdf2f2;
+            --accent-green: #27ae60;
+            --accent-green-light: #eafaf1;
+            --accent-blue: #2980b9;
+            --accent-blue-light: #ebf5fb;
+            --accent-orange: #f39c12;
+            --accent-orange-light: #fef9e7;
+            --border: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.06);
+            --radius: 12px;
+            --sidebar-w: 260px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #111827;
+                --card: #1f2937;
+                --text: #f3f4f6;
+                --text-secondary: #9ca3af;
+                --accent: #f87171;
+                --accent-light: #2d1f1f;
+                --accent-green: #34d399;
+                --accent-green-light: #1a2e1a;
+                --accent-blue: #60a5fa;
+                --accent-blue-light: #1a2333;
+                --accent-orange: #fbbf24;
+                --accent-orange-light: #2e2a1a;
+                --border: #374151;
+                --shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-green));
+            z-index: 1000;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Sidebar TOC */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            overflow-y: auto;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s;
+        }
+        .sidebar h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+        .sidebar a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        .sidebar .progress-text {
+            margin-top: 20px;
+            padding: 12px;
+            background: var(--accent-green-light);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--accent-green);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Mobile sidebar toggle */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 200;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Main content */
+        .main {
+            margin-left: var(--sidebar-w);
+            padding: 40px 48px 80px;
+            max-width: 960px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 60px 0 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+        .hero h1 {
+            font-size: clamp(24px, 4vw, 36px);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        .hero .subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+        .hero .badges {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .hero .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: var(--accent-blue-light);
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 40px;
+            scroll-margin-top: 24px;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 16px 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .section-header:hover {
+            border-color: var(--accent);
+        }
+        .section-header .section-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .section-header .section-info {
+            flex: 1;
+        }
+        .section-header .section-info h2 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .section-header .section-info .section-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .section-header .chevron {
+            font-size: 18px;
+            color: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+        .section.expanded .section-header .chevron {
+            transform: rotate(90deg);
+        }
+        .section-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .section.expanded .section-body {
+            max-height: 8000px;
+        }
+        .section-content {
+            padding: 20px;
+            margin-top: 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* Checklist items */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+        .checklist-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .checklist-item input[type="checkbox"]:checked {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+        .checklist-item input[type="checkbox"]:checked::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .checklist-item label {
+            font-size: 14px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .checklist-item input:checked + label {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        /* Subsection */
+        .subsection-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin: 16px 0 8px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--accent-blue-light);
+        }
+        .subsection-title:first-child {
+            margin-top: 0;
+        }
+
+        /* Callout box */
+        .callout {
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+        .callout-warn {
+            background: var(--accent-orange-light);
+            border-left: 3px solid var(--accent-orange);
+            color: var(--accent-orange);
+        }
+        .callout-info {
+            background: var(--accent-blue-light);
+            border-left: 3px solid var(--accent-blue);
+            color: var(--accent-blue);
+        }
+        .callout-danger {
+            background: var(--accent-light);
+            border-left: 3px solid var(--accent);
+            color: var(--accent);
+        }
+
+        /* Trap card */
+        .trap-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+        .trap-card h4 {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+        .trap-card .trap-method {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .trap-card .trap-fix {
+            font-size: 13px;
+            color: var(--accent-green);
+            font-weight: 500;
+        }
+
+        /* Resource table */
+        .resource-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 12px 0;
+        }
+        .resource-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: var(--accent-blue-light);
+            color: var(--accent-blue);
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+        }
+        .resource-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .resource-table a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+        .resource-table a:hover {
+            text-decoration: underline;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        .timeline-item {
+            position: relative;
+            padding: 12px 0 12px 20px;
+        }
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -20px;
+            top: 18px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            border: 2px solid var(--bg);
+        }
+        .timeline-item .timeline-time {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 4px;
+        }
+        .timeline-item .timeline-text {
+            font-size: 14px;
+        }
+
+        /* Stamp duty table */
+        .stamp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 12px 0;
+        }
+        .stamp-table th, .stamp-table td {
+            padding: 10px 14px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .stamp-table th {
+            background: var(--accent-orange-light);
+            color: var(--accent-orange);
+            font-weight: 600;
+        }
+
+        /* Reset button */
+        .reset-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+        }
+        .reset-bar .check-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .reset-bar .check-count strong {
+            color: var(--accent-green);
+        }
+        .reset-btn {
+            padding: 6px 16px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Print */
+        .print-btn {
+            padding: 8px 20px;
+            background: var(--accent-blue-light);
+            color: var(--accent-blue);
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .print-btn:hover {
+            background: var(--accent-blue);
+            color: #fff;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+            .main { margin-left: 0; padding: 24px 16px 80px; }
+            .hero { padding: 30px 0 20px; }
+        }
+
+        @media print {
+            .sidebar, .sidebar-toggle, .progress-bar, .reset-bar, .print-btn { display: none !important; }
+            .main { margin-left: 0; padding: 10px; }
+            .section-body { max-height: none !important; }
+            .section { break-inside: avoid; }
+            .checklist-item input { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <h3>Checklist</h3>
+        <a href="#sec-negotiate">一、跟中介细谈</a>
+        <a href="#sec-verify">二、验明中介真身</a>
+        <a href="#sec-inspect">三、看房必问</a>
+        <a href="#sec-sign">四、签约注意事项</a>
+        <a href="#sec-traps">五、常见陷阱</a>
+        <a href="#sec-resources">六、实用资源</a>
+        <a href="#sec-timeline">七、时间线</a>
+        <div class="progress-text" id="progressText">0 / 0 已完成</div>
+    </nav>
+
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+    <div class="main">
+        <div class="hero">
+            <h1>香港租房 Checklist</h1>
+            <p class="subtitle">港大硕士适用 — 西营盘、西环、坚尼地城、薄扶林等区域</p>
+            <div class="badges">
+                <span class="badge">&#128270; 中介谈判</span>
+                <span class="badge">&#128203; 合约审查</span>
+                <span class="badge">&#127968; 看房要点</span>
+                <span class="badge">&#9888; 避坑指南</span>
+            </div>
+        </div>
+
+        <div class="reset-bar">
+            <span class="check-count">进度：<strong id="checkedCount">0</strong> / <span id="totalCount">0</span> 项已完成</span>
+            <div style="display:flex;gap:8px;">
+                <button class="print-btn" onclick="window.print()">&#128424; 打印</button>
+                <button class="reset-btn" onclick="resetAll()">重置全部</button>
+            </div>
+        </div>
+
+        <!-- Section 1 -->
+        <div class="section expanded" id="sec-negotiate">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-icon">&#129309;</span>
+                <div class="section-info">
+                    <h2>一、跟中介细谈的步骤</h2>
+                    <span class="section-desc">初次接触 → 看房 → 谈判 → 签约，四阶段逐项确认</span>
+                </div>
+                <span class="chevron">&#9654;</span>
+            </div>
+            <div class="section-body">
+                <div class="section-content">
+                    <div class="subsection-title">1.1 初次接触</div>
+                    <div class="checklist-item"><input type="checkbox" id="n1"><label for="n1">明确告知预算范围（港币/月）、期望区域、入住时间、租期长短</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n2"><label for="n2">问清中介费由谁承担、金额多少（惯例：半个月至一个月租金，通常业主和租客各付半月）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n3"><label for="n3">确认中介是代表业主方还是代表租客方（双代中介需格外注意利益冲突）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n4"><label for="n4">要求中介提供 EAA 牌照号码</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n5"><label for="n5">询问手上是否有多个符合需求的房源，避免被单一房源牵着走</label></div>
+
+                    <div class="subsection-title">1.2 看房安排</div>
+                    <div class="checklist-item"><input type="checkbox" id="n6"><label for="n6">要求看实际在租的房源，而非"类似户型样板间"</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n7"><label for="n7">白天看采光和噪音，晚上感受社区环境</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n8"><label for="n8">一次性安排多套房看房，方便横向比较</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n9"><label for="n9">提前在 28Hse、Squarefoot 等平台自行搜索同类房源</label></div>
+
+                    <div class="subsection-title">1.3 谈判阶段</div>
+                    <div class="checklist-item"><input type="checkbox" id="n10"><label for="n10">租金可大胆还价（尤其空置较久的单位）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n11"><label for="n11">争取入住前免租装修/搬家期（通常 7-14 天）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n12"><label for="n12">协商中介费可否由业主全额承担</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n13"><label for="n13">明确约定维修责任划分（多少以下租客负责、多少以上业主承担）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n14"><label for="n14">要求业主提供或补充缺失家电，并写入合同清单</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n15"><label for="n15">提前谈好续租条件（如每年涨幅上限）</label></div>
+
+                    <div class="subsection-title">1.4 签约阶段</div>
+                    <div class="checklist-item"><input type="checkbox" id="n16"><label for="n16">要求看正式租约草稿，逐条审阅后再签约</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n17"><label for="n17">所有口头承诺（维修、添置家具、减免租金等）必须写入合同</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="n18"><label for="n18">确认签约对象是业主本人或其合法授权代理人（要求出示授权书）</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section" id="sec-verify">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-icon">&#128100;</span>
+                <div class="section-info">
+                    <h2>二、验明中介真身</h2>
+                    <span class="section-desc">EAA 牌照核查 + 业主身份确认</span>
+                </div>
+                <span class="chevron">&#9654;</span>
+            </div>
+            <div class="section-body">
+                <div class="section-content">
+                    <div class="subsection-title">2.1 核查 EAA 牌照</div>
+                    <div class="checklist-item"><input type="checkbox" id="v1"><label for="v1">要求出示地产代理牌照号码（E-state Agent 牌照或营业员牌照）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="v2"><label for="v2">登录 <a href="https://www.eaa.org.hk" target="_blank">EAA 官网</a> 查册：确认牌照是否有效、有无纪律处分记录</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="v3"><label for="v3">致电 EAA 热线核实：(852) 2111 2777</label></div>
+                    <div class="callout callout-danger">拒绝提供牌照信息的中介一律不合作！</div>
+
+                    <div class="subsection-title">2.2 核查中介公司</div>
+                    <div class="checklist-item"><input type="checkbox" id="v4"><label for="v4">确认中介所属公司是否为正规注册公司（公司注册处查询）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="v5"><label for="v5">优先选择知名品牌：中原地产、美联物业、利嘉阁</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="v6"><label for="v6">在小红书、连登（LIHKG）、Google 搜索中介/公司的评价和投诉</label></div>
+
+                    <div class="subsection-title">2.3 核查业主身份</div>
+                    <div class="checklist-item"><input type="checkbox" id="v7"><label for="v7">要求查看土地注册处查册报告（<a href="https://www.landsd.gov.hk" target="_blank">www.landsd.gov.hk</a>）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="v8"><label for="v8">确认出租人姓名与查册报告上的登记业主一致</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="v9"><label for="v9">如业主委托他人代签，要求出示经公证的授权书</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="v10"><label for="v10">查看业主身份证/护照副本（核实身份）</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="section" id="sec-inspect">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-icon">&#128269;</span>
+                <div class="section-info">
+                    <h2>三、看房时必须问明白的关键问题</h2>
+                    <span class="section-desc">房屋状况、设施设备、费用明细、合约条款、社区安全</span>
+                </div>
+                <span class="chevron">&#9654;</span>
+            </div>
+            <div class="section-body">
+                <div class="section-content">
+                    <div class="subsection-title">3.1 房屋基本情况</div>
+                    <div class="checklist-item"><input type="checkbox" id="i1"><label for="i1">实用面积是多少？（注意"实用面积"vs"建筑面积"的区别）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i2"><label for="i2">楼龄多少年？最近有无装修/翻新？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i3"><label for="i3">属于什么类型？（唐楼/洋楼/屋苑/单栋楼）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i4"><label for="i4">有无有效的入伙纸（Occupation Permit）？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i5"><label for="i5">是否为合法分间单位（劏房）？如是，是否已登记？</label></div>
+
+                    <div class="subsection-title">3.2 设施与设备</div>
+                    <div class="checklist-item"><input type="checkbox" id="i6"><label for="i6">家电清单及品牌/型号：冷气机、热水器、冰箱、洗衣机、抽油烟机、电磁炉/煤气炉</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i7"><label for="i7">各家电是否正常运作？（逐一试用）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i8"><label for="i8">水压是否正常？马桶冲水是否顺畅？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i9"><label for="i9">窗户能否正常开关？有无漏水/渗水痕迹？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i10"><label for="i10">有无独立水电表？（合租/劏房特别重要）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i11"><label for="i11">网络是否已安装？是否包含在租金内？</label></div>
+
+                    <div class="subsection-title">3.3 费用明细</div>
+                    <div class="callout callout-info">逐项确认租金是否包含以下费用：</div>
+                    <div class="checklist-item"><input type="checkbox" id="i12"><label for="i12">管理费</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i13"><label for="i13">差饷（Rates）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i14"><label for="i14">地租（Government Rent）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i15"><label for="i15">水费 / 电费 / 煤气费 / 宽带费</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i16"><label for="i16">如果不包含，确认水电煤单价（劏房常被加价，正常电价约 HK$1.0-1.3/度）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i17"><label for="i17">押金金额及退还条件</label></div>
+
+                    <div class="subsection-title">3.4 合约条款</div>
+                    <div class="checklist-item"><input type="checkbox" id="i18"><label for="i18">最短租期（通常 1-2 年）；死约期多长？生约期多长？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i19"><label for="i19">提前退租的条件和赔偿方式</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i20"><label for="i20">业主有无"收回自住"条款？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i21"><label for="i21">能否转租/分租给他人？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i22"><label for="i22">维修责任如何划分？</label></div>
+
+                    <div class="subsection-title">3.5 社区与安全</div>
+                    <div class="checklist-item"><input type="checkbox" id="i23"><label for="i23">大厦有无保安/门禁系统？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i24"><label for="i24">走火通道是否畅通？有无灭火器/消防喉？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i25"><label for="i25">窗花是否为"活窗花"（可开启用于逃生）？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i26"><label for="i26">附近有无噪音源（酒吧、工地、马路）？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i27"><label for="i27">距港铁站/巴士站步行几分钟？</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="i28"><label for="i28">周边生活配套（超市、餐厅、便利店、银行）是否齐全？</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="section" id="sec-sign">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-icon">&#128221;</span>
+                <div class="section-info">
+                    <h2>四、签约前的注意事项</h2>
+                    <span class="section-desc">合约审查、打厘印、入住准备、支付方式</span>
+                </div>
+                <span class="chevron">&#9654;</span>
+            </div>
+            <div class="section-body">
+                <div class="section-content">
+                    <div class="subsection-title">4.1 合约审查</div>
+                    <div class="checklist-item"><input type="checkbox" id="s1"><label for="s1">仔细阅读租约每一条条款，不懂的要求解释或咨询律师</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s2"><label for="s2">确认租约中物业地址、面积、租金金额与实际一致</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s3"><label for="s3">确认押金金额（标准：<strong>两个月租金</strong>）及退还条件</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s4"><label for="s4">确认上期租金（标准：<strong>一个月租金</strong>）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s5"><label for="s5">确认中介费金额及支付方式</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s6"><label for="s6">确认死约/生约时长及终止条件</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s7"><label for="s7">确认退租通知期（通常 1-2 个月）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s8"><label for="s8">确认有无"业主可提前收回自住"等不利条款</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s9"><label for="s9">确认家电家具清单是否作为合约附件</label></div>
+
+                    <div class="subsection-title">4.2 打厘印（印花税）</div>
+                    <div class="callout callout-warn">租约必须在签订后 30天内到税务局打厘印！未打厘印的租约不受法律全面保护。</div>
+                    <table class="stamp-table">
+                        <tr><th>租期</th><th>厘印费（按年租/平均年租）</th></tr>
+                        <tr><td>1年或以下</td><td>0.25%</td></tr>
+                        <tr><td>1-3年</td><td>0.5%</td></tr>
+                        <tr><td>3年以上</td><td>1%</td></tr>
+                    </table>
+                    <div class="checklist-item"><input type="checkbox" id="s10"><label for="s10">厘印费通常由业主和租客平分</label></div>
+
+                    <div class="subsection-title">4.3 入住前准备</div>
+                    <div class="checklist-item"><input type="checkbox" id="s11"><label for="s11">与业主/中介一起验楼，逐项检查房屋及家电状态</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s12"><label for="s12">对全屋拍照/录影存证（尤其是已有的损坏处）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s13"><label for="s13">填写房屋状况报告（Condition Report），双方签字确认</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s14"><label for="s14">记录入住时水电煤表读数</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s15"><label for="s15">办理水电煤过户手续（中电/港灯、中华煤气、水务署）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s16"><label for="s16">确认钥匙数量（大门、信箱、门禁卡等）</label></div>
+
+                    <div class="subsection-title">4.4 支付方式</div>
+                    <div class="callout callout-danger">绝对不要以现金方式支付大额押金或租金！</div>
+                    <div class="checklist-item"><input type="checkbox" id="s17"><label for="s17">所有款项通过银行转账支付，保留转账记录</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s18"><label for="s18">要求业主出具收据，注明收款事由</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="s19"><label for="s19">押金支付给业主本人银行账户，而非中介或第三方</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="section" id="sec-traps">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-icon">&#9888;</span>
+                <div class="section-info">
+                    <h2>五、常见陷阱与避坑指南</h2>
+                    <span class="section-desc">假房源、黑心中介、二房东、押金纠纷、劏房风险...</span>
+                </div>
+                <span class="chevron">&#9654;</span>
+            </div>
+            <div class="section-body">
+                <div class="section-content">
+                    <div class="trap-card">
+                        <h4>1. 假房源/钓鱼帖</h4>
+                        <p class="trap-method">手法：发布低价精装房源吸引联系，到场后告知"已租出"，转推高价房源</p>
+                        <p class="trap-fix">避坑：看房前要求实拍视频；同房源多平台比价；到场不符直接离开</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>2. 黑心中介加价</h4>
+                        <p class="trap-method">手法：在业主报价基础上加价出租，赚取差价</p>
+                        <p class="trap-fix">避坑：28Hse 搜索同楼盘挂牌价；签约时向业主确认真实租金；选正规大中介</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>3. 二房东/无权转租</h4>
+                        <p class="trap-method">手法：未经业主同意转租，收租金后消失或被清退</p>
+                        <p class="trap-fix">避坑：查原始租约是否允许转租；要业主书面同意函；最好直接与业主签约</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>4. 押金不退/乱扣</h4>
+                        <p class="trap-method">手法：退租时以损坏、清洁费、折旧费等理由克扣押金</p>
+                        <p class="trap-fix">避坑：入住详细拍照存证；退租前恢复原状并拍照；合约明确扣除标准</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>5. 劏房风险</h4>
+                        <p class="trap-method">手法：分间单位可能存在消防、结构安全问题</p>
+                        <p class="trap-fix">避坑：查入伙纸；检查消防设施；确认独立水电表；了解劏房租务管制规定（2+2年保障）</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>6. "免佣"陷阱</h4>
+                        <p class="trap-method">手法：声称免中介费，实际租金已暗中加价</p>
+                        <p class="trap-fix">避坑：对比同类房源市场租金；问清有无其他隐藏费用；算总账</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>7. 凶宅/不吉利单位</h4>
+                        <p class="trap-method">手法：隐瞒非正常死亡事件</p>
+                        <p class="trap-fix">避坑：网上搜索该地址凶宅记录；直接询问中介（有义务如实告知）；28Hse 凶宅数据库查询</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>8. 水电费加价</h4>
+                        <p class="trap-method">手法：劏房/合租房东收取高于标准的水电费</p>
+                        <p class="trap-fix">避坑：正常电费约 HK$1.0-1.3/度；要求看缴费单据；过高可向消委会投诉</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>9. 业主提前收回</h4>
+                        <p class="trap-method">手法：合约中加入"业主可随时收回自住"条款</p>
+                        <p class="trap-fix">避坑：审查中止条款；争取删除或限制（如提前3-6个月通知+赔偿）；死约期内不得单方终止</p>
+                    </div>
+                    <div class="trap-card">
+                        <h4>10. 网络诈骗</h4>
+                        <p class="trap-method">手法：社交媒体发布虚假房源，要求先付定金才给钥匙看房</p>
+                        <p class="trap-fix">避坑：未看房绝不付款；不向未见面的人转账；优先使用担保支付方式</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="section" id="sec-resources">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-icon">&#128218;</span>
+                <div class="section-info">
+                    <h2>六、实用资源汇总</h2>
+                    <span class="section-desc">官方机构、租房平台、社交渠道</span>
+                </div>
+                <span class="chevron">&#9654;</span>
+            </div>
+            <div class="section-body">
+                <div class="section-content">
+                    <div class="subsection-title">官方机构</div>
+                    <table class="resource-table">
+                        <tr><th>机构</th><th>用途</th><th>网址</th></tr>
+                        <tr><td>地产代理监管局（EAA）</td><td>验证中介牌照</td><td><a href="https://www.eaa.org.hk" target="_blank">www.eaa.org.hk</a></td></tr>
+                        <tr><td>土地注册处</td><td>查册确认业主身份</td><td><a href="https://www.landsd.gov.hk" target="_blank">www.landsd.gov.hk</a></td></tr>
+                        <tr><td>差饷物业估价署</td><td>租务参考/标准租约</td><td><a href="https://www.rvd.gov.hk" target="_blank">www.rvd.gov.hk</a></td></tr>
+                        <tr><td>税务局</td><td>打厘印（印花税）</td><td><a href="https://www.ird.gov.hk" target="_blank">www.ird.gov.hk</a></td></tr>
+                        <tr><td>屋宇署</td><td>查入伙纸/建筑安全</td><td><a href="https://www.bd.gov.hk" target="_blank">www.bd.gov.hk</a></td></tr>
+                        <tr><td>消费者委员会</td><td>租务投诉/权益咨询</td><td><a href="https://www.consumer.org.hk" target="_blank">www.consumer.org.hk</a></td></tr>
+                    </table>
+
+                    <div class="subsection-title">租房平台</div>
+                    <table class="resource-table">
+                        <tr><th>平台</th><th>特点</th></tr>
+                        <tr><td>28Hse（28Housing）</td><td>香港最大本地租房平台，房源多</td></tr>
+                        <tr><td>Squarefoot</td><td>中英文双语，界面友好</td></tr>
+                        <tr><td>Spacious</td><td>英文为主，适合外籍人士</td></tr>
+                        <tr><td>中原地产/美联物业</td><td>大型连锁中介，相对规范</td></tr>
+                        <tr><td>591房屋网</td><td>有港漂专区</td></tr>
+                    </table>
+
+                    <div class="subsection-title">社交渠道</div>
+                    <div class="checklist-item"><input type="checkbox" id="r1"><label for="r1">小红书：搜"港大租房""西营盘租房""香港租房避坑"</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="r2"><label for="r2">知乎：搜"香港读研租房经验"</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="r3"><label for="r3">寄托天下（gter.net）：留学生租房论坛</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="r4"><label for="r4">Facebook 群组："HKU Accommodation"、"Hong Kong Apartments & Rooms for Rent"</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="r5"><label for="r5">微信群：各届港大内地生租房群（通过录取群或学长学姐加入）</label></div>
+                    <div class="checklist-item"><input type="checkbox" id="r6"><label for="r6">连登（LIHKG）：香港本地论坛，有租房讨论区</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="section" id="sec-timeline">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-icon">&#128197;</span>
+                <div class="section-info">
+                    <h2>七、时间线建议</h2>
+                    <span class="section-desc">从拿到录取到入住的全流程节奏</span>
+                </div>
+                <span class="chevron">&#9654;</span>
+            </div>
+            <div class="section-body">
+                <div class="section-content">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-time">拿到录取后（3-5月）</div>
+                            <div class="timeline-text">开始在网上了解市场行情，加入租房群</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">5-7月</div>
+                            <div class="timeline-text">租房旺季，积极看房、比较</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">确定房源后</div>
+                            <div class="timeline-text">核实中介/业主身份、审查合约</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">签约时</div>
+                            <div class="timeline-text">打厘印、支付押金和上期租金</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">入住前</div>
+                            <div class="timeline-text">验楼、拍照存证、水电煤过户</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">入住后</div>
+                            <div class="timeline-text">保留所有文件和沟通记录</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>基于 2024-2026 年公开信息和常见经验整理 · 签约前请参考官方机构最新指引</p>
+            <p style="margin-top:6px;">Wanghainuo2004.github.io</p>
+        </div>
+    </div>
+
+    <script>
+        // Section toggle
+        function toggleSection(header) {
+            header.parentElement.classList.toggle('expanded');
+        }
+
+        // Checkbox persistence & progress
+        const STORAGE_KEY = 'hk-rental-checklist';
+        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+
+        function loadState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                allCheckboxes.forEach(cb => {
+                    if (saved[cb.id]) cb.checked = true;
+                });
+            } catch(e) {}
+        }
+
+        function saveState() {
+            const state = {};
+            allCheckboxes.forEach(cb => { state[cb.id] = cb.checked; });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function updateProgress() {
+            const total = allCheckboxes.length;
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            const pct = total ? (checked / total * 100) : 0;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressText').textContent = checked + ' / ' + total + ' 已完成';
+            document.getElementById('checkedCount').textContent = checked;
+            document.getElementById('totalCount').textContent = total;
+        }
+
+        function resetAll() {
+            if (!confirm('确定要重置所有勾选吗？')) return;
+            allCheckboxes.forEach(cb => cb.checked = false);
+            saveState();
+            updateProgress();
+        }
+
+        allCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => { saveState(); updateProgress(); });
+        });
+
+        // Sidebar active state
+        const sections = document.querySelectorAll('.section');
+        const sidebarLinks = document.querySelectorAll('.sidebar a');
+        function updateSidebarActive() {
+            let current = '';
+            sections.forEach(sec => {
+                if (sec.getBoundingClientRect().top <= 100) current = sec.id;
+            });
+            sidebarLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+            });
+        }
+        window.addEventListener('scroll', updateSidebarActive);
+
+        // Init
+        loadState();
+        updateProgress();
+        updateSidebarActive();
+    </script>
+</body>
+</html>
