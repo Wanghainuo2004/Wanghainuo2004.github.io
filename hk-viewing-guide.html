@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>香港租房看房 · 内地居民懒人攻略</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fa;
+    color: #1a1a2e;
+    line-height: 1.8;
+    padding: 20px;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  header {
+    text-align: center;
+    padding: 30px 0 20px;
+  }
+  header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0d3b66;
+  }
+  header p {
+    color: #666;
+    font-size: 14px;
+    margin-top: 6px;
+  }
+  .step-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 4px solid #0d3b66;
+  }
+  .step-card.warn {
+    border-left-color: #e6a817;
+  }
+  .step-card.success {
+    border-left-color: #2d9c3e;
+  }
+  .step-card.danger {
+    border-left-color: #d1453b;
+  }
+  .step-number {
+    display: inline-block;
+    width: 28px; height: 28px;
+    background: #0d3b66;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-right: 10px;
+  }
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+  }
+  h2 .emoji { margin-right: 8px; }
+  ul, ol {
+    padding-left: 24px;
+    margin: 8px 0;
+  }
+  li { margin-bottom: 6px; }
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .tag.green { background: #e6f7e6; color: #2d9c3e; }
+  .tag.yellow { background: #fef7e0; color: #b8860b; }
+  .tag.red { background: #fde8e6; color: #d1453b; }
+  .tag.blue { background: #e6f0ff; color: #0d3b66; }
+  .highlight-box {
+    background: #f0f4ff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .highlight-box strong { color: #0d3b66; }
+  .divider {
+    height: 1px;
+    background: #e8ecf0;
+    margin: 20px 0;
+  }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background: #fafbfc;
+    border-radius: 8px;
+  }
+  .checklist-item .box {
+    width: 20px; height: 20px;
+    border: 2px solid #b0b8c4;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .checklist-item .label { flex: 1; }
+  .checklist-item .label small {
+    color: #888;
+    font-size: 12px;
+  }
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+  }
+  .btn.primary { background: #0d3b66; color: white; }
+  .btn.outline { background: transparent; color: #0d3b66; border: 2px solid #0d3b66; }
+  .btn.gray { background: #e8ecf0; color: #333; }
+  footer {
+    text-align: center;
+    padding: 30px 0;
+    color: #999;
+    font-size: 13px;
+  }
+  @media (max-width: 480px) {
+    body { padding: 12px; }
+    .step-card { padding: 18px; }
+    header h1 { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🇭🇰 香港租房看房 · 内地居民懒人攻略</h1>
+  <p>从办证到过关到看房，不用动脑子，跟着做就行</p>
+</header>
+
+<!-- ===== 第零步：自检 ===== -->
+<div class="step-card danger">
+  <h2><span class="emoji">🪪</span> 第 0 步：先确认你有没有证</h2>
+  <ul>
+    <li>翻一下你手头有没有 <strong>港澳通行证</strong>（一本蓝色/紫色的小本子，或者一张卡式证件）</li>
+    <li><strong>有，且没过期</strong> → 跳到第 1 步</li>
+    <li><strong>有，但过期了</strong> → 去当地出入境大厅换发新证（跟办新证流程一样）</li>
+    <li><strong>从来没有办过</strong> → 看第 1 步</li>
+  </ul>
+  <div class="highlight-box">
+    ⚠️ <strong>只有港澳通行证还不够</strong>，你还需要一个 <strong>签注（ endorsement）</strong>贴在/印在通行证上才能过关。两个东西缺一不可。
+  </div>
+</div>
+
+<!-- ===== 第一步 ===== -->
+<div class="step-card">
+  <h2><span class="step-number">1</span> 办港澳通行证（如果没有的话）</h2>
+  <div class="highlight-box">
+    <strong>去哪办：</strong>你附近的（全国通办，不用回户籍地） <strong>公安局出入境管理局</strong>（可以在微信/支付宝搜"出入境"预约）
+  </div>
+  <ul>
+    <li><strong>材料：</strong>身份证原件 + 回执（现场拍证件照）</li>
+    <li><strong>费用：</strong>通行证 60 元 + 一次签注 15 元（建议直接办 <strong>一年两次</strong> 的签注，共 30 元）</li>
+    <li><strong>时间：</strong>7–15 个工作日（不同城市不一样，节前可能更慢）</li>
+  </ul>
+  <div class="btn-group">
+    <a class="btn primary" target="_blank" href="https://s.nia.gov.cn/">👉 国家移民管理局官网预约</a>
+    <a class="btn gray" target="_blank" href="https://www.12367.cn/">📞 移民局服务热线 12367</a>
+  </div>
+</div>
+
+<!-- ===== 第二步 ===== -->
+<div class="step-card">
+  <h2><span class="step-number">2</span> 已经有通行证？检查签注</h2>
+  <p>翻到通行证背面的签注页（或者卡式证件的内置芯片信息），看：</p>
+  <ul>
+    <li><strong>签注类型：</strong>必须是 <span class="tag green">个人旅游（G签）</span> 或 <span class="tag green">团队旅游（L签）</span><br>
+    <small>🔹 L签现在也可以自己过关，不需要跟团了（2017 年以后的政策）</small></li>
+    <li><strong>有效期：</strong>签注必须在有效期内（通常是一年或三个月）</li>
+    <li><strong>剩余次数：</strong>如果已经用完（比如一年两次已经用了两次），需要 <strong>续签</strong></li>
+  </ul>
+  <div class="highlight-box">
+    <strong>续签方法（最简单）：</strong>很多城市出入境大厅有 <strong>自助签注机</strong>，带上通行证和身份证，当场办理、当场出签，<strong>立等可取</strong>，不需要预约。<br>
+    🔸 费用：一次 15 元<br>
+    🔸 建议签 <strong>一年两次（30 元）</strong>，这样去一趟回来还有一次备用
+  </div>
+</div>
+
+<!-- ===== 第三步 ===== -->
+<div class="step-card success">
+  <h2><span class="step-number">3</span> 出发前：证件核对清单</h2>
+  <p>出发前一晚，对着这个清单检查一遍：</p>
+
+  <div class="checklist-item">
+    <div class="box"></div>
+    <div class="label"><strong>✅ 港澳通行证</strong><br><small>确认在有效期内，没有破损</small></div>
+  </div>
+  <div class="checklist-item">
+    <div class="box"></div>
+    <div class="label"><strong>✅ 有效签注（G签 或 L签）</strong><br><small>确认还有剩余次数、未过期</small></div>
+  </div>
+  <div class="checklist-item">
+    <div class="box"></div>
+    <div class="label"><strong>✅ 内地身份证</strong><br><small>过关基本不需要，但建议带着</small></div>
+  </div>
+  <div class="checklist-item">
+    <div class="box"></div>
+    <div class="label"><strong>✅ 手机开通香港漫游</strong><br><small>支付宝搜"境外上网"买流量包，约 20元/天</small></div>
+  </div>
+  <div class="checklist-item">
+    <div class="box"></div>
+    <div class="label"><strong>✅ 适量港币现金</strong><br><small>建议 1000–2000 HKD，部分小店/茶餐厅只收现金</small></div>
+  </div>
+  <div class="checklist-item">
+    <div class="box"></div>
+    <div class="label"><strong>✅ 八达通或支付宝乘车码</strong><br><small>支付宝搜"香港乘车码"开通即可坐港铁</small></div>
+  </div>
+  <div class="checklist-item">
+    <div class="box"></div>
+    <div class="label"><strong>✅ 充电宝 + 转换插头</strong><br><small>香港用英标三脚插头（如果你住酒店一般有提供）</small></div>
+  </div>
+
+  <div class="highlight-box" style="margin-top: 14px;">
+    💡 <strong>强烈建议：</strong>出发前先在 <strong>微信/支付宝</strong> 搜"海关旅客指尖服务"（或叫"海关申报"），提前填好 <strong>健康申报</strong>（黑码），截图保存，过关时直接扫码，省去现场排队填表的时间。
+  </div>
+</div>
+
+<!-- ===== 第四步 ===== -->
+<div class="step-card">
+  <h2><span class="step-number">4</span> 怎么去香港：过关口岸选择</h2>
+  <p>从深圳过关去香港有以下几个主要口岸，选你最方便的：</p>
+
+  <table style="width:100%; border-collapse: collapse; margin: 12px 0; font-size: 14px;">
+    <tr style="background: #f0f4ff;">
+      <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">口岸</th>
+      <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">交通方式</th>
+      <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">到市区时间</th>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">🚇 罗湖口岸</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">深圳地铁1号线 → 港铁东铁线</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">约 40 分钟到旺角</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">🚇 福田口岸</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">深圳地铁4号线 → 港铁东铁线（落马洲站）</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">约 45 分钟到旺角</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">🚌 深圳湾口岸</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">过关后坐跨境巴士（B2/B3等）</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">约 30-50 分钟</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">🚄 西九龙高铁站</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">从深圳北/广州南坐高铁直达</td>
+      <td style="padding: 8px; border-bottom: 1px solid #eee;">深圳 14 分钟 / 广州 50 分钟</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px;">✈️ 直飞香港机场</td>
+      <td style="padding: 8px;">从你所在城市直飞香港</td>
+      <td style="padding: 8px;">最方便但最贵</td>
+    </tr>
+  </table>
+
+  <div class="highlight-box">
+    <strong>新手最推荐：福田口岸 或 罗湖口岸</strong><br>
+    过关后直接上港铁东铁线，一路坐到市区，指示清晰、不容易走错。而且这两个口岸的自助通道多，排队时间相对短。
+  </div>
+</div>
+
+<!-- ===== 第五步 ===== -->
+<div class="step-card">
+  <h2><span class="step-number">5</span> 过关流程（非常简单）</h2>
+  <ol>
+    <li><strong>深圳这边出关：</strong>走 <strong>自助通道（e-道）</strong>，把港澳通行证放在读卡器上，按指纹，闸门开，走过去。<br>
+    <small>🔸 注意：第一次用新版卡式通行证的人，有的口岸需要走人工通道录一次指纹，之后就可以一直走自助通道了。</small></li>
+    <li><strong>香港这边入关：</strong>同样走 <strong>e-道（自助通道）</strong>，放通行证 → 按指纹 → 取入境小纸条（<strong>这张小纸条收好</strong>，住酒店可能会看）。</li>
+  </ol>
+  <div class="highlight-box">
+    ⚠️ <strong>入境小纸条（Landing Slip）一定要收好！</strong> 有些酒店 check-in 时要求出示，而且如果弄丢了，离开香港时可能要多花时间补办。
+  </div>
+</div>
+
+<!-- ===== 第六步 ===== -->
+<div class="step-card">
+  <h2><span class="step-number">6</span> 到了香港怎么看房</h2>
+
+  <div class="highlight-box" style="background: #fff8e6;">
+    <strong>📌 你在跟中介 battle 看房费对吧？现在你到了香港，记住几点：</strong>
+  </div>
+
+  <ul>
+    <li><strong>中介带你看房，不需要提前签任何东西</strong>——正规大行（中原、美联、利嘉阁、香港置业）都是免费带看，不会要你签任何协议才让看房。</li>
+    <li><strong>如果中介让你先签 Form 6 再看房</strong>——那是正常的，<strong>但注意看 Schedule 3 的佣金条款</strong>：佣金只有成交才付。不要在 Form 6 里签任何"睇楼费"之类的额外收费条款。</li>
+    <li><strong>如果中介说要收睇楼费才给看房</strong>——直接换一家。香港正规中介上千家，不收睇楼费的占绝大多数。</li>
+    <li><strong>常用的找房平台：</strong>
+      <br>🔸 <a href="https://www.28hse.com/" target="_blank">28Hse</a>（最多人用）
+      <br>🔸 <a href="https://www.spacious.hk/" target="_blank">Spacious</a>
+      <br>🔸 <a href="https://www.centanet.com/" target="_blank">中原地产</a> / <a href="https://www.midland.com.hk/" target="_blank">美联物业</a>
+    </li>
+    <li><strong>看房前先跟中介确认清楚：</strong>有没有任何费用？佣金怎么收？是成交后付半月租金还是一整个月？这些都要提前说好。</li>
+  </ul>
+</div>
+
+<!-- ===== 第七步 ===== -->
+<div class="step-card warn">
+  <h2><span class="step-number">7</span> 看完房之后（租还是不租）</h2>
+  <ul>
+    <li><strong>如果决定租：</strong>中介会准备正式租约，你需要提供通行证复印件，签署 Form 6 或正式租约，然后付 <strong>按金（押金，通常是两个月租金）+ 上期（首月租金）+ 佣金（半个月或一个月租金）</strong>。</li>
+    <li><strong>如果不租：</strong>没有任何费用，直接走人就行。</li>
+    <li><strong>如果在香港期间拿不定主意：</strong>可以先回内地，微信上跟中介继续聊，决定好了再安排下一次去签约。</li>
+  </ul>
+</div>
+
+<!-- ===== 第八步 ===== -->
+<div class="step-card success">
+  <h2><span class="step-number">8</span> 回程 &amp; 下次再去</h2>
+  <ul>
+    <li>原路返回即可，过关流程一样：走自助通道，放通行证、按指纹。</li>
+    <li><strong>签注次数提醒：</strong>
+      <br>🔸 如果你办的是 <strong>一年两次</strong> 的签注，去一次用一次，回来还剩一次，下次可以直接再去。
+      <br>🔸 如果用完了，去出入境大厅的自助签注机 <strong>续签</strong>（15 元一次，立等可取）。</li>
+  </ul>
+</div>
+
+<!-- ===== 附录 ===== -->
+<div class="step-card" style="border-left-color: #888;">
+  <h2>📋 附录：常用电话 &amp; 链接</h2>
+  <table style="width:100%; border-collapse: collapse; font-size: 14px; margin-top: 8px;">
+    <tr><td style="padding: 6px 0;"><strong>国家移民管理局</strong></td><td style="padding: 6px 0;"><a href="https://s.nia.gov.cn/" target="_blank">s.nia.gov.cn</a></td></tr>
+    <tr><td style="padding: 6px 0;"><strong>移民局热线</strong></td><td style="padding: 6px 0;">12367</td></tr>
+    <tr><td style="padding: 6px 0;"><strong>EAA 投诉电话</strong></td><td style="padding: 6px 0;">2111 2777</td></tr>
+    <tr><td style="padding: 6px 0;"><strong>EAA 投诉邮箱</strong></td><td style="padding: 6px 0;">complaint@eaa.org.hk</td></tr>
+    <tr><td style="padding: 6px 0;"><strong>海关健康申报</strong></td><td style="padding: 6px 0;">微信/支付宝搜"海关旅客指尖服务"</td></tr>
+    <tr><td style="padding: 6px 0;"><strong>香港流量包</strong></td><td style="padding: 6px 0;">支付宝搜"境外上网"</td></tr>
+  </table>
+</div>
+
+<!-- ===== 一句话总结 ===== -->
+<div class="step-card danger" style="text-align: center; border-left-color: #0d3b66;">
+  <h2 style="justify-content: center; margin-bottom: 4px;">你的行动清单</h2>
+  <p style="font-size: 22px; font-weight: 700; margin: 10px 0;">① 确认通行证 + 签注有效 → ② 买流量包 → ③ 填海关申报 → ④ 过关 → ⑤ 免费看房</p>
+  <p style="color: #888; font-size: 14px;">搞定 👌 有任何问题随时问</p>
+</div>
+
+<footer>
+  本攻略仅供参考，具体政策以官方最新公告为准 · 最后更新 2026 年 6 月
+</footer>
+
+</div>
+</body>
+</html>
