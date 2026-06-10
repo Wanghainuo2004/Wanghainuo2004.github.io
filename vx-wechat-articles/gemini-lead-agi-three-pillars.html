@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对话 Gemini 负责人：AGI 的三条主线</title>
+<style>
+:root {
+  --google-blue: #4285F4;
+  --google-red: #EA4335;
+  --google-yellow: #FBBC05;
+  --google-green: #34A853;
+  --bg: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-card: #ffffff;
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --text-tertiary: #80868b;
+  --border: #dadce0;
+  --shadow: rgba(0,0,0,0.08);
+  --shadow-lg: rgba(0,0,0,0.12);
+  --accent: var(--google-blue);
+  --progress-bg: #e8eaed;
+  --code-bg: #f1f3f4;
+  --overlay: rgba(0,0,0,0.5);
+  --toc-bg: #ffffff;
+  --hero-gradient: linear-gradient(135deg, #1a73e8 0%, #4285F4 50%, #34A853 100%);
+  --pill-blue-bg: #e8f0fe;
+  --pill-red-bg: #fce8e6;
+  --pill-yellow-bg: #fef7e0;
+  --pill-green-bg: #e6f4ea;
+}
+[data-theme="dark"] {
+  --bg: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-card: #1e293b;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-tertiary: #80868b;
+  --border: #3c4043;
+  --shadow: rgba(0,0,0,0.3);
+  --shadow-lg: rgba(0,0,0,0.5);
+  --progress-bg: #3c4043;
+  --code-bg: #2d3748;
+  --overlay: rgba(0,0,0,0.7);
+  --toc-bg: #1e293b;
+  --hero-gradient: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1b5e20 100%);
+  --pill-blue-bg: #1a3a5c;
+  --pill-red-bg: #5c2020;
+  --pill-yellow-bg: #5c4a10;
+  --pill-green-bg: #1a4020;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.8;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Progress Bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--google-blue), var(--google-red), var(--google-yellow), var(--google-green));
+  z-index: 1000;
+  transition: width 0.1s;
+}
+
+/* Top Nav */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+  transition: background 0.3s;
+}
+.nav-logo {
+  font-size: 18px;
+  font-weight: 700;
+  background: var(--hero-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.nav-actions { display: flex; gap: 8px; align-items: center; }
+.nav-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.nav-btn:hover { background: var(--bg-secondary); }
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+.theme-toggle:hover { background: var(--bg-secondary); transform: rotate(30deg); }
+
+/* Hero Section */
+.hero {
+  margin-top: 56px;
+  padding: 80px 24px 60px;
+  background: var(--hero-gradient);
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(255,255,255,0.05) 0%, transparent 50%);
+  animation: heroFloat 20s ease-in-out infinite;
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(2%, -2%) rotate(1deg); }
+  66% { transform: translate(-1%, 1%) rotate(-0.5deg); }
+}
+.hero-content { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 800;
+  line-height: 1.3;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.hero-subtitle {
+  font-size: clamp(15px, 2.5vw, 18px);
+  opacity: 0.9;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.hero-meta {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  opacity: 0.85;
+}
+.hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+/* Three Pillars Preview */
+.pillars-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 600px;
+  margin: 32px auto 0;
+  position: relative;
+  z-index: 1;
+}
+.pillar-pill {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform 0.2s, background 0.2s;
+  cursor: default;
+}
+.pillar-pill:hover { transform: translateY(-2px); background: rgba(255,255,255,0.2); }
+.pillar-icon { font-size: 24px; display: block; margin-bottom: 6px; }
+
+/* Main Layout */
+.main-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+  padding: 40px 24px;
+}
+.content-area { max-width: 720px; }
+
+/* TOC Sidebar */
+.toc-sidebar {
+  position: sticky;
+  top: 76px;
+  height: fit-content;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--toc-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+.toc-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+}
+.toc-list { list-style: none; }
+.toc-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 2px solid transparent;
+  margin-bottom: 2px;
+}
+.toc-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.toc-item.active {
+  color: var(--google-blue);
+  background: var(--pill-blue-bg);
+  border-left-color: var(--google-blue);
+  font-weight: 600;
+}
+.toc-num {
+  display: inline-block;
+  width: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+/* Module Sections */
+.module {
+  margin-bottom: 56px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.module.visible { opacity: 1; transform: translateY(0); }
+.module-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+.module-num {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+  color: white;
+  flex-shrink: 0;
+}
+.module-num.blue { background: var(--google-blue); }
+.module-num.red { background: var(--google-red); }
+.module-num.yellow { background: var(--google-yellow); color: #333; }
+.module-num.green { background: var(--google-green); }
+.module-title { font-size: clamp(22px, 3.5vw, 28px); font-weight: 700; letter-spacing: -0.01em; }
+.module p {
+  margin-bottom: 16px;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text-primary);
+}
+
+/* Concept Cards */
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.concept-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--shadow-lg);
+}
+.concept-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.concept-card.blue::before { background: var(--google-blue); }
+.concept-card.red::before { background: var(--google-red); }
+.concept-card.yellow::before { background: var(--google-yellow); }
+.concept-card.green::before { background: var(--google-green); }
+.concept-card-icon { font-size: 28px; margin-bottom: 10px; }
+.concept-card h4 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.concept-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0; }
+
+/* Quote Blocks */
+.quote-block {
+  border-left: 3px solid var(--google-blue);
+  background: var(--bg-secondary);
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  margin: 24px 0;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.quote-block:hover { background: var(--pill-blue-bg); }
+.quote-block::before {
+  content: '"';
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--google-blue);
+  opacity: 0.3;
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  line-height: 1;
+}
+.quote-text {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--text-primary);
+  padding-left: 28px;
+  line-height: 1.8;
+}
+.quote-attr {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-top: 10px;
+  padding-left: 28px;
+  font-style: normal;
+}
+.quote-expanded {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s;
+  padding-left: 28px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.quote-block.expanded .quote-expanded { max-height: 300px; padding-top: 12px; }
+.expand-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding-left: 28px;
+  margin-top: 8px;
+}
+
+/* Pillar Cards (3-column) */
+.pillar-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.pillar-card {
+  border-radius: 14px;
+  padding: 24px 20px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+  border: 1px solid transparent;
+}
+.pillar-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--shadow-lg); }
+.pillar-card.blue-card {
+  background: var(--pill-blue-bg);
+  border-color: rgba(66,133,244,0.2);
+}
+.pillar-card.red-card {
+  background: var(--pill-red-bg);
+  border-color: rgba(234,67,53,0.2);
+}
+.pillar-card.yellow-card {
+  background: var(--pill-yellow-bg);
+  border-color: rgba(251,188,5,0.2);
+}
+.pillar-card.green-card {
+  background: var(--pill-green-bg);
+  border-color: rgba(52,168,83,0.2);
+}
+.pillar-card-icon { font-size: 36px; margin-bottom: 12px; }
+.pillar-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.pillar-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.pillar-card .pillar-en {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+  margin: 24px 0;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--google-blue), var(--google-red), var(--google-yellow), var(--google-green));
+  border-radius: 2px;
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.timeline-item:hover { transform: translateX(4px); box-shadow: 0 2px 8px var(--shadow); }
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -27px;
+  top: 22px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+}
+.timeline-item.tl-blue::before { background: var(--google-blue); }
+.timeline-item.tl-red::before { background: var(--google-red); }
+.timeline-item.tl-yellow::before { background: var(--google-yellow); }
+.timeline-item.tl-green::before { background: var(--google-green); }
+.timeline-item h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.timeline-item p { font-size: 14px; color: var(--text-secondary); margin-bottom: 0; }
+
+/* Comparison Table */
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 24px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px var(--shadow);
+  font-size: 14px;
+}
+.comparison-table thead th {
+  background: var(--bg-secondary);
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border);
+}
+.comparison-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  vertical-align: top;
+}
+.comparison-table tbody tr:last-child td { border-bottom: none; }
+.comparison-table tbody tr:hover td { background: var(--bg-secondary); }
+.table-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.tag-blue { background: var(--pill-blue-bg); color: var(--google-blue); }
+.tag-red { background: var(--pill-red-bg); color: var(--google-red); }
+.tag-green { background: var(--pill-green-bg); color: var(--google-green); }
+
+/* Key Insight Box */
+.insight-box {
+  background: linear-gradient(135deg, var(--pill-blue-bg), var(--pill-green-bg));
+  border: 1px solid rgba(66,133,244,0.15);
+  border-radius: 14px;
+  padding: 24px;
+  margin: 24px 0;
+}
+.insight-box h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--google-blue);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.insight-box p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0; }
+
+/* Expandable Detail */
+.expandable {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 16px 0;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.expandable:hover { border-color: var(--google-blue); }
+.expandable-header {
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s;
+  user-select: none;
+}
+.expandable-header:hover { background: var(--bg-secondary); }
+.expandable-arrow {
+  transition: transform 0.3s;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.expandable.open .expandable-arrow { transform: rotate(180deg); }
+.expandable-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.expandable-body-inner {
+  padding: 0 20px 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+/* Quiz Section */
+.quiz-section {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 28px;
+  margin: 40px 0;
+}
+.quiz-section h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quiz-section > p { color: var(--text-secondary); margin-bottom: 28px; font-size: 14px; }
+.quiz-question {
+  margin-bottom: 28px;
+  padding: 20px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+.quiz-question h4 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  background: var(--bg-card);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quiz-option:hover:not(.selected) { border-color: var(--google-blue); background: var(--pill-blue-bg); }
+.quiz-option .opt-letter {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.quiz-option.correct {
+  border-color: var(--google-green);
+  background: var(--pill-green-bg);
+}
+.quiz-option.correct .opt-letter { background: var(--google-green); color: white; }
+.quiz-option.wrong {
+  border-color: var(--google-red);
+  background: var(--pill-red-bg);
+}
+.quiz-option.wrong .opt-letter { background: var(--google-red); color: white; }
+.quiz-option.selected:not(.correct):not(.wrong) {
+  border-color: var(--google-blue);
+  background: var(--pill-blue-bg);
+}
+.quiz-feedback {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  display: none;
+  line-height: 1.6;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: var(--pill-green-bg); color: #137333; border: 1px solid rgba(52,168,83,0.3); }
+.quiz-feedback.wrong-fb { background: var(--pill-red-bg); color: #c5221f; border: 1px solid rgba(234,67,53,0.3); }
+.quiz-score {
+  text-align: center;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  display: none;
+  margin-top: 20px;
+}
+.quiz-score.show { display: block; }
+.quiz-score-num {
+  font-size: 48px;
+  font-weight: 800;
+  background: var(--hero-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.quiz-score p { color: var(--text-secondary); margin-top: 8px; }
+.quiz-btn {
+  background: var(--google-blue);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 16px;
+}
+.quiz-btn:hover { background: #3367d6; transform: translateY(-1px); }
+
+/* Takeaway Cards */
+.takeaways {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.takeaway-card {
+  border-radius: 14px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.takeaway-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow-lg); }
+.takeaway-card::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  opacity: 0.1;
+}
+.takeaway-card.tk-blue {
+  background: var(--pill-blue-bg);
+  border: 1px solid rgba(66,133,244,0.15);
+}
+.takeaway-card.tk-blue::after { background: var(--google-blue); }
+.takeaway-card.tk-red {
+  background: var(--pill-red-bg);
+  border: 1px solid rgba(234,67,53,0.15);
+}
+.takeaway-card.tk-red::after { background: var(--google-red); }
+.takeaway-card.tk-yellow {
+  background: var(--pill-yellow-bg);
+  border: 1px solid rgba(251,188,5,0.15);
+}
+.takeaway-card.tk-yellow::after { background: var(--google-yellow); }
+.takeaway-card.tk-green {
+  background: var(--pill-green-bg);
+  border: 1px solid rgba(52,168,83,0.15);
+}
+.takeaway-card.tk-green::after { background: var(--google-green); }
+.takeaway-card h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  position: relative;
+}
+.takeaway-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  position: relative;
+  margin-bottom: 0;
+}
+
+/* Highlight Text */
+.highlight { font-weight: 600; }
+.highlight-blue { color: var(--google-blue); font-weight: 600; }
+.highlight-red { color: var(--google-red); font-weight: 600; }
+.highlight-yellow { color: #e8a000; font-weight: 600; }
+.highlight-green { color: var(--google-green); font-weight: 600; }
+
+/* NP-hard Analogy Box */
+.analogy-box {
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.analogy-box strong { color: var(--text-primary); }
+
+/* Footer */
+.article-footer {
+  text-align: center;
+  padding: 48px 24px;
+  border-top: 1px solid var(--border);
+  margin-top: 60px;
+}
+.footer-logo {
+  font-size: 20px;
+  font-weight: 800;
+  background: var(--hero-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+}
+.footer-text { font-size: 13px; color: var(--text-tertiary); }
+
+/* Scroll to top */
+.scroll-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--google-blue);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(66,133,244,0.4);
+}
+.scroll-top.show { opacity: 1; transform: translateY(0); }
+.scroll-top:hover { background: #3367d6; transform: translateY(-2px); }
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    padding: 24px 16px;
+    gap: 0;
+  }
+  .toc-sidebar { display: none; }
+  .hero { padding: 60px 20px 48px; }
+  .pillars-preview { grid-template-columns: 1fr; max-width: 280px; }
+  .pillar-cards { grid-template-columns: 1fr; }
+  .takeaways { grid-template-columns: 1fr; }
+  .quiz-section { padding: 24px 18px; }
+  .comparison-table { font-size: 13px; }
+  .comparison-table thead th, .comparison-table tbody td { padding: 10px 12px; }
+  .module-header { gap: 10px; }
+  .module-num { width: 36px; height: 36px; font-size: 15px; }
+}
+@media (max-width: 480px) {
+  .hero h1 { font-size: 24px; }
+  .hero-meta { gap: 12px; }
+  .nav-logo { font-size: 15px; }
+  .concept-card { padding: 18px; }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeInUp 0.6s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+  <div class="nav-logo">AGI Deep Dive</div>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="toggleMobileTOC()" id="tocBtn" style="display:none;">&#9776; 目录</button>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="切换主题">&#9790;</button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">&#127775; Z Finance 深度访谈</div>
+    <h1>对话 Gemini 负责人：<br>AGI 的三条主线</h1>
+    <p class="hero-subtitle">Oriol Vinyals 解构通用人工智能的核心路径——世界模型、Agent 进化与记忆系统</p>
+    <div class="hero-meta">
+      <span>&#128100; Oriol Vinyals / Google DeepMind</span>
+      <span>&#128337; 阅读约 20 分钟</span>
+      <span>&#128218; 8 个学习模块</span>
+    </div>
+    <div class="pillars-preview">
+      <div class="pillar-pill">
+        <span class="pillar-icon">&#127758;</span>
+        世界模型
+      </div>
+      <div class="pillar-pill">
+        <span class="pillar-icon">&#129302;</span>
+        Agent
+      </div>
+      <div class="pillar-pill">
+        <span class="pillar-icon">&#129504;</span>
+        记忆系统
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="main-layout">
+
+  <!-- TOC Sidebar -->
+  <aside class="toc-sidebar" id="tocSidebar">
+    <div class="toc-title">文章目录</div>
+    <ul class="toc-list" id="tocList">
+      <li class="toc-item active" data-target="mod1"><span class="toc-num">01</span> 世界模型</li>
+      <li class="toc-item" data-target="mod2"><span class="toc-num">02</span> 从 Omni 到机器人</li>
+      <li class="toc-item" data-target="mod3"><span class="toc-num">03</span> Agent 进化</li>
+      <li class="toc-item" data-target="mod4"><span class="toc-num">04</span> 记忆系统</li>
+      <li class="toc-item" data-target="mod5"><span class="toc-num">05</span> Post Training 与 RL</li>
+      <li class="toc-item" data-target="mod6"><span class="toc-num">06</span> AGI 已来？</li>
+      <li class="toc-item" data-target="mod7"><span class="toc-num">07</span> 创业建议</li>
+      <li class="toc-item" data-target="mod8"><span class="toc-num">08</span> 创新与自我改进</li>
+      <li class="toc-item" data-target="quiz" style="margin-top:8px; border-top:1px solid var(--border); padding-top:12px;"><span class="toc-num">&#9997;</span> 互动测验</li>
+    </ul>
+  </aside>
+
+  <!-- Content Area -->
+  <main class="content-area">
+
+    <!-- AGI Three Pillars Overview -->
+    <div class="pillar-cards" style="margin-bottom: 48px;">
+      <div class="pillar-card blue-card">
+        <div class="pillar-card-icon">&#127758;</div>
+        <div class="pillar-en">World Model</div>
+        <h4>世界模型</h4>
+        <p>理解世界的本质，而非表面模仿</p>
+      </div>
+      <div class="pillar-card red-card">
+        <div class="pillar-card-icon">&#129302;</div>
+        <div class="pillar-en">Agent</div>
+        <h4>Agent</h4>
+        <p>从人类脚手架到自主工具链</p>
+      </div>
+      <div class="pillar-card yellow-card">
+        <div class="pillar-card-icon">&#129504;</div>
+        <div class="pillar-en">Memory</div>
+        <h4>记忆系统</h4>
+        <p>继推理之后的新范式</p>
+      </div>
+    </div>
+
+    <!-- Module 1: 世界模型 -->
+    <section class="module" id="mod1">
+      <div class="module-header">
+        <div class="module-num blue">1</div>
+        <h2 class="module-title">世界模型：理解而非模仿</h2>
+      </div>
+
+      <p>Oriol Vinyals 对"世界模型"的定义与大众认知有着根本性的差异。当大多数人谈论世界模型时，他们想到的是<span class="highlight-blue">更好的视频生成</span>——更长、更连贯、更高清的视频。但对 Oriol 而言，这只是表面现象。</p>
+
+      <div class="concept-card blue">
+        <div class="concept-card-icon">&#128161;</div>
+        <h4>核心洞察：两种知识类型</h4>
+        <p>语言模型已经消耗了人类写下的所有知识——这是我们对世界的<strong>显式描述</strong>。但视频和图像包含的是另一类知识：<strong>关于物理世界如何运作的隐式知识</strong>。一个杯子会碎、水会流动、光线会折射——这些知识从未被完整地写下来，却存在于每一帧视频中。</p>
+      </div>
+
+      <div class="quote-block" onclick="this.classList.toggle('expanded')">
+        <div class="quote-text">视频的 GPT 时刻还没有到来。语言的 GPT 时刻，是模型突然展现出涌现能力——它不再只是补全文本，而是真正理解了语言背后的结构。视频模型也需要这样一个转折点。</div>
+        <div class="quote-attr">— Oriol Vinyals</div>
+        <div class="expand-hint">&#9662; 点击展开更多</div>
+        <div class="quote-expanded">
+          目前的视频生成模型更像是一种"高保真模仿"——它们学会了像素的统计规律，但并没有真正理解物理世界的因果关系。真正的世界模型应该能够回答"如果我推一下这个杯子，它会怎样倒下？"这样的反事实问题。
+        </div>
+      </div>
+
+      <p>在 Oriol 的愿景中，Gemini 的 Omni 模式不仅仅是一个能看能听的多模态接口，而是一个<strong class="highlight-blue">交互式的世界渲染器</strong>。这意味着模型不仅仅是被动地处理输入，而是能够主动地"想象"和"模拟"世界的运作方式。</p>
+
+      <div class="insight-box">
+        <h4>&#128270; 深度理解</h4>
+        <p><strong>纯视觉迁移学习</strong>——不依赖文本，仅从视觉信号中学习世界的运作规律——被 Oriol 称为"圣杯"。这类似于婴儿在学会语言之前，就已经通过观察世界建立了对物理直觉的理解。如果能实现这一点，AI 将获得一种全新的、独立于语言的世界理解方式。</p>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <div class="expandable-header">
+          <span>&#128300; 什么是"视频的 GPT 时刻"？</span>
+          <span class="expandable-arrow">&#9662;</span>
+        </div>
+        <div class="expandable-body">
+          <div class="expandable-body-inner">
+            GPT 的语言时刻指的是：当模型规模跨越某个临界点后，突然展现出此前无法实现的能力（如推理、代码生成、多步规划等）。这不是渐进式的改进，而是质的飞跃。<br><br>
+            视频模型目前还没有达到这个临界点。它们可以生成逼真的视频片段，但缺乏对物理世界的深度理解——比如因果推理、反事实假设、长程时序规划等。当视频模型跨越这个临界点时，我们才真正拥有了"世界模型"。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Module 2: 从 Omni 到机器人 -->
+    <section class="module" id="mod2">
+      <div class="module-header">
+        <div class="module-num red">2</div>
+        <h2 class="module-title">从 Omni 到机器人：跨越物理鸿沟</h2>
+      </div>
+
+      <p>将世界模型从数字世界迁移到物理世界，最大的挑战是什么？Oriol 的答案出人意料地具体：<span class="highlight-red">物理交互的精度</span>。</p>
+
+      <div class="concept-card red">
+        <div class="concept-card-icon">&#129302;</div>
+        <h4>物理交互的三重挑战</h4>
+        <p><strong>抓取</strong>：需要精确的力控和手眼协调；<strong>力反馈</strong>：需要实时感知和调整施加的力度；<strong>触觉</strong>：需要感知材质、温度、纹理等细微差异。这些对于数字世界中的模型来说，几乎不存在对应的训练数据。</p>
+      </div>
+
+      <p>但 Oriol 提出了一个巧妙的<span class="highlight-red">双向数据飞轮</span>：</p>
+
+      <div class="timeline">
+        <div class="timeline-item tl-red">
+          <h4>&#128260; 数据流方向一：真实 → 模型</h4>
+          <p>机器人在真实世界中收集的交互数据（力传感、触觉、3D 空间信息）被用来增强世界模型的物理精度。</p>
+        </div>
+        <div class="timeline-item tl-blue">
+          <h4>&#127922; 数据流方向二：模型 → 训练</h4>
+          <p>增强后的世界模型可以生成大量的模拟训练环境，让机器人在虚拟世界中安全、高效地练习各种任务。</p>
+        </div>
+        <div class="timeline-item tl-green">
+          <h4>&#128260; 正向循环</h4>
+          <p>经过模拟训练的机器人在真实世界中表现更好，产生更高质量的数据，进一步优化世界模型——形成自我增强的循环。</p>
+        </div>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <div class="expandable-header">
+          <span>&#127919; 为什么数字知识难以迁移到物理世界？</span>
+          <span class="expandable-arrow">&#9662;</span>
+        </div>
+        <div class="expandable-body">
+          <div class="expandable-body-inner">
+            语言模型和视频模型的知识是"离线"的——它们处理的是已经发生、被记录下来的信息。但物理世界的交互是<strong>实时的、连续的、因果的</strong>。<br><br>
+            比如"轻轻地拿起一个鸡蛋"这个动作，人类依靠的是多年积累的触觉经验和力控直觉。这些知识无法通过阅读文本或观看视频完全获得——必须通过实际的物理交互来学习。这就是为什么世界模型需要机器人作为"物理接口"来收集真实世界的数据。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Module 3: Agent 进化 -->
+    <section class="module" id="mod3">
+      <div class="module-header">
+        <div class="module-num yellow">3</div>
+        <h2 class="module-title">Agent 进化：从脚手架到自主</h2>
+      </div>
+
+      <p>当前的 AI Agent 生态有一个公开的秘密：<span class="highlight-yellow">它们高度依赖人类搭建的"脚手架"</span>。ReAct 模式、工具调用协议、思维链提示、多步规划框架——这些都是人类工程师精心设计的结构，Agent 只是在这个结构内填空。</p>
+
+      <div class="concept-card yellow">
+        <div class="concept-card-icon">&#128296;</div>
+        <h4>Oriol 的终极愿景</h4>
+        <p>模型应该能够<strong>自动生成自己的工具链和子 Agent</strong>。不是人类告诉模型"你可以调用这些工具"，而是模型自己决定需要什么工具、如何组合它们、甚至创造新的工具。当前精心设计的编排框架，终将被模型自己的能力所淘汰。</p>
+      </div>
+
+      <div class="quote-block" onclick="this.classList.toggle('expanded')">
+        <div class="quote-text">苦涩的教训（The Bitter Lesson）终将冲刷掉那些巧妙的脚手架工程。脚手架代码本身也是代码——而代码正是模型最擅长生成的东西。</div>
+        <div class="quote-attr">— Oriol Vinyals</div>
+        <div class="expand-hint">&#9662; 点击展开更多</div>
+        <div class="quote-expanded">
+          Rich Sutton 在 2019 年提出的"苦涩的教训"指出：AI 研究中，利用算力的通用方法最终总是胜过利用人类知识的特定方法。Oriol 将这一洞察应用到 Agent 领域：当前那些巧妙的 Agent 编排框架（如 ReAct、Tree of Thoughts 等）终将被更强大的基座模型所取代——因为模型可以自己学会这些策略。
+        </div>
+      </div>
+
+      <p>这个观点的深层含义是：当前 Agent 赛道上那些复杂的编排框架和中间件，可能只是<span class="highlight-yellow">过渡阶段的产物</span>。随着模型能力的提升，越来越多的"智能"将从编排层下沉到模型内部。</p>
+
+      <div class="insight-box">
+        <h4>&#9888;&#65039; 对 Agent 创业者的启示</h4>
+        <p>如果你的 Agent 产品的核心价值建立在"巧妙的编排逻辑"之上，那么需要警惕——这些逻辑很可能在未来 1-2 年内被模型原生能力所覆盖。真正有护城河的 Agent 产品，应该在<strong>数据壁垒、领域知识、评估体系</strong>上建立优势。</p>
+      </div>
+    </section>
+
+    <!-- Module 4: 记忆系统 -->
+    <section class="module" id="mod4">
+      <div class="module-header">
+        <div class="module-num green">4</div>
+        <h2 class="module-title">记忆系统：继推理之后的新范式</h2>
+      </div>
+
+      <p>如果说 2024-2025 年的 AI 主题是"推理"（Reasoning），那么 Oriol 预测下一个范式转移将发生在<span class="highlight-green">记忆系统</span>。这不仅是一个技术问题，更是关于 AI 如何积累经验、形成个性、持续进化的核心命题。</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>记忆类型</th>
+            <th>实现方式</th>
+            <th>特点</th>
+            <th>类比</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="table-tag tag-blue">工作记忆</span></td>
+            <td>Transformer 上下文窗口</td>
+            <td>快速访问，容量有限，会话结束后消失</td>
+            <td>人脑的短期记忆</td>
+          </tr>
+          <tr>
+            <td><span class="table-tag tag-green">情景记忆</span></td>
+            <td>RAG 检索 + 向量数据库</td>
+            <td>可扩展，持久化，需要检索机制</td>
+            <td>回忆过去经历的能力</td>
+          </tr>
+          <tr>
+            <td><span class="table-tag tag-red">归档记忆</span></td>
+            <td>文件系统式结构化存储</td>
+            <td>大容量，可组织，需要读写协议</td>
+            <td>笔记本和文件夹</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="concept-card green">
+        <div class="concept-card-icon">&#128194;</div>
+        <h4>Oriol 的选择：文件系统式记忆</h4>
+        <p>在众多记忆方案中，Oriol 明确偏好<span class="highlight-green">非参数化的文件系统式记忆</span>，而非为每个用户训练个性化权重。原因非常务实：<strong>部署可行性</strong>。为数十亿用户维护独立的模型权重，在工程上几乎是不可能的。但一个结构化的文件系统——每个用户拥有自己的"思想目录"——不仅可行，而且高效。</p>
+      </div>
+
+      <div class="quote-block" onclick="this.classList.toggle('expanded')">
+        <div class="quote-text">"技能"是什么？本质上就是把思考的结果写入文件和目录。模型学会了一种新能力，它就把这个能力的"使用说明"保存下来，下次需要时直接读取。</div>
+        <div class="quote-attr">— Oriol Vinyals</div>
+        <div class="expand-hint">&#9662; 点击展开更多</div>
+        <div class="quote-expanded">
+          这个想法与人类的学习方式惊人地相似。当你学会一项新技能时，你不会"重新训练"你的大脑——你会在记忆中建立新的"索引"，将这项技能与已有的知识网络连接起来。Oriol 的愿景是让 AI 以类似的方式工作：不是通过修改模型参数来学习新技能，而是通过在外部记忆系统中创建新的"技能文件"。
+        </div>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <div class="expandable-header">
+          <span>&#128270; 为什么不用 per-user 权重？</span>
+          <span class="expandable-arrow">&#9662;</span>
+        </div>
+        <div class="expandable-body">
+          <div class="expandable-body-inner">
+            Per-user 权重（即为每个用户微调一个个性化模型）在理论上是最"彻底"的记忆方案，但在实践中面临多重挑战：<br><br>
+            <strong>1. 存储成本</strong>：一个大型模型的权重可能有数百 GB，乘以数十亿用户，存储成本不可接受。<br>
+            <strong>2. 推理效率</strong>：每次请求都需要加载用户专属权重，GPU 利用率极低。<br>
+            <strong>3. 更新困难</strong>：当基座模型更新时，所有用户的个性化权重都需要重新适配。<br>
+            <strong>4. 隐私风险</strong>：用户数据直接编码在模型权重中，难以审计和删除。<br><br>
+            文件系统式记忆巧妙地避开了所有这些问题。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Module 5: Post Training 与 RL -->
+    <section class="module" id="mod5">
+      <div class="module-header">
+        <div class="module-num blue">5</div>
+        <h2 class="module-title">Post Training 与 RL：元能力才是目标</h2>
+      </div>
+
+      <p>强化学习（RL）在大语言模型中的应用已经创造了惊人的成果——AlphaGo 击败围棋世界冠军、模型在数学和编程竞赛中超越人类。但 Oriol 指出了一个关键的区分：</p>
+
+      <div class="concept-card blue">
+        <div class="concept-card-icon">&#127919;</div>
+        <h4>真正的目标不是领域精通，而是元能力</h4>
+        <p>RL 的真正价值不在于让模型在某个特定领域（如下棋、解题）达到超人水平，而在于培养模型的<strong>元能力</strong>——学习新规则的能力、适应新环境的能力、从经验中变得更强的能力。这些元能力才是通向 AGI 的关键。</p>
+      </div>
+
+      <p>Oriol 观察到一个令人惊讶的现象：<span class="highlight-blue">在狭窄领域上的 RL 训练会产生出人意料的泛化效果</span>。在围棋上训练的推理策略，可能会迁移到其他需要规划的场景中；在数学上训练的逻辑能力，可能会帮助解决编程问题。</p>
+
+      <div class="quote-block" onclick="this.classList.toggle('expanded')">
+        <div class="quote-text">在大语言模型的语境下，我们面临一个根本性的问题：数据是有限的。互联网上的文本数据已经被消耗殆尽。那么，无限复杂度的来源在哪里？</div>
+        <div class="quote-attr">— Oriol Vinyals</div>
+        <div class="expand-hint">&#9662; 点击展开更多</div>
+        <div class="quote-expanded">
+          这个问题指向了 RL 的独特价值。与监督学习不同，RL 可以通过自我博弈、环境交互来生成<strong>无限复杂度的训练信号</span>。AlphaGo 的训练不需要人类棋谱——它通过与自己对弈来不断进化。这可能是突破数据瓶颈的关键路径。
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <h4>&#128161; 关键推论</h4>
+        <p>如果 RL 的真正价值在于<strong>元能力</strong>而非领域精通，那么我们应该重新思考评估标准。一个模型的优劣不应该只看它在 benchmark 上的得分，还应该看它<strong>面对全新任务时的学习速度和适应能力</strong>。这才是衡量 AGI 进展的正确指标。</p>
+      </div>
+    </section>
+
+    <!-- Module 6: AGI 已来？ -->
+    <section class="module" id="mod6">
+      <div class="module-header">
+        <div class="module-num red">6</div>
+        <h2 class="module-title">AGI 已来？一个不断移动的终点线</h2>
+      </div>
+
+      <p>当被问到"AGI 是否已经到来"时，Oriol 给出了一个既诚实又耐人寻味的回答：</p>
+
+      <div class="concept-card red">
+        <div class="concept-card-icon">&#128161;</div>
+        <h4>Oriol 的判断</h4>
+        <p>如果把今天（2025年）的模型放到 7 年前，他会毫不犹豫地说"AGI 已经来了"。这些模型展现出的能力——跨领域推理、代码生成、多模态理解、长程规划——在 2018 年看来简直是科幻。但问题在于：<span class="highlight-red">AGI 的门槛在不断提高</span>。</p>
+      </div>
+
+      <div class="quote-block" onclick="this.classList.toggle('expanded')">
+        <div class="quote-text">缺失的那块拼图是：从真实经验中持续学习的能力。当前的模型在训练结束后就"冻结"了——它们无法从与用户的互动中真正成长。</div>
+        <div class="quote-attr">— Oriol Vinyals</div>
+        <div class="expand-hint">&#9662; 点击展开更多</div>
+        <div class="quote-expanded">
+          这个观察与"记忆系统"模块紧密相连。AGI 不仅需要强大的推理能力，还需要一种机制来积累经验、修正错误、形成个性。当前的模型每次对话都从零开始——这就像一个拥有超强智力但完全失忆的人。真正的 AGI 需要能够<strong>从每一次互动中学习和成长</strong>。
+        </div>
+      </div>
+
+      <p>这引出了一个哲学性的问题：<strong>AGI 的定义是否本身就是动态的？</strong>每一次技术突破都会重新定义"通用"的含义。10 年前，能够进行流畅对话的 AI 就会被视为 AGI；今天，我们要求它能写代码、做数学、理解物理世界、甚至具有创造力。</p>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <div class="expandable-header">
+          <span>&#128302; 为什么 AGI 的门槛在不断提高？</span>
+          <span class="expandable-arrow">&#9662;</span>
+        </div>
+        <div class="expandable-body">
+          <div class="expandable-body-inner">
+            这涉及到一个认知偏差：当我们对 AI 的能力越熟悉，就越容易将其"降级"为"仅仅是模式匹配"或"仅仅是工具"。这就是所谓的"AI 效应"——一旦某项技术被成功实现，它就不再被视为"真正的智能"。<br><br>
+            同时，随着模型能力的提升，我们发现人类智能的复杂度远超想象——情感理解、常识推理、具身认知、社会智能……每一个新维度都为 AGI 的定义增加了新的维度。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Module 7: 创业建议 -->
+    <section class="module" id="mod7">
+      <div class="module-header">
+        <div class="module-num yellow">7</div>
+        <h2 class="module-title">创业建议：护城河在哪里？</h2>
+      </div>
+
+      <p>作为 Google DeepMind 的核心成员，Oriol 对 AI 创业有着独特的视角。他认为，在基座模型能力快速提升的时代，真正的价值在于三个方向：</p>
+
+      <div class="timeline">
+        <div class="timeline-item tl-blue">
+          <h4>&#128202; 评估体系（Eval）</h4>
+          <p>能够准确衡量 AI 在特定场景中表现的能力，本身就是巨大的价值。好的评估标准能引导模型的优化方向，并为用户提供可靠的质量保障。</p>
+        </div>
+        <div class="timeline-item tl-red">
+          <h4>&#128209; 数据资产</h4>
+          <p>独特、高质量、难以复制的数据集是持久的竞争优势。当基座模型趋于同质化时，差异化的训练数据将成为关键变量。</p>
+        </div>
+        <div class="timeline-item tl-green">
+          <h4>&#128218; 领域知识库</h4>
+          <p>为特定应用领域构建结构化的知识库，能够创造强大的防御壁垒。这不是简单的 RAG，而是深度的领域建模。</p>
+        </div>
+      </div>
+
+      <div class="quote-block" onclick="this.classList.toggle('expanded')">
+        <div class="quote-text">先做产品专业化，再谈杠杆效应。很多创业者想直接挑战基座模型公司——这是一条艰难的路。更好的策略是：在一个垂直领域做到极致，然后利用 AI 的杠杆放大你的领域优势。</div>
+        <div class="quote-attr">— Oriol Vinyals</div>
+        <div class="expand-hint">&#9662; 点击展开更多</div>
+        <div class="quote-expanded">
+          这与 Y Combinator 的投资逻辑不谋而合：最好的 AI 创业公司不是"AI 公司"，而是"用 AI 解决特定问题的公司"。领域专业知识 + AI 杠杆 > 通用 AI 能力。这也是为什么医疗、法律、金融等垂直领域的 AI 应用正在爆发。
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <h4>&#128161; 创业核心逻辑</h4>
+        <p>在 AI 时代，<strong>知识库就是护城河</strong>。当基座模型可以轻松生成代码、文本、分析报告时，真正不可替代的是那些需要<strong>长期积累、领域专精、持续更新</strong>的知识资产。构建这样一个知识库，就是在为自己的产品建造护城河。</p>
+      </div>
+    </section>
+
+    <!-- Module 8: 创新与自我改进 -->
+    <section class="module" id="mod8">
+      <div class="module-header">
+        <div class="module-num green">8</div>
+        <h2 class="module-title">创新与自我改进：NP 难的启示</h2>
+      </div>
+
+      <p>AI 能够产生真正的新颖想法吗？Oriol 对这个问题持谨慎态度，并用了一个精妙的计算机科学类比来解释：</p>
+
+      <div class="analogy-box">
+        <strong>NP 难问题的启示：</strong>在计算复杂性理论中，验证一个解的正确性（P 类问题）通常比找到这个解（NP 类问题）容易得多。这个不对称性同样适用于创新——<strong>评估一个方案的好坏，远比产生这个方案容易</strong>。这也是为什么人类专家评审仍然不可替代：他们可能无法自己产生最优解，但他们能够识别和验证优秀的结果。
+      </div>
+
+      <p>Oriol 还指出了一个经常被忽视的物理限制：<span class="highlight-green">训练速度存在物理上限</span>。GPU 的计算密度、内存带宽、散热能力、电力供应——这些物理约束意味着模型能力的提升不可能无限加速。</p>
+
+      <div class="concept-card green">
+        <div class="concept-card-icon">&#9878;&#65039;</div>
+        <h4>不对称性的深远影响</h4>
+        <p><strong>评估 vs 创造</strong>的不对称性，意味着 AI 最有价值的角色可能不是"独立创新者"，而是<strong>"超级放大器"</strong>——它能快速生成大量候选方案，然后由人类（或专门的评估模型）来筛选最优解。这种"生成-筛选"循环可能是 AI 驱动创新的最高效模式。</p>
+      </div>
+
+      <div class="expandable" onclick="this.classList.toggle('open')">
+        <div class="expandable-header">
+          <span>&#128300; 模型能否自我改进？</span>
+          <span class="expandable-arrow">&#9662;</span>
+        </div>
+        <div class="expandable-body">
+          <div class="expandable-body-inner">
+            自我改进（self-improvement）是 AI 领域最令人兴奋也最令人担忧的话题之一。Oriol 的观点是：<strong>在有限的范围内，是的</strong>。AlphaGo 的自我博弈就是一种自我改进——模型通过与自己对弈来变得更强。<br><br>
+            但这种改进存在边界。模型的改进受限于其架构的表达能力、训练数据的多样性、以及物理计算资源的限制。真正的"递归自我改进"（即模型能够改进自己的代码/架构/训练过程）仍然是一个开放问题。<br><br>
+            更现实的路径可能是<strong>人机协作的自我改进</strong>：模型提出改进建议，人类评估和实施，然后模型在新的基础上继续优化——形成一个有界的、可控的改进循环。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGI Timeline -->
+    <div style="margin: 48px 0 32px;">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">&#128338; AGI 三条主线的演进路径</h3>
+      <div class="timeline">
+        <div class="timeline-item tl-blue">
+          <h4>阶段一：世界模型突破</h4>
+          <p>视频模型迎来"GPT 时刻"，从像素模仿走向真正的物理理解。纯视觉迁移学习取得初步成果。</p>
+        </div>
+        <div class="timeline-item tl-red">
+          <h4>阶段二：Agent 自主化</h4>
+          <p>模型开始自动生成工具链和子 Agent。人类编排框架逐步被模型原生能力取代。Agent 从"受控执行者"进化为"自主规划者"。</p>
+        </div>
+        <div class="timeline-item tl-yellow">
+          <h4>阶段三：记忆与持续学习</h4>
+          <p>文件系统式记忆成为标配。模型能够从真实经验中积累知识、修正错误、形成个性。持续学习不再是论文中的概念。</p>
+        </div>
+        <div class="timeline-item tl-green">
+          <h4>汇聚点：AGI</h4>
+          <p>当世界理解、自主行动、持续学习三条线汇聚时——模型不仅理解世界、能够行动，还能从经验中不断进化——AGI 的曙光才真正到来。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Section -->
+    <section class="quiz-section" id="quiz">
+      <h3>&#9997; 互动测验</h3>
+      <p>检验你对 Oriol Vinyals AGI 观点的理解程度</p>
+
+      <!-- Question 1 -->
+      <div class="quiz-question" id="q1">
+        <h4>问题 1：Oriol 认为"视频的 GPT 时刻"指的是什么？</h4>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="selectAnswer(1, this, 'wrong')">
+            <span class="opt-letter">A</span>
+            <span>能够生成 4K 分辨率、时长超过 10 分钟的高质量视频</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(1, this, 'correct')">
+            <span class="opt-letter">B</span>
+            <span>视频模型跨越临界点，从像素模仿转向真正的物理世界理解</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(1, this, 'wrong')">
+            <span class="opt-letter">C</span>
+            <span>视频模型能够实时与用户互动并生成内容</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(1, this, 'wrong')">
+            <span class="opt-letter">D</span>
+            <span>视频模型的参数量超过语言模型成为最大的 AI 模型</span>
+          </div>
+        </div>
+        <div class="quiz-feedback correct-fb" id="q1-correct">&#10004; 正确！Oriol 强调的不是视频质量的提升，而是模型从"高保真模仿"到"真正理解物理世界因果关系"的质变。</div>
+        <div class="quiz-feedback wrong-fb" id="q1-wrong">&#10008; 再想想。提示：Oriol 关注的不是表面的质量指标，而是模型能力的质变——类似于语言模型从"补全文本"到"理解语言结构"的跨越。</div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="quiz-question" id="q2">
+        <h4>问题 2：Oriol 为什么偏好文件系统式记忆而非 per-user 权重？</h4>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="selectAnswer(2, this, 'wrong')">
+            <span class="opt-letter">A</span>
+            <span>文件系统的读写速度更快</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(2, this, 'wrong')">
+            <span class="opt-letter">B</span>
+            <span>per-user 权重会导致模型过拟合</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(2, this, 'correct')">
+            <span class="opt-letter">C</span>
+            <span>在数十亿用户的规模下，维护独立模型权重在工程上不可行</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(2, this, 'wrong')">
+            <span class="opt-letter">D</span>
+            <span>文件系统式记忆的准确率更高</span>
+          </div>
+        </div>
+        <div class="quiz-feedback correct-fb" id="q2-correct">&#10004; 正确！Oriol 的核心考量是<strong>部署可行性</strong>。存储成本、推理效率、模型更新、隐私审计——这些工程约束使得 per-user 权重在大规模部署中不切实际。</div>
+        <div class="quiz-feedback wrong-fb" id="q2-wrong">&#10008; 不够准确。提示：Oriol 用了"deployment practicality"（部署可行性）这个词。思考一下，为数十亿用户各维护一套模型权重会带来什么工程挑战？</div>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="quiz-question" id="q3">
+        <h4>问题 3：Oriol 认为 RL 真正的价值在于什么？</h4>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="selectAnswer(3, this, 'wrong')">
+            <span class="opt-letter">A</span>
+            <span>在特定任务上达到超人水平（如下棋、解题）</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(3, this, 'correct')">
+            <span class="opt-letter">B</span>
+            <span>培养"元能力"——学习新规则、适应新环境、从经验中进化的能力</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(3, this, 'wrong')">
+            <span class="opt-letter">C</span>
+            <span>减少模型对训练数据的依赖</span>
+          </div>
+          <div class="quiz-option" onclick="selectAnswer(3, this, 'wrong')">
+            <span class="opt-letter">D</span>
+            <span>提升模型的推理速度和效率</span>
+          </div>
+        </div>
+        <div class="quiz-feedback correct-fb" id="q3-correct">&#10004; 正确！Oriol 区分了"领域精通"和"元能力"——RL 的终极价值不是赢得特定比赛，而是让模型获得一种通用的"学会学习"的能力，这才是通向 AGI 的关键。</div>
+        <div class="quiz-feedback wrong-fb" id="q3-wrong">&#10008; 再想想。提示：Oriol 用了"meta-abilities"（元能力）这个词。他强调的不是在某个领域赢，而是一种更通用的能力——关于"学习本身"的能力。</div>
+      </div>
+
+      <div style="text-align: center;">
+        <button class="quiz-btn" onclick="showScore()">查看成绩</button>
+      </div>
+
+      <div class="quiz-score" id="quizScore">
+        <div class="quiz-score-num" id="scoreNum">0/3</div>
+        <p id="scoreMsg">尚未作答所有题目</p>
+      </div>
+    </section>
+
+    <!-- Key Takeaways -->
+    <section style="margin: 48px 0;">
+      <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">&#127775; 核心要点</h3>
+      <div class="takeaways">
+        <div class="takeaway-card tk-blue">
+          <h4>&#127758; 世界模型的本质</h4>
+          <p>不是更好的视频生成，而是从视频/图像中学习<strong>物理世界的因果结构</strong>。纯视觉迁移学习是"圣杯"。</p>
+        </div>
+        <div class="takeaway-card tk-red">
+          <h4>&#129302; Agent 的终局</h4>
+          <p>当前精巧的编排框架是<strong>过渡产物</strong>。模型将自动生成工具链和子 Agent，"苦涩的教训"将再次应验。</p>
+        </div>
+        <div class="takeaway-card tk-yellow">
+          <h4>&#129504; 记忆新范式</h4>
+          <p>继推理之后的下一个突破方向。文件系统式非参数记忆是<strong>工程可行</strong>的最佳方案。</p>
+        </div>
+        <div class="takeaway-card tk-green">
+          <h4>&#128640; RL 的真正价值</h4>
+          <p>不在领域精通，而在<strong>元能力</strong>——学会学习、适应新规则、从经验中进化。</p>
+        </div>
+        <div class="takeaway-card tk-blue">
+          <h4>&#127919; AGI 的定义</h4>
+          <p>是一个<strong>不断移动的终点线</strong>。缺失的关键拼图：从真实经验中持续学习。</p>
+        </div>
+        <div class="takeaway-card tk-red">
+          <h4>&#128176; 创业护城河</h4>
+          <p>不在编排逻辑，而在<strong>评估体系、数据资产、领域知识库</strong>。知识库就是护城河。</p>
+        </div>
+        <div class="takeaway-card tk-yellow">
+          <h4>&#9878;&#65039; 创新的不对称性</h4>
+          <p>评估方案比创造方案容易。AI 最佳角色是<strong>"生成-筛选"循环中的超级放大器</strong>。</p>
+        </div>
+        <div class="takeaway-card tk-green">
+          <h4>&#128260; 双向飞轮</h4>
+          <p>机器人数据增强世界模型，世界模型为机器人创建训练模拟——<strong>自我增强的正向循环</strong>。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="article-footer">
+      <div class="footer-logo">AGI Deep Dive</div>
+      <p class="footer-text">基于 Z Finance 对 Oriol Vinyals 的深度访谈整理<br>仅供学习交流使用</p>
+    </footer>
+
+  </main>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script>
+// Theme Toggle
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? '' : 'dark');
+  document.getElementById('themeBtn').innerHTML = isDark ? '&#9790;' : '&#9728;';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('themeBtn').innerHTML = '&#9728;';
+  }
+})();
+
+// Progress Bar
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (scrollTop / docHeight) * 100;
+  document.getElementById('progressBar').style.width = progress + '%';
+
+  // Scroll to top button
+  document.getElementById('scrollTop').classList.toggle('show', scrollTop > 400);
+
+  // TOC active state
+  updateTOC();
+
+  // Module animations
+  document.querySelectorAll('.module').forEach(m => {
+    const rect = m.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.85) m.classList.add('visible');
+  });
+});
+
+// TOC
+function updateTOC() {
+  const sections = document.querySelectorAll('.module, .quiz-section');
+  const items = document.querySelectorAll('.toc-item');
+  let current = '';
+  sections.forEach(s => {
+    if (s.getBoundingClientRect().top <= 150) current = s.id;
+  });
+  items.forEach(item => {
+    item.classList.toggle('active', item.dataset.target === current);
+  });
+}
+document.querySelectorAll('.toc-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const target = document.getElementById(item.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// Mobile TOC
+function toggleMobileTOC() {
+  const sidebar = document.getElementById('tocSidebar');
+  if (sidebar.style.display === 'block') {
+    sidebar.style.display = '';
+  } else {
+    sidebar.style.display = 'block';
+    sidebar.style.position = 'fixed';
+    sidebar.style.top = '56px';
+    sidebar.style.left = '0';
+    sidebar.style.right = '0';
+    sidebar.style.zIndex = '998';
+    sidebar.style.borderRadius = '0 0 12px 12px';
+    sidebar.style.maxHeight = '60vh';
+  }
+}
+function checkMobile() {
+  const btn = document.getElementById('tocBtn');
+  btn.style.display = window.innerWidth <= 900 ? 'inline-flex' : 'none';
+  if (window.innerWidth > 900) {
+    const sidebar = document.getElementById('tocSidebar');
+    sidebar.style = '';
+  }
+}
+window.addEventListener('resize', checkMobile);
+checkMobile();
+
+// Quiz
+const answers = {};
+function selectAnswer(qNum, el, result) {
+  const question = document.getElementById('q' + qNum);
+  if (question.dataset.answered) return;
+  question.dataset.answered = 'true';
+
+  question.querySelectorAll('.quiz-option').forEach(opt => {
+    opt.style.pointerEvents = 'none';
+  });
+  el.classList.add(result);
+  if (result === 'correct') {
+    question.querySelector('.quiz-option.correct') || el.classList.add('correct');
+  }
+  // Mark the correct answer
+  question.querySelectorAll('.quiz-option').forEach(opt => {
+    if (opt.onclick.toString().includes("'correct'")) {
+      opt.classList.add('correct');
+    }
+  });
+  el.classList.add(result);
+  answers[qNum] = result === 'correct';
+
+  document.getElementById('q' + qNum + '-' + (result === 'correct' ? 'correct' : 'wrong')).classList.add('show');
+}
+
+function showScore() {
+  const total = Object.keys(answers).length;
+  if (total < 3) {
+    document.getElementById('scoreMsg').textContent = '请先回答所有题目（已答 ' + total + '/3）';
+    document.getElementById('quizScore').classList.add('show');
+    document.getElementById('scoreNum').textContent = total + '/3';
+    return;
+  }
+  const correct = Object.values(answers).filter(Boolean).length;
+  document.getElementById('scoreNum').textContent = correct + '/3';
+  const msgs = {
+    3: '太棒了！你对 Oriol 的 AGI 观点理解得非常透彻！',
+    2: '不错！再回顾一下文章中的关键概念。',
+    1: '建议重新阅读相关章节，重点关注核心论点。',
+    0: '没关系，重新阅读文章后再试一次吧！'
+  };
+  document.getElementById('scoreMsg').textContent = msgs[correct];
+  document.getElementById('quizScore').classList.add('show');
+}
+
+// Initial module animation
+setTimeout(() => {
+  document.querySelectorAll('.module').forEach(m => {
+    const rect = m.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.85) m.classList.add('visible');
+  });
+}, 100);
+</script>
+</body>
+</html>

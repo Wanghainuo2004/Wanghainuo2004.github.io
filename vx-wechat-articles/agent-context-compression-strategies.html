@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 上下文压缩策略横向拆解 — 腾讯技术工程</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --card-bg: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #555;
+    --accent: #4f46e5;
+    --accent-light: #818cf8;
+    --accent-dark: #3730a3;
+    --gradient: linear-gradient(135deg, #4f46e5, #7c3aed, #a855f7);
+    --gradient-soft: linear-gradient(135deg, #eef2ff, #f5f3ff);
+    --border: #e5e7eb;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --shadow: 0 4px 24px rgba(79,70,229,0.08);
+    --shadow-hover: 0 8px 32px rgba(79,70,229,0.15);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+    --progress-h: 3px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f1a;
+      --card-bg: #1a1a2e;
+      --text: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --border: #2d2d44;
+      --code-bg: #11111b;
+      --gradient-soft: linear-gradient(135deg, #1a1a2e, #1e1033);
+      --shadow: 0 4px 24px rgba(0,0,0,0.3);
+      --shadow-hover: 0 8px 32px rgba(0,0,0,0.4);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Progress Bar */
+  #progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: var(--progress-h);
+    background: var(--gradient);
+    z-index: 9999;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* Layout */
+  .layout {
+    display: flex;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* Sidebar TOC */
+  .sidebar {
+    position: sticky;
+    top: 40px;
+    width: 260px;
+    min-width: 260px;
+    height: fit-content;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    padding: 24px 16px;
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .sidebar { display: block; }
+  }
+
+  .sidebar h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .toc-list { list-style: none; }
+
+  .toc-list li a {
+    display: block;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    margin-bottom: 2px;
+  }
+
+  .toc-list li a:hover,
+  .toc-list li a.active {
+    color: var(--accent);
+    background: var(--gradient-soft);
+    border-left-color: var(--accent);
+  }
+
+  /* Main Content */
+  .main {
+    flex: 1;
+    min-width: 0;
+    padding: 0 20px 80px;
+  }
+
+  /* Hero Section */
+  .hero {
+    background: var(--gradient);
+    color: #fff;
+    padding: 64px 32px 48px;
+    border-radius: 0 0 32px 32px;
+    margin: 0 -20px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .hero > * { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    padding: 6px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 16px;
+  }
+
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .hero-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Section Headers */
+  .section {
+    margin-bottom: 56px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--gradient);
+    color: #fff;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .card p, .card li {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* Product Cards */
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (min-width: 640px) {
+    .product-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .product-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .product-card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .product-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .product-card-header h3 {
+    font-size: 1rem;
+    margin-bottom: 2px;
+  }
+
+  .product-card-header .subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .product-card-body {
+    padding: 20px 24px;
+  }
+
+  .product-card-body .philosophy {
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: var(--gradient-soft);
+    border-radius: 8px;
+    display: inline-block;
+  }
+
+  .product-card-body ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .product-card-body li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .product-card-body li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-light);
+  }
+
+  /* Comparison Table */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 700px;
+  }
+
+  .comparison-table thead th {
+    background: var(--gradient);
+    color: #fff;
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+  }
+
+  .comparison-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card-bg);
+    vertical-align: top;
+  }
+
+  .comparison-table tbody tr:hover td {
+    background: var(--gradient-soft);
+  }
+
+  .comparison-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .table-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .tag-auto { background: #dbeafe; color: #1d4ed8; }
+  .tag-manual { background: #fce7f3; color: #be185d; }
+  .tag-both { background: #d1fae5; color: #047857; }
+  .tag-none { background: #f1f5f9; color: #64748b; }
+
+  @media (prefers-color-scheme: dark) {
+    .tag-auto { background: #1e3a5f; color: #93c5fd; }
+    .tag-manual { background: #4a1942; color: #f9a8d4; }
+    .tag-both { background: #064e3b; color: #6ee7b7; }
+    .tag-none { background: #1e293b; color: #94a3b8; }
+  }
+
+  /* Expandable Sections */
+  .expandable {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .expandable-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
+    transition: background 0.2s;
+  }
+
+  .expandable-trigger:hover {
+    background: var(--gradient-soft);
+  }
+
+  .expandable-trigger .arrow {
+    transition: transform 0.3s;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .expandable.open .expandable-trigger .arrow {
+    transform: rotate(180deg);
+  }
+
+  .expandable-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+    padding: 0 24px;
+  }
+
+  .expandable.open .expandable-content {
+    max-height: 2000px;
+    padding: 0 24px 24px;
+  }
+
+  .expandable-content p {
+    color: var(--text-secondary);
+    font-size: 14.5px;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+
+  .expandable-content ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .expandable-content li {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .expandable-content li::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    color: var(--accent-light);
+    font-weight: bold;
+  }
+
+  /* Code Blocks */
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius-sm);
+    padding: 20px 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 16px 0;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-block .code-label {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 11px;
+    color: #6c7086;
+    font-family: var(--font);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .code-block .keyword { color: #cba6f7; }
+  .code-block .string { color: #a6e3a1; }
+  .code-block .comment { color: #6c7086; font-style: italic; }
+  .code-block .number { color: #fab387; }
+  .code-block .fn { color: #89b4fa; }
+  .code-block .op { color: #89dceb; }
+  .code-block .warn { color: #f9e2af; }
+  .code-block .err { color: #f38ba8; }
+
+  /* Concept Cards */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (min-width: 640px) {
+    .concept-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 900px) {
+    .concept-grid.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  .concept-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .concept-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient);
+  }
+
+  .concept-card .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--gradient);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .concept-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .concept-card p {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 36px;
+    margin: 24px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--gradient);
+    border-radius: 3px;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 28px;
+    padding: 20px 24px;
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -29px;
+    top: 24px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .timeline-item h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .timeline-item p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Highlight Box */
+  .highlight-box {
+    background: var(--gradient-soft);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+
+  .highlight-box.warning {
+    border-left-color: var(--warning);
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .highlight-box.warning {
+      background: linear-gradient(135deg, #1c1a0e, #271f04);
+    }
+  }
+
+  .highlight-box.danger {
+    border-left-color: var(--danger);
+    background: linear-gradient(135deg, #fef2f2, #fecaca);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .highlight-box.danger {
+      background: linear-gradient(135deg, #1c0e0e, #271010);
+    }
+  }
+
+  .highlight-box strong {
+    color: var(--text);
+  }
+
+  .highlight-box p {
+    color: var(--text-secondary);
+    font-size: 14.5px;
+    line-height: 1.75;
+  }
+
+  /* Pain Points */
+  .pain-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  @media (min-width: 640px) {
+    .pain-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .pain-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--danger);
+    box-shadow: var(--shadow);
+  }
+
+  .pain-card h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--danger);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pain-card p {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  /* Takeaway Cards */
+  .takeaway-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (min-width: 640px) {
+    .takeaway-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .takeaway-card {
+    background: var(--gradient);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .takeaway-card::after {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+
+  .takeaway-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .takeaway-card p {
+    font-size: 13.5px;
+    opacity: 0.92;
+    line-height: 1.7;
+  }
+
+  /* Quiz */
+  .quiz-section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 32px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    margin-top: 24px;
+  }
+
+  .quiz-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  .quiz-q {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .quiz-q:last-of-type {
+    border-bottom: none;
+    margin-bottom: 16px;
+    padding-bottom: 0;
+  }
+
+  .quiz-q p {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+
+  .quiz-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: var(--text);
+    background: none;
+    text-align: left;
+    font-family: var(--font);
+    width: 100%;
+  }
+
+  .quiz-opt:hover { border-color: var(--accent-light); background: var(--gradient-soft); }
+
+  .quiz-opt.selected { border-color: var(--accent); background: var(--gradient-soft); }
+
+  .quiz-opt.correct { border-color: var(--success); background: #d1fae5; }
+  .quiz-opt.wrong { border-color: var(--danger); background: #fee2e2; }
+
+  @media (prefers-color-scheme: dark) {
+    .quiz-opt.correct { background: #064e3b; }
+    .quiz-opt.wrong { background: #450a0a; }
+  }
+
+  .quiz-opt .marker {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .quiz-opt.selected .marker {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .quiz-feedback {
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    display: none;
+    line-height: 1.6;
+  }
+
+  .quiz-feedback.show { display: block; }
+
+  .quiz-feedback.correct-fb { background: #d1fae5; color: #065f46; }
+  .quiz-feedback.wrong-fb { background: #fee2e2; color: #991b1b; }
+
+  @media (prefers-color-scheme: dark) {
+    .quiz-feedback.correct-fb { background: #064e3b; color: #6ee7b7; }
+    .quiz-feedback.wrong-fb { background: #450a0a; color: #fca5a5; }
+  }
+
+  .quiz-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 32px;
+    background: var(--gradient);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .quiz-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+  .quiz-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .quiz-score {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    display: none;
+  }
+
+  .quiz-score.show { display: block; }
+  .quiz-score.perfect { background: #d1fae5; color: #065f46; }
+  .quiz-score.good { background: #dbeafe; color: #1e40af; }
+  .quiz-score.try-again { background: #fee2e2; color: #991b1b; }
+
+  @media (prefers-color-scheme: dark) {
+    .quiz-score.perfect { background: #064e3b; color: #6ee7b7; }
+    .quiz-score.good { background: #1e3a5f; color: #93c5fd; }
+    .quiz-score.try-again { background: #450a0a; color: #fca5a5; }
+  }
+
+  /* Tags inline */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--gradient-soft);
+    color: var(--accent);
+    margin: 2px 4px 2px 0;
+  }
+
+  /* Key figure */
+  .key-figure {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: var(--gradient-soft);
+    border-radius: var(--radius-sm);
+    margin: 16px 0;
+  }
+
+  .key-figure .big-num {
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .key-figure .desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-in { animation: fadeInUp 0.5s ease forwards; }
+
+  /* Pipeline diagram */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 20px 0;
+    margin: 16px 0;
+  }
+
+  .pipeline-step {
+    background: var(--card-bg);
+    border: 2px solid var(--accent-light);
+    border-radius: 12px;
+    padding: 12px 16px;
+    min-width: 130px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .pipeline-step .step-num {
+    display: block;
+    font-size: 10px;
+    color: var(--accent);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .pipeline-arrow {
+    flex-shrink: 0;
+    color: var(--accent-light);
+    font-size: 20px;
+    padding: 0 4px;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 36px; margin: 0 -20px 32px; border-radius: 0 0 24px 24px; }
+    .main { padding: 0 16px 60px; }
+    .card, .quiz-section { padding: 20px; }
+    .product-card-body { padding: 16px 20px; }
+    .timeline { padding-left: 30px; }
+  }
+
+  /* Back to top */
+  .back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--gradient);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-hover);
+    z-index: 100;
+    transition: opacity 0.3s;
+  }
+
+  .back-to-top.show { display: flex; }
+
+  /* Storage diagram */
+  .storage-diagram {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  @media (max-width: 640px) {
+    .storage-diagram { grid-template-columns: 1fr; }
+  }
+
+  .storage-box {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .storage-box:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  .storage-box h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .storage-box p {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Inline code */
+  code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--gradient-soft);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div class="layout">
+
+<!-- Sidebar TOC -->
+<nav class="sidebar" id="sidebar">
+  <h3>目录导航</h3>
+  <ul class="toc-list" id="toc-list">
+    <li><a href="#s1">1. 六款产品，六种哲学</a></li>
+    <li><a href="#s2">2. 反面教材：第一代痛点</a></li>
+    <li><a href="#s3">3. 第二代各家做法</a></li>
+    <li><a href="#s4">4. 实施陷阱</a></li>
+    <li><a href="#s5">5. 七条共识原则</a></li>
+    <li><a href="#s6">6. 四级水位线方案</a></li>
+    <li><a href="#s7">7. 云端三层架构</a></li>
+    <li><a href="#s8">8. 红线：不可触碰</a></li>
+    <li><a href="#s9">9. 哲学结论</a></li>
+    <li><a href="#quiz">互动测验</a></li>
+    <li><a href="#takeaway">核心收获</a></li>
+  </ul>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-badge">深度技术拆解</div>
+  <h1>Agent 上下文压缩策略<br>横向拆解</h1>
+  <div class="hero-meta">
+    <span>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      腾讯技术工程 / mervynyang
+    </span>
+    <span>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      约 25 分钟阅读
+    </span>
+    <span>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      9 大章节
+    </span>
+  </div>
+</header>
+
+<!-- Section 1 -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">1</span>
+    <h2>六款产品，六种哲学</h2>
+  </div>
+  <p style="color:var(--text-secondary);margin-bottom:24px;font-size:15px;">
+    当上下文窗口成为 Agent 的"工作台面"，如何管理这块有限资源，每家产品给出了截然不同的答案。
+  </p>
+
+  <!-- Comparison Table -->
+  <div class="table-wrap">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>产品</th>
+          <th>压缩方式</th>
+          <th>核心隐喻</th>
+          <th>触发机制</th>
+          <th>可逆性</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Claude Code</strong></td>
+          <td>五段流水线</td>
+          <td>分级降压</td>
+          <td><span class="table-tag tag-auto">自动</span></td>
+          <td>不可逆</td>
+        </tr>
+        <tr>
+          <td><strong>Codex CLI</strong></td>
+          <td>Handoff 摘要</td>
+          <td>交接棒</td>
+          <td><span class="table-tag tag-auto">自动</span></td>
+          <td>不可逆</td>
+        </tr>
+        <tr>
+          <td><strong>OpenCode</strong></td>
+          <td>时间戳隐藏 + 摘要</td>
+          <td>可逆折叠</td>
+          <td><span class="table-tag tag-auto">自动</span></td>
+          <td>可逆</td>
+        </tr>
+        <tr>
+          <td><strong>Cline</strong></td>
+          <td>Focus Chain 双模式</td>
+          <td>手动 + 自动</td>
+          <td><span class="table-tag tag-both">混合</span></td>
+          <td>部分可逆</td>
+        </tr>
+        <tr>
+          <td><strong>Cursor</strong></td>
+          <td>动态上下文发现</td>
+          <td>搜索回忆</td>
+          <td><span class="table-tag tag-auto">自动</span></td>
+          <td>可搜索</td>
+        </tr>
+        <tr>
+          <td><strong>Amp</strong></td>
+          <td>不压缩，开新线程</td>
+          <td>分叉工作流</td>
+          <td><span class="table-tag tag-manual">手动</span></td>
+          <td>天然隔离</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Product Cards -->
+  <div class="product-grid">
+    <div class="product-card">
+      <div class="product-card-header">
+        <div class="product-icon" style="background:linear-gradient(135deg,#d97706,#f59e0b);">C</div>
+        <div>
+          <h3>Claude Code</h3>
+          <span class="subtitle">Anthropic / 五段流水线</span>
+        </div>
+      </div>
+      <div class="product-card-body">
+        <div class="philosophy">分级降压：先轻后重，逐级加深</div>
+        <ul>
+          <li>Budget Reduction — 预算软限制预警</li>
+          <li>Snip — 裁剪低价值工具输出</li>
+          <li>Microcompact — 微压缩高频短内容</li>
+          <li>Context Collapse — 结构化折叠长对话</li>
+          <li>Auto-Compact — 自动全量摘要兜底</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <div class="product-icon" style="background:linear-gradient(135deg,#059669,#10b981);">O</div>
+        <div>
+          <h3>Codex CLI</h3>
+          <span class="subtitle">OpenAI / Handoff 模式</span>
+        </div>
+      </div>
+      <div class="product-card-body">
+        <div class="philosophy">交接棒：保留近期，摘要远期</div>
+        <ul>
+          <li>保留最近几轮用户消息原文</li>
+          <li>其余内容生成 handoff 摘要</li>
+          <li>新上下文 = 摘要 + 近期原文</li>
+          <li>类比项目交接：背景交代清楚，细节不再赘述</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <div class="product-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">O</div>
+        <div>
+          <h3>OpenCode</h3>
+          <span class="subtitle">社区 / 可逆折叠</span>
+        </div>
+      </div>
+      <div class="product-card-body">
+        <div class="philosophy">可逆折叠：隐藏但不丢失</div>
+        <ul>
+          <li>时间戳标记历史消息，隐藏但不删除</li>
+          <li>生成结构化摘要代替原文</li>
+          <li>回放最后一条用户消息保持连贯</li>
+          <li>需要时可以"展开"恢复原文</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <div class="product-icon" style="background:linear-gradient(135deg,#be185d,#ec4899);">C</div>
+        <div>
+          <h3>Cline</h3>
+          <span class="subtitle">社区 / Focus Chain</span>
+        </div>
+      </div>
+      <div class="product-card-body">
+        <div class="philosophy">双模式：自动 + 手动协同</div>
+        <ul>
+          <li><code>/smol</code> 命令手动触发压缩</li>
+          <li>Focus Chain 自动追踪任务焦点</li>
+          <li>用户可选择压缩哪些内容</li>
+          <li>保留用户标记为重要的上下文</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <div class="product-icon" style="background:linear-gradient(135deg,#2563eb,#3b82f6);">C</div>
+        <div>
+          <h3>Cursor</h3>
+          <span class="subtitle">Anysphere / 动态发现</span>
+        </div>
+      </div>
+      <div class="product-card-body">
+        <div class="philosophy">搜索回忆：不压缩，去搜索</div>
+        <ul>
+          <li>自动摘要 + 提示开新对话</li>
+          <li>历史对话可搜索、可引用</li>
+          <li>Codebase 索引作为外部记忆</li>
+          <li>动态上下文发现替代静态压缩</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-card-header">
+        <div class="product-icon" style="background:linear-gradient(135deg,#dc2626,#ef4444);">A</div>
+        <div>
+          <h3>Amp</h3>
+          <span class="subtitle">Sourcegraph / 线程优先</span>
+        </div>
+      </div>
+      <div class="product-card-body">
+        <div class="philosophy">不压缩：分叉代替压缩</div>
+        <ul>
+          <li>明确不做上下文压缩</li>
+          <li><code>/handoff</code> 命令开新线程</li>
+          <li>每个线程聚焦单一任务</li>
+          <li>哲学：压缩必然丢信息，不如不压</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MemGPT Special Card -->
+  <div class="card" style="border-left:4px solid var(--accent);margin-top:8px;">
+    <h3>MemGPT / Letta — 操作系统级内存管理</h3>
+    <p style="margin-top:8px;">
+      将上下文视为 <strong>RAM</strong>，将持久化历史视为 <strong>磁盘</strong>。Agent 自主决定何时将信息从"内存"换出到"磁盘"，何时从"磁盘"换入到"内存"。这是唯一一个从操作系统内存管理视角设计上下文管理的方案。
+    </p>
+  </div>
+</section>
+
+<!-- Section 2 -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">2</span>
+    <h2>反面教材：第一代的五个痛点</h2>
+  </div>
+  <p style="color:var(--text-secondary);margin-bottom:20px;font-size:15px;">
+    第一代上下文压缩采用"撑不住才动手"的被动策略，在实际使用中暴露出一系列严重问题。
+  </p>
+
+  <div class="pain-grid">
+    <div class="pain-card">
+      <h4>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        痛点一：压缩滞后
+      </h4>
+      <p>等到上下文快满才触发压缩，此时已无足够空间执行压缩操作本身（压缩摘要也需要 token），导致"要压缩时已经压不动了"。</p>
+    </div>
+    <div class="pain-card">
+      <h4>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        痛点二：信息断裂
+      </h4>
+      <p>粗暴截断或简单摘要丢失关键上下文，Agent 忘记之前的决策和承诺，导致行为前后矛盾、重复犯错。</p>
+    </div>
+    <div class="pain-card">
+      <h4>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        痛点三：缓存失效
+      </h4>
+      <p>滑动窗口截断导致前缀变化，Anthropic / OpenAI 的 prompt cache 全部失效，每次调用都是冷启动，成本飙升。</p>
+    </div>
+    <div class="pain-card">
+      <h4>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        痛点四：用户无感知
+      </h4>
+      <p>压缩在后台静默发生，用户不知道哪些信息被丢弃了，直到 Agent 犯错才发现"它忘了"。</p>
+    </div>
+    <div class="pain-card" style="grid-column:1/-1;">
+      <h4>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        痛点五：压缩质量不可控
+      </h4>
+      <p>用 LLM 做摘要本身就可能出错——遗漏关键信息、曲解语义、丢失精确数值。压缩质量取决于模型能力，但多数系统对压缩质量没有任何校验机制。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Section 3 -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <span class="section-num">3</span>
+    <h2>第二代各家做法详解</h2>
+  </div>
+
+  <!-- Claude Code Pipeline -->
+  <h3 style="margin-bottom:16px;font-size:1.1rem;">Claude Code 五段流水线</h3>
+  <p style="color:var(--text-secondary);font-size:14.5px;margin-bottom:16px;">
+    Claude Code 的核心设计思想是<strong>本地操作优先</strong>——能用确定性操作解决的，绝不动用 LLM。五级渐进式压缩，从轻到重：
+  </p>
+
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <span class="step-num">Stage 1</span>
+      Budget<br>Reduction
+    </div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step">
+      <span class="step-num">Stage 2</span>
+      Snip
+    </div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step">
+      <span class="step-num">Stage 3</span>
+      Microcompact
+    </div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step">
+      <span class="step-num">Stage 4</span>
+      Context<br>Collapse
+    </div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step">
+      <span class="step-num">Stage 5</span>
+      Auto-<br>Compact
+    </div>
+  </div>
+
+  <!-- Expandable details for each stage -->
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Stage 1: Budget Reduction — 预算预警与软限制
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>当 token 使用接近预算阈值时，系统发出软限制预警。这是一种"提前打招呼"的机制，让后续压缩操作有充足的缓冲空间。</p>
+      <ul>
+        <li>不丢弃任何信息，仅发出警告</li>
+        <li>为后续阶段争取操作空间</li>
+        <li>用户可感知当前上下文健康度</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Stage 2: Snip — 确定性裁剪
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>纯本地操作，不调用 LLM。根据规则裁剪低价值内容：</p>
+      <ul>
+        <li>截断过长的工具输出（如大文件内容、搜索结果列表）</li>
+        <li>移除已成功执行的工具调用的冗余返回值</li>
+        <li>保留工具调用的结构和关键摘要行</li>
+        <li>零成本、零延迟、零风险</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Stage 3: Microcompact — 微压缩
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>对高频出现的短对话片段进行局部压缩，保持对话流的完整性：</p>
+      <ul>
+        <li>合并连续的简单工具调用为摘要</li>
+        <li>压缩重复的确认/反馈循环</li>
+        <li>保留意图和结论，丢弃中间过程</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Stage 4: Context Collapse — 结构化折叠
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>对较长的对话段落进行结构化折叠，使用 LLM 生成高质量摘要：</p>
+      <ul>
+        <li>识别对话中的"任务边界"，按任务段落折叠</li>
+        <li>保留每个任务的输入、输出、关键决策</li>
+        <li>摘要中包含结构化标签便于检索</li>
+        <li>仅在 Stage 2/3 不足以解决问题时触发</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Stage 5: Auto-Compact — 全量自动摘要
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>最终兜底方案。当所有轻量级手段都用尽，对整个上下文进行全量压缩：</p>
+      <ul>
+        <li>使用 LLM 对全部历史生成一份综合摘要</li>
+        <li>保留系统提示、关键工具定义、近期对话</li>
+        <li>摘要作为新的"起始上下文"继续工作</li>
+        <li>这是最后手段，代价最高但最彻底</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top:20px;">
+    <p><strong>设计精髓：</strong>Claude Code 的五段流水线体现了"能用规则不用模型，能用小模型不用大模型"的工程哲学。每一级压缩都比上一级更"贵"，但效果也更强。这种渐进式设计确保了成本和效果的平衡。</p>
+  </div>
+
+  <!-- Codex CLI -->
+  <div class="expandable" data-expandable style="margin-top:24px;">
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Codex CLI — Handoff 交接模式详解
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>Codex CLI 采用"交接棒"隐喻：长对话就像接力赛，每一棒需要把足够的上下文传给下一棒，但不需要把每一棒的所有细节都带过去。</p>
+      <ul>
+        <li><strong>近期保护</strong>：最近 N 轮用户消息保持原文不压缩</li>
+        <li><strong>远期摘要</strong>：更早的内容生成 handoff 摘要</li>
+        <li><strong>新上下文</strong>：摘要 + 近期原文，构成新的工作窗口</li>
+        <li><strong>隐含假设</strong>：越近期的内容越可能与当前任务相关</li>
+      </ul>
+      <p>这种设计的优势是简单、可预测。劣势是 handoff 摘要的质量直接影响后续表现。</p>
+    </div>
+  </div>
+
+  <!-- OpenCode -->
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      OpenCode — 可逆折叠详解
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>OpenCode 独特之处在于其<strong>可逆性</strong>设计：压缩不等于丢弃。</p>
+      <ul>
+        <li><strong>时间戳标记</strong>：为每条消息打上时间戳，超过阈值的消息被"隐藏"而非删除</li>
+        <li><strong>结构化摘要</strong>：被隐藏的内容被转化为结构化摘要，保留关键决策和状态</li>
+        <li><strong>消息回放</strong>：压缩后回放最后一条用户消息，帮助模型重建当前任务焦点</li>
+        <li><strong>可展开恢复</strong>：需要时可以"展开"恢复被隐藏的原始内容</li>
+      </ul>
+      <p>这种"先隐藏再摘要"的两步策略，在丢信息和省空间之间找到了一个新平衡点。</p>
+    </div>
+  </div>
+
+  <!-- Cline -->
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Cline — Focus Chain 双模式详解
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>Cline 走的是"人机协同"路线，将压缩的控制权部分交还给用户。</p>
+      <ul>
+        <li><strong><code>/smol</code> 手动触发</strong>：用户在觉得上下文冗余时主动触发压缩</li>
+        <li><strong>Focus Chain 自动追踪</strong>：系统自动识别当前任务焦点，标记相关内容为"高优先级"</li>
+        <li><strong>选择性压缩</strong>：用户可以选择压缩哪些内容，保留哪些内容</li>
+        <li><strong>重要标记</strong>：用户可以标记某些上下文为"重要"，压缩时不会被触碰</li>
+      </ul>
+      <p>双模式的好处是灵活，但也增加了用户的认知负担。</p>
+    </div>
+  </div>
+
+  <!-- Cursor -->
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Cursor — 动态上下文发现详解
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>Cursor 的策略独特之处在于它不执着于"压缩"，而是用"搜索"来替代"压缩"。</p>
+      <ul>
+        <li><strong>自动摘要 + 提示开新对话</strong>：当上下文过长时，主动建议用户开新对话</li>
+        <li><strong>历史可搜索</strong>：所有历史对话都被索引，可以通过搜索重新调取</li>
+        <li><strong>Codebase 索引</strong>：代码仓库被索引为外部记忆，不必全部放入上下文</li>
+        <li><strong>动态发现</strong>：根据当前任务动态搜索相关的代码片段、文档和历史对话</li>
+      </ul>
+      <p>这是一种"换一种思路"的方案：不压缩信息，而是让信息在需要时被找到。</p>
+    </div>
+  </div>
+
+  <!-- Amp -->
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      Amp — 线程优先，不压缩策略详解
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>Amp 采取了最激进的策略：<strong>不做压缩</strong>。</p>
+      <ul>
+        <li><strong>核心信念</strong>：任何压缩都会丢信息，丢信息必然有风险</li>
+        <li><strong><code>/handoff</code> 命令</strong>：当上下文不够用时，开一个新线程继续</li>
+        <li><strong>单任务聚焦</strong>：每个线程只做一件事，做完就结束</li>
+        <li><strong>上下文隔离</strong>：不同线程之间天然隔离，不共享上下文</li>
+      </ul>
+      <p>这种设计的前提是：用户能够合理地将大任务拆分为小任务。对于高度自主的 Agent，这可能不太现实。</p>
+    </div>
+  </div>
+
+  <!-- MemGPT -->
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      MemGPT / Letta — 操作系统级内存管理详解
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>MemGPT 将 LLM 上下文管理类比为操作系统的虚拟内存管理，这是一个深刻的范式转换。</p>
+      <ul>
+        <li><strong>上下文 = RAM</strong>：当前上下文窗口就是"物理内存"，容量有限</li>
+        <li><strong>历史 = 磁盘</strong>：持久化存储的历史对话就是"磁盘"，容量无限</li>
+        <li><strong>换入/换出</strong>：Agent 自主决定何时将信息从"磁盘"加载到"内存"（page-in），何时将信息从"内存"卸载到"磁盘"（page-out）</li>
+        <li><strong>缺页中断</strong>：当 Agent 需要某个信息但不在上下文中时，触发"缺页中断"，从存储中检索</li>
+        <li><strong>自主管理</strong>：Agent 具有对自身记忆的完全管理权限，可以主动查询、存储、删除</li>
+      </ul>
+      <p>这是目前最具理论深度的方案，但实现复杂度也最高。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Section 4 -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <span class="section-num">4</span>
+    <h2>实施陷阱：滑动窗口的代价</h2>
+  </div>
+
+  <div class="highlight-box warning">
+    <p><strong>核心警告：</strong>看似简单的"滑动窗口截断 + stub 替换"策略，在 API 层面会引发灾难性的缓存失效问题。</p>
+  </div>
+
+  <p style="color:var(--text-secondary);font-size:14.5px;margin:20px 0;">
+    滑动窗口策略的问题在于：每次截断最前面的消息后，整个消息序列的前缀都发生了变化。对于使用 prompt cache 的 API（Anthropic、OpenAI），这意味着<strong>每次请求都是一次全新的冷启动</strong>。
+  </p>
+
+  <div class="code-block">
+    <span class="code-label">真实案例</span>
+    <span class="comment">// 一个真实任务的成本拆解</span><br>
+    <span class="keyword">任务</span>: <span class="string">"重构认证模块"</span><br>
+    <span class="keyword">总成本</span>: <span class="number">$77.30</span><br><br>
+    <span class="comment">// token 使用分布</span><br>
+    <span class="fn">cache_read</span>:  <span class="number">12%</span>  <span class="comment">// 缓存命中 — 正常</span><br>
+    <span class="err">cache_write</span>: <span class="number">83%</span>  <span class="comment">// 缓存写入 — 异常！几乎全在重建缓存</span><br>
+    <span class="fn">output</span>:      <span class="number">5%</span>   <span class="comment">// 实际输出</span><br><br>
+    <span class="warn">// 83% 的钱花在了"重新写缓存"上</span><br>
+    <span class="warn">// 每一步滑动窗口截断 → 前缀变化 → 缓存全失效</span>
+  </div>
+
+  <div class="key-figure">
+    <span class="big-num">83%</span>
+    <div class="desc">
+      <strong>cache_write 占比</strong><br>
+      滑动窗口导致每步缓存失效，<br>绝大多数 token 花费在重建缓存上
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>正确做法：</strong>压缩操作应该采用"追加式"而非"截断式"——新生成的摘要放在消息末尾，保持原有消息序列的前缀不变，从而最大化 prompt cache 的命中率。</p>
+  </div>
+</section>
+
+<!-- Section 5 -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <span class="section-num">5</span>
+    <h2>七条共识原则</h2>
+  </div>
+  <p style="color:var(--text-secondary);margin-bottom:24px;font-size:15px;">
+    尽管各家策略不同，但从实践中提炼出了七条跨产品的共识原则。
+  </p>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="num">1</div>
+      <h4>分层压缩</h4>
+      <p>不要一刀切。设计多级压缩策略，从轻量级的规则操作到重量级的 LLM 摘要，逐级加深。</p>
+    </div>
+    <div class="concept-card">
+      <div class="num">2</div>
+      <h4>成本递进</h4>
+      <p>每一级压缩的计算成本应该递增。能用确定性操作（零成本）解决的，绝不动用 LLM。</p>
+    </div>
+    <div class="concept-card">
+      <div class="num">3</div>
+      <h4>增量摘要</h4>
+      <p>压缩应该是增量式的——对新内容生成摘要，而非每次对全量内容重新压缩。追加而非替换。</p>
+    </div>
+    <div class="concept-card">
+      <div class="num">4</div>
+      <h4>真实 Token 计数</h4>
+      <p>不要用"消息条数"估算上下文使用量。必须使用真实的 token 计数，因为一条工具输出可能包含数万 token。</p>
+    </div>
+    <div class="concept-card">
+      <div class="num">5</div>
+      <h4>用户特权</h4>
+      <p>用户显式标记的内容应被视为"特权信息"，压缩时不可触碰。用户标记 > 系统判断。</p>
+    </div>
+    <div class="concept-card">
+      <div class="num">6</div>
+      <h4>保护近期</h4>
+      <p>最近几轮对话是最可能与当前任务相关的。压缩应从最远的内容开始，保护近期上下文。</p>
+    </div>
+    <div class="concept-card">
+      <div class="num">7</div>
+      <h4>单调边界</h4>
+      <p>压缩操作的"水位线"应该单调递增——已经压缩过的内容不应该被"展开回来"再压缩一次，避免信息振荡。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Section 6 -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <span class="section-num">6</span>
+    <h2>四级水位线方案</h2>
+  </div>
+  <p style="color:var(--text-secondary);margin-bottom:24px;font-size:15px;">
+    基于七条共识原则，提出一套标准化的四级水位线压缩方案。水位线单调递增，不可回退。
+  </p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <h4>Tier 0 — 安全水位 (0-60%)</h4>
+      <p>
+        <strong>状态：</strong>上下文充裕，无需任何压缩操作。<br>
+        <strong>行为：</strong>正常工作，所有消息保持原文。<br>
+        <strong>监控：</strong>后台持续统计真实 token 使用量，为后续水位预警做准备。
+      </p>
+    </div>
+    <div class="timeline-item">
+      <h4>Tier 1 — 预警水位 (60-75%)</h4>
+      <p>
+        <strong>状态：</strong>上下文开始紧张，需要主动管理。<br>
+        <strong>行为：</strong>触发确定性裁剪 — 截断过长的工具输出、移除冗余返回值、压缩重复确认循环。<br>
+        <strong>成本：</strong>零（纯本地操作，不调用 LLM）。<br>
+        <strong>缓存影响：</strong>追加式操作，不破坏前缀缓存。
+      </p>
+    </div>
+    <div class="timeline-item">
+      <h4>Tier 2 — 压缩水位 (75-90%)</h4>
+      <p>
+        <strong>状态：</strong>上下文紧张，需要 LLM 辅助压缩。<br>
+        <strong>行为：</strong>对最早的对话段落生成结构化摘要，按任务边界折叠。摘要追加到消息末尾，保持前缀不变。<br>
+        <strong>成本：</strong>中等（调用 LLM 生成摘要，但仅处理部分内容）。<br>
+        <strong>缓存影响：</strong>追加式摘要，前缀缓存保持有效。
+      </p>
+    </div>
+    <div class="timeline-item">
+      <h4>Tier 3 — 紧急水位 (90-100%)</h4>
+      <p>
+        <strong>状态：</strong>上下文即将耗尽。<br>
+        <strong>行为：</strong>全量压缩 — 保留系统提示和工具定义，对全部对话历史生成综合摘要。建议用户开新对话。<br>
+        <strong>成本：</strong>高（全量 LLM 摘要）。<br>
+        <strong>缓存影响：</strong>全量重写，缓存失效，但这是最后手段。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Section 7 -->
+<section class="section" id="s7">
+  <div class="section-header">
+    <span class="section-num">7</span>
+    <h2>云端三层架构</h2>
+  </div>
+  <p style="color:var(--text-secondary);margin-bottom:24px;font-size:15px;">
+    云端 Agent 的上下文管理需要在存储、工具和缓存三个层面系统性设计。
+  </p>
+
+  <div class="storage-diagram">
+    <div class="storage-box">
+      <h4>热存储</h4>
+      <p>当前上下文窗口<br>全量原文<br>最高保真度<br>容量最有限</p>
+    </div>
+    <div class="storage-box">
+      <h4>温存储</h4>
+      <p>近期摘要 + 结构化索引<br>压缩后的关键信息<br>中等保真度<br>容量较充裕</p>
+    </div>
+    <div class="storage-box">
+      <h4>冷存储</h4>
+      <p>全量历史记录<br>可检索的原始对话<br>最低访问频率<br>容量无限</p>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      层一：存储分层 — 热/温/冷三级存储
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>将信息按照访问频率和重要性分配到不同存储层：</p>
+      <ul>
+        <li><strong>热存储</strong>：当前上下文窗口，包含全量原文，保真度最高但容量最有限</li>
+        <li><strong>温存储</strong>：压缩后的摘要和结构化索引，保真度中等，访问频率中等</li>
+        <li><strong>冷存储</strong>：全量历史记录，按需检索，容量几乎无限</li>
+        <li>信息可以在层级间流动：热 → 温 → 冷（压缩降级），冷 → 温 → 热（检索升级）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      层二：工具差异化 — 不同工具消耗不同
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>不同类型的内容应该采用不同的压缩策略：</p>
+      <ul>
+        <li><strong>工具输出</strong>：通常是最占空间的，优先裁剪。保留结构，删除冗余数据</li>
+        <li><strong>对话消息</strong>：按时间远近分层压缩，近期保留原文，远期生成摘要</li>
+        <li><strong>系统提示</strong>：通常不可压缩，但可以移除过时的指令</li>
+        <li><strong>代码片段</strong>：保留关键函数签名和逻辑，删除注释和空行</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable>
+    <button class="expandable-trigger" onclick="toggleExpand(this)">
+      层三：跨轮缓存 — 最大化 Prompt Cache 命中
+      <span class="arrow">▼</span>
+    </button>
+    <div class="expandable-content">
+      <p>缓存策略是云端 Agent 成本控制的关键：</p>
+      <ul>
+        <li><strong>前缀稳定性</strong>：所有压缩操作必须保持消息序列前缀不变</li>
+        <li><strong>追加式更新</strong>：新摘要追加到末尾，而非替换中间内容</li>
+        <li><strong>缓存预算</strong>：将 prompt cache 的命中率作为压缩策略的优化目标之一</li>
+        <li><strong>成本核算</strong>：cache_write 的价格是 cache_read 的数倍，必须监控</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Section 8 -->
+<section class="section" id="s8">
+  <div class="section-header">
+    <span class="section-num">8</span>
+    <h2>红线：不可触碰的底线</h2>
+  </div>
+
+  <div class="highlight-box danger">
+    <p><strong>系统提示不可压缩。</strong>System Prompt 是 Agent 的"人格"和"规则"，任何对系统提示的压缩都可能导致 Agent 行为偏离预期，产生不可预测的后果。</p>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h3>完整的红线清单</h3>
+    <ul style="list-style:none;padding:0;margin-top:12px;">
+      <li style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;">
+        <span style="color:var(--danger);font-weight:bold;flex-shrink:0;">✖</span>
+        <span><strong>系统提示（System Prompt）</strong> — Agent 的核心指令集，压缩可能导致行为异常</span>
+      </li>
+      <li style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;">
+        <span style="color:var(--danger);font-weight:bold;flex-shrink:0;">✖</span>
+        <span><strong>用户显式标记的重要信息</strong> — 用户特权高于系统判断</span>
+      </li>
+      <li style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;">
+        <span style="color:var(--danger);font-weight:bold;flex-shrink:0;">✖</span>
+        <span><strong>当前任务的活跃上下文</strong> — 正在执行的任务所需的核心信息</span>
+      </li>
+      <li style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;">
+        <span style="color:var(--danger);font-weight:bold;flex-shrink:0;">✖</span>
+        <span><strong>安全相关的约束条件</strong> — 权限控制、数据访问规则等</span>
+      </li>
+      <li style="padding:10px 0;display:flex;align-items:flex-start;gap:10px;">
+        <span style="color:var(--danger);font-weight:bold;flex-shrink:0;">✖</span>
+        <span><strong>关键工具的定义和 Schema</strong> — 压缩工具定义会导致调用失败</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- Section 9 -->
+<section class="section" id="s9">
+  <div class="section-header">
+    <span class="section-num">9</span>
+    <h2>哲学结论：Context Rot</h2>
+  </div>
+
+  <div class="card" style="border-left:4px solid var(--accent);">
+    <h3>Context Rot（上下文腐烂）</h3>
+    <p style="margin-top:8px;font-size:15px;line-height:1.85;">
+      上下文不仅仅是信息的容器，更是模型的<strong>注意力资源</strong>。当上下文中充斥着大量低价值信息时，模型的注意力被稀释——这就是 <strong>Context Rot</strong>。
+    </p>
+    <p style="margin-top:12px;font-size:15px;line-height:1.85;">
+      就像一间堆满杂物的房间让人无法专注工作一样，一个臃肿的上下文窗口让模型无法准确理解和执行任务。上下文压缩的本质不是"省空间"，而是<strong>"保护模型的注意力"</strong>。
+    </p>
+  </div>
+
+  <div class="concept-grid" style="margin-top:24px;">
+    <div class="concept-card">
+      <h4>注意力是稀缺资源</h4>
+      <p>模型的注意力窗口有限。上下文越长、噪音越多，模型对关键信息的注意力就越弱。压缩的终极目标是<strong>信噪比最大化</strong>。</p>
+    </div>
+    <div class="concept-card">
+      <h4>压缩即策展</h4>
+      <p>好的上下文压缩不是简单的"删减"，而是一种"策展"——决定哪些信息值得模型花注意力去关注，哪些应该退到幕后。</p>
+    </div>
+    <div class="concept-card">
+      <h4>记忆是 Agent 的灵魂</h4>
+      <p>一个 Agent 的能力上限不取决于模型本身，而取决于它如何管理自己的记忆。优秀的上下文管理让弱模型胜过强模型。</p>
+    </div>
+    <div class="concept-card">
+      <h4>工程 > 理论</h4>
+      <p>上下文管理的每一条共识原则都来自工程实践的血泪教训，而非理论推演。在真实场景中，一个缓存失效就能让成本翻倍。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Quiz Section -->
+<section class="section" id="quiz">
+  <div class="section-header">
+    <span class="section-num">Q</span>
+    <h2>互动测验</h2>
+  </div>
+
+  <div class="quiz-section">
+    <h3>检验你对 Agent 上下文压缩策略的理解</h3>
+
+    <!-- Question 1 -->
+    <div class="quiz-q" data-correct="B">
+      <p>问题 1：Claude Code 的五段流水线中，哪个阶段是纯本地操作、不调用 LLM 的？</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-val="A" onclick="selectOpt(this)">
+          <span class="marker">A</span>
+          Auto-Compact
+        </button>
+        <button class="quiz-opt" data-val="B" onclick="selectOpt(this)">
+          <span class="marker">B</span>
+          Snip（裁剪）
+        </button>
+        <button class="quiz-opt" data-val="C" onclick="selectOpt(this)">
+          <span class="marker">C</span>
+          Context Collapse
+        </button>
+        <button class="quiz-opt" data-val="D" onclick="selectOpt(this)">
+          <span class="marker">D</span>
+          Budget Reduction
+        </button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="quiz-q" data-correct="C">
+      <p>问题 2：在滑动窗口截断导致的真实案例中，cache_write 占总 token 的比例是多少？</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-val="A" onclick="selectOpt(this)">
+          <span class="marker">A</span>
+          50%
+        </button>
+        <button class="quiz-opt" data-val="B" onclick="selectOpt(this)">
+          <span class="marker">B</span>
+          70%
+        </button>
+        <button class="quiz-opt" data-val="C" onclick="selectOpt(this)">
+          <span class="marker">C</span>
+          83%
+        </button>
+        <button class="quiz-opt" data-val="D" onclick="selectOpt(this)">
+          <span class="marker">D</span>
+          95%
+        </button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="quiz-q" data-correct="D">
+      <p>问题 3：以下哪个产品选择"不做压缩"的策略？</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" data-val="A" onclick="selectOpt(this)">
+          <span class="marker">A</span>
+          Claude Code
+        </button>
+        <button class="quiz-opt" data-val="B" onclick="selectOpt(this)">
+          <span class="marker">B</span>
+          Cursor
+        </button>
+        <button class="quiz-opt" data-val="C" onclick="selectOpt(this)">
+          <span class="marker">C</span>
+          Cline
+        </button>
+        <button class="quiz-opt" data-val="D" onclick="selectOpt(this)">
+          <span class="marker">D</span>
+          Amp
+        </button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <button class="quiz-submit" id="quiz-submit" onclick="submitQuiz()" disabled>提交答案</button>
+    <div class="quiz-score" id="quiz-score"></div>
+  </div>
+</section>
+
+<!-- Takeaway Section -->
+<section class="section" id="takeaway">
+  <div class="section-header">
+    <span class="section-num">✨</span>
+    <h2>核心收获</h2>
+  </div>
+
+  <div class="takeaway-grid">
+    <div class="takeaway-card">
+      <h4>分层渐进，能轻不重</h4>
+      <p>上下文压缩应该像 Claude Code 的五段流水线一样，先用零成本的确定性操作，再用 LLM 辅助，最后才全量压缩。</p>
+    </div>
+    <div class="takeaway-card">
+      <h4>追加式而非截断式</h4>
+      <p>所有压缩操作都应该保持消息前缀不变，追加摘要到末尾，最大化 prompt cache 命中率。83% cache_write 的惨剧不要重演。</p>
+    </div>
+    <div class="takeaway-card">
+      <h4>保护注意力，而非省空间</h4>
+      <p>上下文压缩的本质是"策展"——让模型的注意力集中在最重要的信息上。Context Rot 比 Context Overflow 更可怕。</p>
+    </div>
+    <div class="takeaway-card">
+      <h4>用户标记 > 系统判断</h4>
+      <p>用户显式标记的内容是"特权信息"，压缩时绝不可触碰。系统提示、安全约束、工具定义同理——这些是红线。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>基于腾讯技术工程 / mervynyang 的技术文章整理</p>
+  <p style="margin-top:4px;">交互式学习页面 &middot; 2026</p>
+</footer>
+
+</main>
+</div>
+
+<button class="back-to-top" id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// Progress Bar
+const progressBar = document.getElementById('progress-bar');
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  progressBar.style.width = progress + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+// Section reveal on scroll
+const sections = document.querySelectorAll('.section');
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -60px 0px' };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, observerOptions);
+sections.forEach(s => observer.observe(s));
+
+// TOC active state
+const tocLinks = document.querySelectorAll('.toc-list a');
+const sectionIds = Array.from(tocLinks).map(a => a.getAttribute('href').slice(1));
+
+function updateToc() {
+  let currentId = '';
+  for (const id of sectionIds) {
+    const el = document.getElementById(id);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= 120) currentId = id;
+    }
+  }
+  tocLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + currentId);
+  });
+}
+window.addEventListener('scroll', updateToc, { passive: true });
+
+// Back to top button
+const backToTop = document.getElementById('back-to-top');
+function updateBackToTop() {
+  backToTop.classList.toggle('show', window.scrollY > 400);
+}
+window.addEventListener('scroll', updateBackToTop, { passive: true });
+
+// Expandable sections
+function toggleExpand(trigger) {
+  const parent = trigger.closest('.expandable');
+  parent.classList.toggle('open');
+}
+
+// Quiz logic
+let selectedAnswers = {};
+
+function selectOpt(btn) {
+  const q = btn.closest('.quiz-q');
+  const qIdx = Array.from(document.querySelectorAll('.quiz-q')).indexOf(q);
+  const alreadySubmitted = q.classList.contains('submitted');
+  if (alreadySubmitted) return;
+
+  q.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedAnswers[qIdx] = btn.dataset.val;
+
+  // Enable submit if all answered
+  const totalQ = document.querySelectorAll('.quiz-q').length;
+  const submitBtn = document.getElementById('quiz-submit');
+  submitBtn.disabled = Object.keys(selectedAnswers).length < totalQ;
+}
+
+function submitQuiz() {
+  const questions = document.querySelectorAll('.quiz-q');
+  let score = 0;
+
+  questions.forEach((q, idx) => {
+    const correct = q.dataset.correct;
+    const selected = selectedAnswers[idx];
+    const feedback = q.querySelector('.quiz-feedback');
+
+    q.classList.add('submitted');
+
+    q.querySelectorAll('.quiz-opt').forEach(opt => {
+      const val = opt.dataset.val;
+      if (val === correct) {
+        opt.classList.add('correct');
+      } else if (val === selected && val !== correct) {
+        opt.classList.add('wrong');
+      }
+      opt.style.pointerEvents = 'none';
+    });
+
+    if (selected === correct) {
+      score++;
+      feedback.textContent = '正确！';
+      feedback.className = 'quiz-feedback show correct-fb';
+    } else {
+      feedback.textContent = '不正确。正确答案是 ' + correct + '。';
+      feedback.className = 'quiz-feedback show wrong-fb';
+    }
+  });
+
+  const scoreEl = document.getElementById('quiz-score');
+  scoreEl.classList.add('show');
+  if (score === questions.length) {
+    scoreEl.className = 'quiz-score show perfect';
+    scoreEl.innerHTML = '满分！' + score + '/' + questions.length + ' — 你已经深入理解了 Agent 上下文压缩的核心策略！';
+  } else if (score >= questions.length * 0.6) {
+    scoreEl.className = 'quiz-score show good';
+    scoreEl.innerHTML = score + '/' + questions.length + ' — 不错，建议回顾相关内容巩固理解。';
+  } else {
+    scoreEl.className = 'quiz-score show try-again';
+    scoreEl.innerHTML = score + '/' + questions.length + ' — 建议重新阅读文章重点章节后再试。';
+  }
+
+  document.getElementById('quiz-submit').disabled = true;
+}
+
+// Initialize
+updateProgress();
+updateToc();
+updateBackToTop();
+</script>
+</body>
+</html>
