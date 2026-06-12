@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent 框架全景解析</title>
+<style>
+/* ============================================================
+   Design tokens — extracted from web-design-website skill
+   OKLCH warm palette · 8px grid · minimal radius
+   ============================================================ */
+:root {
+  --paper:      oklch(0.965 0.018 78);
+  --paper-deep: oklch(0.928 0.024 78);
+  --paper-edge: oklch(0.880 0.028 78);
+  --ink:        oklch(0.180 0.014 60);
+  --ink-soft:   oklch(0.300 0.014 60);
+  --ink-mute:   oklch(0.520 0.012 60);
+  --ink-faint:  oklch(0.760 0.010 60);
+  --ember:      oklch(0.700 0.170 42);
+  --ember-deep: oklch(0.560 0.180 38);
+  --ember-soft: oklch(0.860 0.060 60);
+  --line-1:     oklch(0.180 0.014 60 / 0.10);
+  --line-2:     oklch(0.180 0.014 60 / 0.22);
+  --line-3:     oklch(0.180 0.014 60 / 0.45);
+
+  --s-1: 8px; --s-2: 16px; --s-3: 24px; --s-4: 32px;
+  --s-5: 48px; --s-6: 64px; --s-7: 96px; --s-8: 128px;
+
+  --f-serif: "Instrument Serif", "Songti SC", "Noto Serif SC", Georgia, serif;
+  --f-sans:  "Geist", "PingFang SC", "HarmonyOS Sans SC", system-ui, sans-serif;
+  --f-mono:  "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+
+  --ease-enter: cubic-bezier(.2, .8, .2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper:      oklch(0.220 0.014 60);
+    --paper-deep: oklch(0.180 0.014 60);
+    --paper-edge: oklch(0.275 0.014 60);
+    --ink:        oklch(0.965 0.018 78);
+    --ink-soft:   oklch(0.820 0.018 78);
+    --ink-mute:   oklch(0.620 0.015 70);
+    --ink-faint:  oklch(0.450 0.012 65);
+    --ember:      oklch(0.740 0.170 42);
+    --ember-soft: oklch(0.300 0.060 42);
+    --line-1:     oklch(0.965 0.018 78 / 0.08);
+    --line-2:     oklch(0.965 0.018 78 / 0.15);
+    --line-3:     oklch(0.965 0.018 78 / 0.30);
+  }
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--f-sans);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--ember);
+  color: var(--paper);
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--s-6) var(--s-3);
+}
+
+@media (max-width: 680px) {
+  .page { padding: var(--s-4) var(--s-2); }
+}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.hero {
+  text-align: center;
+  padding: var(--s-7) 0 var(--s-6);
+  border-bottom: 1px solid var(--line-1);
+  margin-bottom: var(--s-6);
+}
+
+.hero__eyebrow {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: var(--s-2);
+}
+
+.hero__title {
+  font-family: var(--f-serif);
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--s-3);
+  text-wrap: balance;
+}
+
+.hero__title em {
+  font-style: normal;
+  color: var(--ember);
+  position: relative;
+}
+
+.hero__title em::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 2px;
+  width: 100%; height: 4px;
+  background: var(--ember);
+  opacity: 0.2;
+  border-radius: 2px;
+}
+
+.hero__sub {
+  font-size: 18px;
+  color: var(--ink-mute);
+  max-width: 640px;
+  margin: 0 auto var(--s-2);
+  line-height: 1.7;
+}
+
+.hero__meta {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  letter-spacing: 1px;
+}
+
+/* ============================================================
+   TOC (sticky sidebar on wide screens)
+   ============================================================ */
+.toc {
+  position: sticky;
+  top: var(--s-3);
+  float: left;
+  width: 200px;
+  margin-left: -240px;
+  padding-right: var(--s-3);
+}
+
+@media (max-width: 1280px) {
+  .toc {
+    float: none;
+    position: relative;
+    top: auto;
+    width: 100%;
+    margin: 0 0 var(--s-5);
+    padding: var(--s-3);
+    background: var(--paper-deep);
+    border-radius: 4px;
+    border: 1px solid var(--line-1);
+  }
+}
+
+.toc__title {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--s-2);
+}
+
+.toc__list {
+  list-style: none;
+}
+
+.toc__link {
+  display: block;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--ink-mute);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  padding-left: var(--s-2);
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.toc__link:hover,
+.toc__link.active {
+  color: var(--ember);
+  border-left-color: var(--ember);
+}
+
+/* ============================================================
+   Section
+   ============================================================ */
+.section {
+  margin-bottom: var(--s-7);
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s var(--ease-enter), transform 0.8s var(--ease-enter);
+}
+
+.section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section__eyebrow {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--s-1);
+}
+
+.section__title {
+  font-family: var(--f-serif);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--s-4);
+  text-wrap: balance;
+}
+
+.section__body {
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--ink-soft);
+}
+
+.section__body p {
+  margin-bottom: var(--s-3);
+  text-wrap: pretty;
+}
+
+.section__body strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ============================================================
+   Why cards (2x2 grid)
+   ============================================================ */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+}
+
+@media (max-width: 600px) {
+  .why-grid { grid-template-columns: 1fr; }
+}
+
+.why-card {
+  background: var(--paper-deep);
+  border: 1px solid var(--line-1);
+  border-radius: 4px;
+  padding: var(--s-3);
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s var(--ease-enter), transform 0.6s var(--ease-enter);
+}
+
+.why-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.why-card:nth-child(2) { transition-delay: 0.1s; }
+.why-card:nth-child(3) { transition-delay: 0.2s; }
+.why-card:nth-child(4) { transition-delay: 0.3s; }
+
+.why-card__num {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--ember);
+  margin-bottom: var(--s-1);
+}
+
+.why-card__title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.why-card__desc {
+  font-size: 15px;
+  color: var(--ink-mute);
+  line-height: 1.7;
+}
+
+/* ============================================================
+   Framework overview (4-col)
+   ============================================================ */
+.fw-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+}
+
+@media (max-width: 800px) {
+  .fw-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .fw-grid { grid-template-columns: 1fr; }
+}
+
+.fw-card {
+  background: var(--paper-deep);
+  border: 1px solid var(--line-1);
+  border-radius: 4px;
+  padding: var(--s-3) var(--s-2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s var(--ease-enter), transform 0.6s var(--ease-enter);
+  cursor: pointer;
+}
+
+.fw-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fw-card:nth-child(2) { transition-delay: 0.1s; }
+.fw-card:nth-child(3) { transition-delay: 0.2s; }
+.fw-card:nth-child(4) { transition-delay: 0.3s; }
+
+.fw-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.fw-card[data-fw="autogen"]::before   { background: #60a5fa; }
+.fw-card[data-fw="scope"]::before     { background: #f97316; }
+.fw-card[data-fw="camel"]::before     { background: #a78bfa; }
+.fw-card[data-fw="langgraph"]::before { background: #34d399; }
+
+.fw-card:hover {
+  border-color: var(--line-2);
+}
+
+.fw-card__icon {
+  font-size: 32px;
+  margin-bottom: var(--s-1);
+}
+
+.fw-card__name {
+  font-family: var(--f-mono);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.fw-card__origin {
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 1px;
+  margin-bottom: var(--s-2);
+}
+
+.fw-card__keyword {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--ember);
+  color: var(--paper);
+  margin-bottom: var(--s-2);
+}
+
+.fw-card__desc {
+  font-size: 13px;
+  color: var(--ink-mute);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   Framework detail panel (expandable)
+   ============================================================ */
+.fw-detail {
+  margin-top: var(--s-5);
+  border: 1px solid var(--line-1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fw-detail__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-3) var(--s-4);
+  background: var(--paper-deep);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.fw-detail__header:hover {
+  background: var(--paper-edge);
+}
+
+.fw-detail__header-left {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+
+.fw-detail__name {
+  font-family: var(--f-serif);
+  font-size: 28px;
+  font-weight: 400;
+}
+
+.fw-detail__tag {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--ember);
+  color: var(--paper);
+}
+
+.fw-detail__chevron {
+  font-size: 20px;
+  color: var(--ink-mute);
+  transition: transform 0.3s var(--ease-enter);
+}
+
+.fw-detail.open .fw-detail__chevron {
+  transform: rotate(180deg);
+}
+
+.fw-detail__body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s var(--ease-enter);
+}
+
+.fw-detail.open .fw-detail__body {
+  max-height: 2000px;
+}
+
+.fw-detail__inner {
+  padding: var(--s-4);
+}
+
+.fw-detail__subtitle {
+  font-size: 16px;
+  color: var(--ink-mute);
+  margin-bottom: var(--s-4);
+  font-style: italic;
+}
+
+.fw-detail__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-4);
+}
+
+@media (max-width: 680px) {
+  .fw-detail__cols { grid-template-columns: 1fr; }
+}
+
+.fw-detail__col-title {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--s-2);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line-1);
+}
+
+.fw-detail__point {
+  display: flex;
+  gap: 10px;
+  margin-bottom: var(--s-2);
+  align-items: flex-start;
+}
+
+.fw-detail__dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ember);
+  margin-top: 9px;
+  flex-shrink: 0;
+}
+
+.fw-detail__point-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.fw-detail__point-text strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.fw-detail__tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: var(--s-3);
+  padding-top: var(--s-2);
+  border-top: 1px solid var(--line-1);
+}
+
+.fw-tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--line-2);
+  color: var(--ink-mute);
+}
+
+.fw-tag--pro { border-color: oklch(0.65 0.15 145); color: oklch(0.50 0.15 145); }
+.fw-tag--con { border-color: oklch(0.60 0.18 22);  color: oklch(0.50 0.18 22);  }
+
+/* ============================================================
+   Philosophy section
+   ============================================================ */
+.phil-scale {
+  display: flex;
+  align-items: stretch;
+  margin: var(--s-5) 0;
+  border: 1px solid var(--line-1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.phil-side {
+  flex: 1;
+  padding: var(--s-4);
+  text-align: center;
+}
+
+.phil-side:first-child {
+  border-right: 1px solid var(--line-1);
+}
+
+@media (max-width: 600px) {
+  .phil-scale { flex-direction: column; }
+  .phil-side:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--line-1);
+  }
+}
+
+.phil-side__label {
+  font-family: var(--f-serif);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.phil-side__en {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--ink-faint);
+  margin-bottom: var(--s-2);
+}
+
+.phil-side__desc {
+  font-size: 14px;
+  color: var(--ink-mute);
+  line-height: 1.8;
+}
+
+.phil-insight {
+  background: var(--paper-deep);
+  border: 1px solid var(--line-1);
+  border-radius: 4px;
+  padding: var(--s-4);
+  text-align: center;
+  margin-top: var(--s-4);
+}
+
+.phil-insight__text {
+  font-size: 17px;
+  color: var(--ink-soft);
+  line-height: 1.8;
+}
+
+.phil-insight__text strong {
+  color: var(--ink);
+}
+
+.phil-chips {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--s-3);
+}
+
+.phil-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 999px;
+  background: var(--paper-deep);
+  border: 1px solid var(--line-1);
+  font-size: 13px;
+}
+
+.phil-chip__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
+.phil-chip__name { font-weight: 600; }
+.phil-chip__trait { color: var(--ink-mute); }
+
+/* ============================================================
+   Source footer
+   ============================================================ */
+.source-footer {
+  margin-top: var(--s-7);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line-1);
+  text-align: center;
+}
+
+.source-footer__link {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+}
+
+.source-footer__link:hover { color: var(--ember); }
+
+/* ============================================================
+   Progress bar
+   ============================================================ */
+.progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: var(--ember);
+  z-index: 100;
+  transition: width 0.1s linear;
+}
+
+/* ============================================================
+   Back-to-top
+   ============================================================ */
+.back-top {
+  position: fixed;
+  bottom: var(--s-3);
+  right: var(--s-3);
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--paper-deep);
+  border: 1px solid var(--line-2);
+  color: var(--ink-mute);
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.3s, transform 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.back-top:hover {
+  border-color: var(--ember);
+  color: var(--ember);
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="page">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero__eyebrow">Datawhale · Hello-Agents · 第六章</div>
+    <h1 class="hero__title">智能体框架<em>全景解析</em></h1>
+    <p class="hero__sub">AutoGen · AgentScope · CAMEL · LangGraph —— 四种实现复杂智能体系统的技术路径</p>
+    <p class="hero__meta">作者：陈思州 ｜ 来源：Datawhale</p>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc" id="toc">
+    <div class="toc__title">目录</div>
+    <ul class="toc__list">
+      <li><a class="toc__link" href="#why">为何需要框架</a></li>
+      <li><a class="toc__link" href="#overview">四大框架一览</a></li>
+      <li><a class="toc__link" href="#autogen">AutoGen</a></li>
+      <li><a class="toc__link" href="#scope">AgentScope</a></li>
+      <li><a class="toc__link" href="#camel">CAMEL</a></li>
+      <li><a class="toc__link" href="#langgraph">LangGraph</a></li>
+      <li><a class="toc__link" href="#philosophy">设计哲学</a></li>
+    </ul>
+  </nav>
+
+  <!-- Section: Why -->
+  <section class="section" id="why">
+    <div class="section__eyebrow">01 · 背景</div>
+    <h2 class="section__title">为什么需要智能体框架？</h2>
+    <div class="section__body">
+      <p>一个框架的本质，是提供一套经过验证的<strong>"规范"</strong>。它将所有智能体共有的、重复性工作（如主循环、状态管理、工具调用、日志记录等）进行抽象和封装，让我们在构建新的智能体时，能够专注于其独特的业务逻辑。</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-card__num">01</div>
+        <div class="why-card__title">代码复用与开发效率</div>
+        <div class="why-card__desc">通用 Agent 基类封装核心循环，ReAct / Plan-and-Solve 可基于标准组件快速搭建，避免重复劳动。</div>
+      </div>
+      <div class="why-card">
+        <div class="why-card__num">02</div>
+        <div class="why-card__title">核心组件解耦与可扩展</div>
+        <div class="why-card__desc">模型层、工具层、记忆层分离，更换或升级任何组件都变得简单，系统极具可扩展性。</div>
+      </div>
+      <div class="why-card">
+        <div class="why-card__num">03</div>
+        <div class="why-card__title">标准化复杂状态管理</div>
+        <div class="why-card__desc">上下文窗口限制、历史信息持久化、多轮对话状态跟踪——框架提供通用机制，无需重复造轮子。</div>
+      </div>
+      <div class="why-card">
+        <div class="why-card__num">04</div>
+        <div class="why-card__title">可观测性与调试简化</div>
+        <div class="why-card__desc">事件回调机制在 on_llm_start / on_tool_end 等节点自动触发日志，追踪完整运行轨迹。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: Overview -->
+  <section class="section" id="overview">
+    <div class="section__eyebrow">02 · 全景</div>
+    <h2 class="section__title">四大框架一览</h2>
+    <div class="section__body">
+      <p>如果说 LangChain 和 LlamaIndex 定义了第一代通用 LLM 应用框架的范式，那么新一代框架则更专注于<strong>多智能体协作</strong>和<strong>复杂工作流控制</strong>。以下四个框架分别代表了四种不同的技术路径。</p>
+    </div>
+    <div class="fw-grid">
+      <div class="fw-card" data-fw="autogen" onclick="toggleDetail('autogen')">
+        <div class="fw-card__icon">💬</div>
+        <div class="fw-card__name">AutoGen</div>
+        <div class="fw-card__origin">Microsoft</div>
+        <div class="fw-card__keyword">对话驱动</div>
+        <div class="fw-card__desc">将多智能体系统抽象为群聊，通过自动化消息传递协作迭代。</div>
+      </div>
+      <div class="fw-card" data-fw="scope" onclick="toggleDetail('scope')">
+        <div class="fw-card__icon">🏗</div>
+        <div class="fw-card__name">AgentScope</div>
+        <div class="fw-card__origin">阿里巴巴达摩院</div>
+        <div class="fw-card__keyword">工程化优先</div>
+        <div class="fw-card__desc">消息驱动架构，内置分布式部署、容错恢复、可观测性。</div>
+      </div>
+      <div class="fw-card" data-fw="camel" onclick="toggleDetail('camel')">
+        <div class="fw-card__icon">🎭</div>
+        <div class="fw-card__name">CAMEL</div>
+        <div class="fw-card__origin">King Abdullah University</div>
+        <div class="fw-card__keyword">角色扮演</div>
+        <div class="fw-card__desc">两个智能体通过引导性提示自主协作，轻架构重提示。</div>
+      </div>
+      <div class="fw-card" data-fw="langgraph" onclick="toggleDetail('langgraph')">
+        <div class="fw-card__icon">🔄</div>
+        <div class="fw-card__name">LangGraph</div>
+        <div class="fw-card__origin">LangChain</div>
+        <div class="fw-card__keyword">状态机图</div>
+        <div class="fw-card__desc">将执行流程建模为有向图，天然支持循环与条件跳转。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detail: AutoGen -->
+  <div class="fw-detail" id="autogen" data-fw="autogen">
+    <div class="fw-detail__header" onclick="toggle('autogen')">
+      <div class="fw-detail__header-left">
+        <span class="fw-detail__name">AutoGen</span>
+        <span class="fw-detail__tag">Microsoft</span>
+      </div>
+      <span class="fw-detail__chevron">▾</span>
+    </div>
+    <div class="fw-detail__body">
+      <div class="fw-detail__inner">
+        <p class="fw-detail__subtitle">以对话驱动协作 —— 多角色群聊式智能体编排</p>
+        <div class="fw-detail__cols">
+          <div>
+            <div class="fw-detail__col-title">核心机制</div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>分层设计：</strong>autogen-core 底层基础 + autogen-agentchat 高级接口，职责明确、低耦合。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>异步优先：</strong>全面 async/await，等待 LLM 响应时处理其他任务，显著提升并发能力。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>AssistantAgent：</strong>封装 LLM 的任务解决者，通过系统消息赋予不同专家角色。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>UserProxyAgent：</strong>既是人类代言人，又是可靠的代码/工具执行器，分离思考与行动。</div></div>
+          </div>
+          <div>
+            <div class="fw-detail__col-title">协作与局限</div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>RoundRobinGroupChat：</strong>轮询群聊，预定义顺序依次发言，适合流程固定的任务。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>Team 概念：</strong>从 GroupChatManager 演进到更灵活的 Team，支持多种协调模式。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>对话不确定性：</strong>LLM 可能产生偏离预期的回复，甚至陷入循环。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>对话式调试难题：</strong>结果是长串对话历史而非错误堆栈，定位问题困难。</div></div>
+          </div>
+        </div>
+        <div class="fw-detail__tags">
+          <span class="fw-tag fw-tag--pro">贴近人类协作</span>
+          <span class="fw-tag fw-tag--pro">高度可复用</span>
+          <span class="fw-tag fw-tag--pro">Human-in-the-loop</span>
+          <span class="fw-tag fw-tag--con">对话不确定性</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail: AgentScope -->
+  <div class="fw-detail" id="scope" data-fw="scope">
+    <div class="fw-detail__header" onclick="toggle('scope')">
+      <div class="fw-detail__header-left">
+        <span class="fw-detail__name">AgentScope</span>
+        <span class="fw-detail__tag">阿里巴巴达摩院</span>
+      </div>
+      <span class="fw-detail__chevron">▾</span>
+    </div>
+    <div class="fw-detail__body">
+      <div class="fw-detail__inner">
+        <p class="fw-detail__subtitle">工程化优先 —— 消息驱动的多智能体操作系统</p>
+        <div class="fw-detail__cols">
+          <div>
+            <div class="fw-detail__col-title">架构特性</div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>消息驱动架构：</strong>所有交互抽象为 Msg 的发送和接收，异步解耦、位置透明。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>MsgHub 消息中心：</strong>支持点对点、广播、组播路由，消息可持久化到数据库。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>生命周期管理：</strong>基于 AgentBase 统一基类，开发者只需关注 reply 方法。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>原生分布式：</strong>智能体可部署在不同进程/服务器，MsgHub 通过 RPC 自动路由。</div></div>
+          </div>
+          <div>
+            <div class="fw-detail__col-title">工程化能力</div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>四层架构：</strong>基础组件 → 智能体基础设施 → 多智能体协作 → 开发与部署。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>并发与容错：</strong>消息可持久化和重试，即使系统故障也能保证最终一致性。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>异步编程门槛：</strong>需要理解 async/await 和分布式通信概念。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>过度工程化风险：</strong>简单场景下架构可能过于复杂，社区生态仍在完善中。</div></div>
+          </div>
+        </div>
+        <div class="fw-detail__tags">
+          <span class="fw-tag fw-tag--pro">生产级可靠</span>
+          <span class="fw-tag fw-tag--pro">原生分布式</span>
+          <span class="fw-tag fw-tag--pro">可观测性强</span>
+          <span class="fw-tag fw-tag--con">学习曲线陡</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail: CAMEL -->
+  <div class="fw-detail" id="camel" data-fw="camel">
+    <div class="fw-detail__header" onclick="toggle('camel')">
+      <div class="fw-detail__header-left">
+        <span class="fw-detail__name">CAMEL</span>
+        <span class="fw-detail__tag">Role-Playing</span>
+      </div>
+      <span class="fw-detail__chevron">▾</span>
+    </div>
+    <div class="fw-detail__body">
+      <div class="fw-detail__inner">
+        <p class="fw-detail__subtitle">角色扮演协作 —— 轻架构重提示的自主对话范式</p>
+        <div class="fw-detail__cols">
+          <div>
+            <div class="fw-detail__col-title">核心理念</div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>双智能体角色：</strong>AI User 负责需求与指令，AI Assistant 负责执行与方案，互补协作。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>引导性提示：</strong>Inception Prompting——结构化初始指令，定义角色、目标、行为约束。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>沟通协议：</strong>要求"一次一个步骤"，用 &lt;SOLUTION&gt; 标志标识任务完成。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>轻量实现：</strong>无需复杂对话管理或分布式架构，精心设计提示即可高质量协作。</div></div>
+          </div>
+          <div>
+            <div class="fw-detail__col-title">演进与局限</div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>多模态扩展：</strong>已支持文本、图像、音频等多种模态的智能体协作。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>生态联动：</strong>与 LangChain、CrewAI、AutoGen 等框架实现互操作性。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>提示设计门槛：</strong>需要深入理解目标领域和 LLM 行为特性。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>规模限制：</strong>缺乏复杂对话路由和分布式状态管理，大规模场景受限。</div></div>
+          </div>
+        </div>
+        <div class="fw-detail__tags">
+          <span class="fw-tag fw-tag--pro">最少代码量</span>
+          <span class="fw-tag fw-tag--pro">自然涌现协作</span>
+          <span class="fw-tag fw-tag--con">高度依赖提示</span>
+          <span class="fw-tag fw-tag--con">规模受限</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail: LangGraph -->
+  <div class="fw-detail" id="langgraph" data-fw="langgraph">
+    <div class="fw-detail__header" onclick="toggle('langgraph')">
+      <div class="fw-detail__header-left">
+        <span class="fw-detail__name">LangGraph</span>
+        <span class="fw-detail__tag">LangChain</span>
+      </div>
+      <span class="fw-detail__chevron">▾</span>
+    </div>
+    <div class="fw-detail__body">
+      <div class="fw-detail__inner">
+        <p class="fw-detail__subtitle">状态机图结构 —— 显式控制的可编程工作流</p>
+        <div class="fw-detail__cols">
+          <div>
+            <div class="fw-detail__col-title">三要素</div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>全局状态 State：</strong>TypedDict 定义共享状态，所有节点读取和更新同一中心状态。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>节点 Nodes：</strong>每个节点是接收状态、返回更新状态的 Python 函数，执行具体工作。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>边 Edges：</strong>常规边指定固定流向；条件边根据状态动态决定跳转目标。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>原生循环支持：</strong>条件边 + 图结构天然支持"反思-修正"迭代循环。</div></div>
+          </div>
+          <div>
+            <div class="fw-detail__col-title">优势与挑战</div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>高度可控：</strong>精确规划每一步行为，适合高可靠性和可审计的生产应用。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>高度模块化：</strong>每个节点独立函数，插入人类审核节点也变得直接。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>前期代码量大：</strong>定义状态、节点、边——简单任务开发过程更繁琐。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>调试复杂度：</strong>问题可能在节点逻辑、状态异变或条件判断，需全局理解。</div></div>
+          </div>
+        </div>
+        <div class="fw-detail__tags">
+          <span class="fw-tag fw-tag--pro">精确流程控制</span>
+          <span class="fw-tag fw-tag--pro">原生循环/反思</span>
+          <span class="fw-tag fw-tag--pro">Human-in-the-loop</span>
+          <span class="fw-tag fw-tag--con">前期代码量大</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Philosophy -->
+  <section class="section" id="philosophy">
+    <div class="section__eyebrow">07 · 设计哲学</div>
+    <h2 class="section__title"><em>涌现式协作</em> vs <em>显式控制</em></h2>
+
+    <div class="phil-scale">
+      <div class="phil-side">
+        <div class="phil-side__label">涌现式协作</div>
+        <div class="phil-side__en">EMERGENT COLLABORATION</div>
+        <div class="phil-side__desc">
+          定义角色与目标<br>
+          让协作从对话规则中"涌现"<br>
+          更贴近人类交互模式
+        </div>
+      </div>
+      <div class="phil-side">
+        <div class="phil-side__label">显式控制</div>
+        <div class="phil-side__en">EXPLICIT CONTROL</div>
+        <div class="phil-side__desc">
+          定义每一步与跳转条件<br>
+          牺牲涌现惊喜<br>
+          换取可靠性与可观测性
+        </div>
+      </div>
+    </div>
+
+    <div class="phil-insight">
+      <p class="phil-insight__text">
+        <strong>工程化</strong>是另一个关键维度 —— 无论选择哪种协作范式，<br>
+        从实验原型到生产应用，都必须面对并发、容错、分布式部署的挑战。
+      </p>
+      <div class="phil-chips">
+        <div class="phil-chip">
+          <div class="phil-chip__dot" style="background:#60a5fa"></div>
+          <span class="phil-chip__name">AutoGen</span>
+          <span class="phil-chip__trait">群聊对话涌现</span>
+        </div>
+        <div class="phil-chip">
+          <div class="phil-chip__dot" style="background:#a78bfa"></div>
+          <span class="phil-chip__name">CAMEL</span>
+          <span class="phil-chip__trait">角色扮演涌现</span>
+        </div>
+        <div class="phil-chip">
+          <div class="phil-chip__dot" style="background:#34d399"></div>
+          <span class="phil-chip__name">LangGraph</span>
+          <span class="phil-chip__trait">图结构显式控制</span>
+        </div>
+        <div class="phil-chip">
+          <div class="phil-chip__dot" style="background:#f97316"></div>
+          <span class="phil-chip__name">AgentScope</span>
+          <span class="phil-chip__trait">消息驱动工程化</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Source footer -->
+  <footer class="source-footer">
+    <a class="source-footer__link" href="https://mp.weixin.qq.com/s/F5lPK_uUrUY-gNqFZdBCcg" target="_blank">
+      原文链接 · Datawhale · 陈思州
+    </a>
+  </footer>
+
+</div>
+
+<!-- Back to top -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+/* ---------- Scroll-driven reveal ---------- */
+const sections = document.querySelectorAll('.section');
+const whyCards = document.querySelectorAll('.why-card');
+const fwCards  = document.querySelectorAll('.fw-card');
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15 });
+
+sections.forEach(s => io.observe(s));
+whyCards.forEach(c => io.observe(c));
+fwCards.forEach(c  => io.observe(c));
+
+/* ---------- Progress bar ---------- */
+const bar = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  bar.style.width = pct + '%';
+}, { passive: true });
+
+/* ---------- Back-to-top ---------- */
+const btn = document.getElementById('backTop');
+window.addEventListener('scroll', () => {
+  btn.classList.toggle('visible', window.scrollY > 600);
+}, { passive: true });
+
+/* ---------- TOC active state ---------- */
+const tocLinks = document.querySelectorAll('.toc__link');
+const sectionIds = [...tocLinks].map(a => a.getAttribute('href').slice(1));
+const tocObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(a => a.classList.remove('active'));
+      const link = document.querySelector(`.toc__link[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+sectionIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) tocObserver.observe(el);
+});
+
+/* ---------- Expandable framework details ---------- */
+function toggle(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function toggleDetail(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) {
+    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+  }
+}
+</script>
+</body>
+</html>
