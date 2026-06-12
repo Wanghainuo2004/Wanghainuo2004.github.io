@@ -727,6 +727,7 @@ body {
       <li><a class="toc__link" href="#camel">CAMEL</a></li>
       <li><a class="toc__link" href="#langgraph">LangGraph</a></li>
       <li><a class="toc__link" href="#philosophy">设计哲学</a></li>
+      <li><a class="toc__link" href="#references">参考文献</a></li>
     </ul>
   </nav>
 
@@ -735,7 +736,7 @@ body {
     <div class="section__eyebrow">01 · 背景</div>
     <h2 class="section__title">为什么需要智能体框架？</h2>
     <div class="section__body">
-      <p>一个框架的本质，是提供一套经过验证的<strong>"规范"</strong>。它将所有智能体共有的、重复性工作（如主循环、状态管理、工具调用、日志记录等）进行抽象和封装，让我们在构建新的智能体时，能够专注于其独特的业务逻辑。</p>
+      <p>从编写一次性的脚本到使用一个成熟的框架，是软件工程领域一次重要的<strong>思维跃迁</strong>。一个框架的本质，是提供一套经过验证的"规范"。它将所有智能体共有的、重复性工作（如主循环、状态管理、工具调用、日志记录等）进行抽象和封装，让我们在构建新的智能体时，能够专注于其独特的业务逻辑。</p>
     </div>
     <div class="why-grid">
       <div class="why-card">
@@ -834,6 +835,26 @@ body {
           <span class="fw-tag fw-tag--pro">Human-in-the-loop</span>
           <span class="fw-tag fw-tag--con">对话不确定性</span>
         </div>
+        <div style="margin-top:var(--s-3);padding-top:var(--s-2);border-top:1px solid var(--line-1)">
+          <div class="fw-detail__col-title" style="margin-bottom:var(--s-2)">非 OpenAI 模型配置示例</div>
+          <pre style="background:var(--paper);border:1px solid var(--line-1);border-radius:4px;padding:var(--s-2);font-family:var(--f-mono);font-size:13px;line-height:1.6;overflow-x:auto;color:var(--ink-soft)"><code>from autogen_ext.models.openai import OpenAIChatCompletionClient
+
+model_client = OpenAIChatCompletionClient(
+    model="deepseek-chat",
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+    base_url="https://api.deepseek.com/v1",
+    model_info={
+        "function_calling": True,
+        "max_tokens": 4096,
+        "context_length": 32768,
+        "vision": False,
+        "json_output": True,
+        "family": "deepseek",
+        "structured_output": True,
+    }
+)</code></pre>
+          <p style="font-size:13px;color:var(--ink-mute);margin-top:8px">model_info 字典帮助 AutoGen 了解模型的能力边界，适配不同的模型服务。</p>
+        </div>
       </div>
     </div>
   </div>
@@ -853,14 +874,14 @@ body {
         <div class="fw-detail__cols">
           <div>
             <div class="fw-detail__col-title">架构特性</div>
-            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>消息驱动架构：</strong>所有交互抽象为 Msg 的发送和接收，异步解耦、位置透明。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>消息驱动架构：</strong>所有交互抽象为 Msg 的发送和接收，异步解耦、位置透明。消息结构包含 name（发送者）、content（内容）、role（角色）、metadata（元数据）。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>MsgHub 消息中心：</strong>支持点对点、广播、组播路由，消息可持久化到数据库。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>生命周期管理：</strong>基于 AgentBase 统一基类，开发者只需关注 reply 方法。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>原生分布式：</strong>智能体可部署在不同进程/服务器，MsgHub 通过 RPC 自动路由。</div></div>
           </div>
           <div>
             <div class="fw-detail__col-title">工程化能力</div>
-            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>四层架构：</strong>基础组件 → 智能体基础设施 → 多智能体协作 → 开发与部署。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>四层架构：</strong>基础组件层（Message/Memory/Model API/Tool）→ 智能体基础设施层（ReAct、钩子、并行工具调用）→ 多智能体协作层（MsgHub + Pipeline）→ 开发与部署层（Runtime + Studio）。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>并发与容错：</strong>消息可持久化和重试，即使系统故障也能保证最终一致性。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>异步编程门槛：</strong>需要理解 async/await 和分布式通信概念。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>过度工程化风险：</strong>简单场景下架构可能过于复杂，社区生态仍在完善中。</div></div>
@@ -896,12 +917,27 @@ body {
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>沟通协议：</strong>要求"一次一个步骤"，用 &lt;SOLUTION&gt; 标志标识任务完成。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>轻量实现：</strong>无需复杂对话管理或分布式架构，精心设计提示即可高质量协作。</div></div>
           </div>
+          <div style="grid-column:1/-1;margin-top:var(--s-2);padding:var(--s-3);background:var(--paper);border:1px solid var(--line-1);border-radius:4px">
+            <div style="font-family:var(--f-mono);font-size:11px;letter-spacing:2px;color:var(--ink-faint);margin-bottom:8px">案例：股票交易策略分析工具</div>
+            <div style="display:flex;gap:var(--s-3);flex-wrap:wrap">
+              <div style="flex:1;min-width:200px">
+                <div style="font-size:14px;color:var(--ink);margin-bottom:4px"><strong>AI User</strong> <span style="color:var(--ink-faint);font-size:12px">→ 资深股票交易员</span></div>
+                <div style="font-size:13px;color:var(--ink-mute);line-height:1.6">懂市场、懂策略，但不懂编程。负责提出专业需求和交易逻辑。</div>
+              </div>
+              <div style="flex:1;min-width:200px">
+                <div style="font-size:14px;color:var(--ink);margin-bottom:4px"><strong>AI Assistant</strong> <span style="color:var(--ink-faint);font-size:12px">→ 优秀 Python 程序员</span></div>
+                <div style="font-size:13px;color:var(--ink-mute);line-height:1.6">精通编程，但对股票交易一无所知。负责将需求转化为代码实现。</div>
+              </div>
+            </div>
+          </div>
           <div>
             <div class="fw-detail__col-title">演进与局限</div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>多模态扩展：</strong>已支持文本、图像、音频等多种模态的智能体协作。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>生态联动：</strong>与 LangChain、CrewAI、AutoGen 等框架实现互操作性。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>提示设计门槛：</strong>需要深入理解目标领域和 LLM 行为特性。</div></div>
             <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>规模限制：</strong>缺乏复杂对话路由和分布式状态管理，大规模场景受限。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>调试复杂性：</strong>协作效果不佳时，很难定位是角色定义、任务描述还是交互规则的问题。</div></div>
+            <div class="fw-detail__point"><div class="fw-detail__dot"></div><div class="fw-detail__point-text"><strong>一致性挑战：</strong>不同的 LLM 对相同提示的理解可能存在差异。</div></div>
           </div>
         </div>
         <div class="fw-detail__tags">
@@ -909,6 +945,9 @@ body {
           <span class="fw-tag fw-tag--pro">自然涌现协作</span>
           <span class="fw-tag fw-tag--con">高度依赖提示</span>
           <span class="fw-tag fw-tag--con">规模受限</span>
+        </div>
+        <div style="margin-top:var(--s-3);padding:var(--s-2) var(--s-3);background:var(--paper);border:1px solid var(--line-1);border-radius:4px;font-size:13px;color:var(--ink-mute);line-height:1.7">
+          <strong style="color:var(--ink)">任务适用性边界：</strong>严格流程控制任务 → LangGraph 更合适；大规模并发场景 → AgentScope 更有优势；复杂决策树场景 → AutoGen 更灵活。
         </div>
       </div>
     </div>
@@ -979,6 +1018,12 @@ body {
     </div>
 
     <div class="phil-insight">
+      <p class="phil-insight__text" style="text-align:left;font-size:15px;line-height:1.9;margin-bottom:var(--s-3)">
+        <strong>AutoGen</strong> 将复杂的协作抽象为一场由多角色参与的、可自动进行的"群聊"。<br>
+        <strong>AgentScope</strong> 着眼于工业级应用的健壮性与可扩展性，为构建高并发、分布式的多智能体系统提供坚实的工程基础。<br>
+        <strong>CAMEL</strong> 以轻量级的"角色扮演"和"引导性提示"范式，展示如何用最少的代码激发深度、自主的协作。<br>
+        <strong>LangGraph</strong> 回归到更底层的"状态机"模型，通过显式的图结构赋予开发者对工作流的精确控制。
+      </p>
       <p class="phil-insight__text">
         <strong>工程化</strong>是另一个关键维度 —— 无论选择哪种协作范式，<br>
         从实验原型到生产应用，都必须面对并发、容错、分布式部署的挑战。
@@ -1005,6 +1050,19 @@ body {
           <span class="phil-chip__trait">消息驱动工程化</span>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- References -->
+  <section class="section" id="references">
+    <div class="section__eyebrow">参考文献</div>
+    <h2 class="section__title">References</h2>
+    <div class="section__body" style="font-size:14px">
+      <p style="margin-bottom:var(--s-2)"><strong>[1]</strong> Wu Q, Bansal G, Zhang J, et al. <em>Autogen: Enabling next-gen LLM applications via multi-agent conversations</em>[C]//First Conference on Language Modeling. 2024.</p>
+      <p style="margin-bottom:var(--s-2)"><strong>[2]</strong> Gao D, Li Z, Pan X, et al. <em>Agentscope: A flexible yet robust multi-agent platform</em>[J]. arXiv preprint arXiv:2402.14034, 2024.</p>
+      <p style="margin-bottom:var(--s-2)"><strong>[3]</strong> Li G, Hammoud H, Itani H, et al. <em>Camel: Communicative agents for "mind" exploration of large language model society</em>[J]. Advances in Neural Information Processing Systems, 2023, 36: 51991-52008.</p>
+      <p style="margin-bottom:var(--s-2)"><strong>[4]</strong> LangChain. <em>LangGraph</em>[EB/OL]. (2024). https://github.com/langchain-ai/langgraph.</p>
+      <p style="margin-bottom:var(--s-2)"><strong>[5]</strong> Microsoft. <em>AutoGen - UserProxyAgent</em>[EB/OL]. (2024). https://microsoft.github.io/autogen/stable/reference/python/autogen_agentchat.agents.html.</p>
     </div>
   </section>
 
