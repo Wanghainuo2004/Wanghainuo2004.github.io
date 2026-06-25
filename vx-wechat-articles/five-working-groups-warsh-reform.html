@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>"五个工作小组"：沃什改革的开始</title>
+    <style>
+        :root { --primary: #2980b9; --primary-light: #e8f4fd; --secondary: #27ae60; --accent: #e67e22; --bg: #f8f9fa; --card-bg: #ffffff; --text: #2d3436; --text-secondary: #636e72; --border: #dfe6e9; --shadow: 0 2px 12px rgba(0,0,0,0.08); --radius: 12px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; display: flex; min-height: 100vh; }
+        .toc-sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border); overflow-y: auto; padding: 24px 16px; z-index: 100; transition: transform 0.3s; }
+        .toc-header { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--primary); }
+        .toc-item { display: block; padding: 8px 12px; margin: 4px 0; color: var(--text-secondary); text-decoration: none; font-size: 14px; border-radius: 6px; transition: all 0.2s; cursor: pointer; }
+        .toc-item:hover { background: var(--primary-light); color: var(--primary); }
+        .toc-item.active { background: var(--primary); color: white; font-weight: 500; }
+        .toc-item.sub { padding-left: 28px; font-size: 13px; }
+        .progress-container { position: fixed; top: 0; left: 280px; right: 0; height: 4px; background: var(--border); z-index: 101; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); width: 0%; transition: width 0.3s; }
+        .main-content { margin-left: 280px; flex: 1; max-width: 900px; padding: 0 40px 80px; }
+        .hero { padding: 80px 0 60px; text-align: center; border-bottom: 1px solid var(--border); margin-bottom: 48px; }
+        .hero-tag { display: inline-block; padding: 4px 16px; background: var(--primary-light); color: var(--primary); border-radius: 20px; font-size: 14px; font-weight: 500; margin-bottom: 20px; }
+        .hero h1 { font-size: 32px; font-weight: 700; line-height: 1.4; margin-bottom: 20px; }
+        .hero-meta { display: flex; justify-content: center; gap: 24px; color: var(--text-secondary); font-size: 14px; flex-wrap: wrap; }
+        .section { margin-bottom: 48px; padding: 32px; background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--primary-light); }
+        .section-icon { width: 40px; height: 40px; background: var(--primary-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .section h2 { font-size: 22px; font-weight: 600; }
+        .section h3 { font-size: 18px; font-weight: 600; margin: 24px 0 12px; }
+        .section p { margin-bottom: 16px; font-size: 16px; }
+        .key-point { background: linear-gradient(135deg, #e8f4fd, #f0f9ff); border-left: 4px solid var(--primary); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .key-point-title { font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+        .work-group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 24px 0; }
+        .work-group-card { background: var(--primary-light); padding: 20px; border-radius: 10px; cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--primary); }
+        .work-group-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .work-group-card h4 { color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .work-group-card p { font-size: 14px; color: var(--text-secondary); margin: 0; }
+        .work-group-card .detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text); }
+        .work-group-card.expanded .detail { display: block; }
+        .expandable { margin: 20px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .expandable-header { padding: 16px 20px; background: var(--bg); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 500; transition: background 0.2s; }
+        .expandable-header:hover { background: var(--primary-light); }
+        .expandable-header::after { content: '+'; font-size: 20px; color: var(--primary); transition: transform 0.3s; }
+        .expandable.expanded .expandable-header::after { transform: rotate(45deg); }
+        .expandable-content { padding: 0 20px; max-height: 0; overflow: hidden; transition: all 0.3s; }
+        .expandable.expanded .expandable-content { max-height: 2000px; padding: 20px; }
+        .warning-box { background: #fff3e0; border-left: 4px solid var(--accent); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .warning-box-title { font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+        .summary-section { background: linear-gradient(135deg, #e8f4fd, #e8f8f0); padding: 40px; border-radius: var(--radius); margin: 48px 0; }
+        .summary-title { font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center; color: var(--primary); }
+        .takeaway-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .takeaway-card { background: white; padding: 24px; border-radius: 10px; box-shadow: var(--shadow); }
+        .takeaway-number { width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; margin-bottom: 12px; }
+        .takeaway-card h4 { font-size: 16px; margin-bottom: 8px; }
+        .takeaway-card p { font-size: 14px; color: var(--text-secondary); margin: 0; }
+        .footer { margin-top: 60px; padding: 32px; background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; }
+        .footer-meta { color: var(--text-secondary); font-size: 13px; margin-bottom: 12px; }
+        .footer-link { color: var(--primary); text-decoration: none; }
+        .footer-link:hover { text-decoration: underline; }
+        .toc-toggle { display: none; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: var(--shadow); z-index: 102; }
+        @media (max-width: 1024px) { .toc-sidebar { transform: translateX(-100%); } .toc-sidebar.open { transform: translateX(0); } .main-content { margin-left: 0; padding: 0 20px 60px; } .progress-container { left: 0; } .toc-toggle { display: flex; align-items: center; justify-content: center; } .hero h1 { font-size: 26px; } }
+        @media (max-width: 640px) { .hero h1 { font-size: 22px; } .work-group-grid, .takeaway-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="toc-sidebar" id="tocSidebar">
+        <div class="toc-header">目录导航</div>
+        <a href="#intro" class="toc-item active">导读</a>
+        <a href="#five-groups" class="toc-item">五大工作小组</a>
+        <a href="#communication" class="toc-item sub">沟通工作组</a>
+        <a href="#balance-sheet" class="toc-item sub">资产负债表工作组</a>
+        <a href="#data" class="toc-item sub">数据工作组</a>
+        <a href="#productivity" class="toc-item sub">生产力与就业工作组</a>
+        <a href="#inflation" class="toc-item sub">通胀框架工作组</a>
+        <a href="#disagreement" class="toc-item">分歧核心议题</a>
+        <a href="#takeaways" class="toc-item">总结</a>
+    </nav>
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    <button class="toc-toggle" id="tocToggle">☰</button>
+    <main class="main-content">
+        <header class="hero">
+            <span class="hero-tag">付鹏的财经世界</span>
+            <h1>"五个工作小组"：沃什改革的开始</h1>
+            <div class="hero-meta">
+                <span>✍️ 付鹏</span>
+                <span>📅 2026年6月18日</span>
+                <span>⏱️ 阅读约 10 分钟</span>
+            </div>
+        </header>
+        <section class="section" id="intro">
+            <div class="section-header"><div class="section-icon">📖</div><h2>导读</h2></div>
+            <div class="key-point"><div class="key-point-title">💡 核心观点</div><p>用五个工作小组宣告改革开始，向保守主义的复位与传统原则的回归。</p></div>
+            <p>凯文·沃什（Kevin Warsh）首次会议及声明的核心可总结为"五个工作小组改革正式启动"。这五个工作小组代表了美联储未来在重要政策领域的调整方向。</p>
+        </section>
+        <section class="section" id="five-groups">
+            <div class="section-header"><div class="section-icon">👥</div><h2>五大工作小组</h2></div>
+            <p>沃什在其主持的首次联邦公开市场委员会（FOMC）利率会议后的新闻发布会上明确表示："我将成立五个工作组，聚焦货币政策实践中的五个核心领域。"</p>
+            <div class="work-group-grid">
+                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
+                    <h4>📢 沟通工作组</h4>
+                    <p>审查美联储沟通方式</p>
+                    <div class="detail">包括对SEP的调整（如点阵图的呈现形式、其在决策中的权重等），减少前瞻指引"噪音"和过多官员表态。</div>
+                </div>
+                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
+                    <h4>📊 资产负债表工作组</h4>
+                    <p>评估债券持有结构</p>
+                    <div class="detail">评估充足准备金制度的利弊及替代方案，探讨货币政策实施的备选框架。</div>
+                </div>
+                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
+                    <h4>📈 数据来源/收集工作组</h4>
+                    <p>解决数据滞后问题</p>
+                    <div class="detail">评估新信息来源和方法改进，以获得更及时的经济洞见。</div>
+                </div>
+                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
+                    <h4>🤖 生产力与就业工作组</h4>
+                    <p>审查AI对劳动力市场的影响</p>
+                    <div class="detail">研究AI等通用技术对生产力、劳动力市场的影响及对美联储政策的含义。</div>
+                </div>
+                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
+                    <h4>💰 通胀框架工作组</h4>
+                    <p>重新审视通胀驱动因素</p>
+                    <div class="detail">重新审视通胀驱动因素和价格稳定方法，可能对通胀背后的驱动因子进行重大调整。</div>
+                </div>
+            </div>
+        </section>
+        <section class="section" id="communication">
+            <div class="section-header"><div class="section-icon">📢</div><h2>沟通工作组：精简市场沟通</h2></div>
+            <p>沃什明确对这类市场沟通工具进行大刀阔斧的精简，因为他认为这类工具已不再适用于当前的货币政策。</p>
+            <div class="expandable">
+                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    点阵图的命运
+                </div>
+                <div class="expandable-content">
+                    <p>经济预测摘要（SEP）中最核心关注的点阵图，年内肯定会被取消。</p>
+                    <p>沃什曾明确表示，对他个人而言，提交点阵图预测对政策执行没有任何意义。</p>
+                    <p>他将点阵图比作"带橡皮的铅笔"，认为点阵图等前瞻指引"噪音过大"、限制政策灵活性、其会扭曲市场。</p>
+                </div>
+            </div>
+        </section>
+        <section class="section" id="balance-sheet">
+            <div class="section-header"><div class="section-icon">📊</div><h2>资产负债表工作组</h2></div>
+            <p>评估债券持有结构、充足准备金制度的利弊及替代方案。</p>
+            <div class="key-point"><div class="key-point-title">🔑 核心议题</div><p>审查"充足准备金制度"（ample reserves regime）及其替代方案。</p></div>
+        </section>
+        <section class="section" id="data">
+            <div class="section-header"><div class="section-icon">📈</div><h2>数据来源/收集工作组</h2></div>
+            <p>核心意图就是对数据来源及方法论进行调整。由于央行目前依赖的大部分数据仍来自传统调查，数据工作组正针对官方统计提出改进建议。</p>
+        </section>
+        <section class="section" id="productivity">
+            <div class="section-header"><div class="section-icon">🤖</div><h2>生产力与就业工作组</h2></div>
+            <p>审查AI等通用技术对生产力、劳动力市场的影响及对美联储政策的含义。</p>
+            <div class="warning-box"><div class="warning-box-title">💡 关键洞察</div><p>沃什认为AI驱动下潜在生产率提升是确认的，这影响了他对货币政策的判断。</p></div>
+        </section>
+        <section class="section" id="inflation">
+            <div class="section-header"><div class="section-icon">💰</div><h2>通胀框架工作组</h2></div>
+            <p>重新审视通胀驱动因素和价格稳定方法。</p>
+            <div class="key-point"><div class="key-point-title">⚠️ 注意</div><p>2%目标本身可能不在直接评估范围内，但框架整体会检讨，可能对通胀背后的驱动因子进行重大调整。</p></div>
+        </section>
+        <section class="section" id="disagreement">
+            <div class="section-header"><div class="section-icon">⚡</div><h2>分歧核心议题</h2></div>
+            <p>其中一个工作组还将研究一个长期处于沃什与美联储分歧核心的议题——审查"充足准备金制度"及其替代方案。</p>
+            <div class="expandable">
+                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    充裕准备金体制的利弊
+                </div>
+                <div class="expandable-content">
+                    <p><strong>优势：</strong>在后危机时代在利率控制精准性和金融稳定方面优于传统稀缺准备金框架。</p>
+                    <p><strong>成本：</strong>资产负债表相关亏损、市场扭曲、正常化难度等真实存在且不可忽视。</p>
+                    <p>框架并非"免费午餐"，需要在控制力、稳定性和效率/成本之间持续权衡。</p>
+                </div>
+            </div>
+        </section>
+        <section class="summary-section" id="takeaways">
+            <div class="summary-title">📚 核心总结</div>
+            <div class="takeaway-grid">
+                <div class="takeaway-card"><div class="takeaway-number">1</div><h4>五大工作组启动</h4><p>沟通、资产负债表、数据、生产力与就业、通胀框架五大领域改革正式启动。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">2</div><h4>点阵图将被取消</h4><p>沃什认为点阵图"噪音过大"、限制政策灵活性，年内肯定会被取消。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">3</div><h4>数据方法论改革</h4><p>传统调查数据滞后，将引入新信息来源和方法改进。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">4</div><h4>分歧核心议题</h4><p>充足准备金制度及其替代方案是沃什与美联储分歧的核心。</p></div>
+            </div>
+        </section>
+        <footer class="footer">
+            <div class="footer-meta">原文来源：付鹏的财经世界 | 2026年6月18日</div>
+            <a href="https://mp.weixin.qq.com/s/Y1BsGRanNEpacY3ENFCyHQ" class="footer-link" target="_blank">查看原文 →</a>
+            <div class="footer-meta" style="margin-top: 16px;">交互式网页生成于 2026年6月26日</div>
+        </footer>
+    </main>
+    <script>
+        window.addEventListener('scroll', () => { const scrollTop = window.scrollY; const docHeight = document.documentElement.scrollHeight - window.innerHeight; document.getElementById('progressBar').style.width = (scrollTop / docHeight * 100) + '%'; const sections = document.querySelectorAll('.section, .summary-section'); let current = ''; sections.forEach(section => { if (section.getBoundingClientRect().top <= 100) current = section.id; }); document.querySelectorAll('.toc-item').forEach(item => { item.classList.remove('active'); if (item.getAttribute('href') === '#' + current) item.classList.add('active'); }); });
+        document.getElementById('tocToggle').addEventListener('click', () => { document.getElementById('tocSidebar').classList.toggle('open'); });
+        document.querySelectorAll('.toc-item').forEach(item => { item.addEventListener('click', () => { if (window.innerWidth <= 1024) document.getElementById('tocSidebar').classList.remove('open'); }); });
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => { anchor.addEventListener('click', function(e) { e.preventDefault(); const target = document.querySelector(this.getAttribute('href')); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }); });
+    </script>
+</body>
+</html>
