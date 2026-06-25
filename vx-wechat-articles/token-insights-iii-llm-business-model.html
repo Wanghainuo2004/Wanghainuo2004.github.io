@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token启示录（三）：大模型商业模式的中观分析</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-light: #e8f0fe;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* TOC Sidebar */
+        .toc-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 24px 16px;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .toc-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .toc-item {
+            display: block;
+            padding: 8px 12px;
+            margin: 4px 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 6px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .toc-item.active {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+
+        .toc-item.sub {
+            padding-left: 28px;
+            font-size: 13px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            height: 4px;
+            background: var(--border);
+            z-index: 101;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            max-width: 900px;
+            padding: 0 40px 80px;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 48px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 4px 16px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--text), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Content Modules */
+        .section {
+            margin-bottom: 48px;
+            padding: 32px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .section:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 24px 0 12px;
+        }
+
+        .section p {
+            margin-bottom: 16px;
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        /* Key Points */
+        .key-point {
+            background: linear-gradient(135deg, #fff3cd, #fff9e6);
+            border-left: 4px solid #ffc107;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .key-point-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Concept Cards */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .concept-card {
+            background: var(--primary-light);
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .concept-card h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .concept-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .concept-card .definition {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .concept-card.expanded .definition {
+            display: block;
+        }
+
+        /* Expandable Sections */
+        .expandable {
+            margin: 20px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .expandable-header {
+            padding: 16px 20px;
+            background: var(--bg);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .expandable-header:hover {
+            background: var(--primary-light);
+        }
+
+        .expandable-header::after {
+            content: '+';
+            font-size: 20px;
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .expandable.expanded .expandable-header::after {
+            transform: rotate(45deg);
+        }
+
+        .expandable-content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .expandable.expanded .expandable-content {
+            max-height: 2000px;
+            padding: 20px;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary), #1557b0);
+            color: white;
+            border-radius: var(--radius);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Knowledge Check */
+        .quiz-section {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            padding: 32px;
+            border-radius: var(--radius);
+            margin: 32px 0;
+        }
+
+        .quiz-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quiz-question {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .quiz-question p {
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quiz-option {
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--secondary);
+            background: #e8f5e9;
+            color: var(--secondary);
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--accent);
+            background: #fce4ec;
+            color: var(--accent);
+        }
+
+        .quiz-feedback {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.correct {
+            background: #e8f5e9;
+            color: var(--secondary);
+        }
+
+        .quiz-feedback.incorrect {
+            background: #fce4ec;
+            color: var(--accent);
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            padding: 40px;
+            border-radius: var(--radius);
+            margin: 48px 0;
+        }
+
+        .summary-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .takeaway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .takeaway-card {
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .takeaway-number {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .takeaway-card h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .takeaway-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Learning Checklist */
+        .checklist {
+            margin: 24px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .checklist-item.checked .checklist-checkbox {
+            background: var(--primary);
+            color: white;
+        }
+
+        .checklist-text {
+            font-size: 15px;
+        }
+
+        .checklist-item.checked .checklist-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 60px;
+            padding: 32px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .footer-meta {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .footer-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile TOC Toggle */
+        .toc-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 102;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .toc-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 0 20px 60px;
+            }
+
+            .progress-container {
+                left: 0;
+            }
+
+            .toc-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .section {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .takeaway-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+
+        /* Print styles */
+        @media print {
+            .toc-sidebar,
+            .toc-toggle,
+            .progress-container {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TOC Sidebar -->
+    <nav class="toc-sidebar" id="tocSidebar">
+        <div class="toc-header">目录导航</div>
+        <a href="#overview" class="toc-item active">报告概览</a>
+        <a href="#summary" class="toc-item sub">核心摘要</a>
+        <a href="#revenue" class="toc-item">收入端分析</a>
+        <a href="#b2b" class="toc-item sub">B端：Token Factory</a>
+        <a href="#coding" class="toc-item sub">AI Coding突破</a>
+        <a href="#b2c" class="toc-item sub">C端：订阅与广告</a>
+        <a href="#cost" class="toc-item">成本端分析</a>
+        <a href="#training" class="toc-item sub">训练成本</a>
+        <a href="#inference" class="toc-item sub">推理成本</a>
+        <a href="#profit" class="toc-item">盈利展望</a>
+        <a href="#risks" class="toc-item">风险提示</a>
+        <a href="#quiz" class="toc-item">知识检验</a>
+        <a href="#takeaways" class="toc-item">学习总结</a>
+    </nav>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Mobile TOC Toggle -->
+    <button class="toc-toggle" id="tocToggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <header class="hero">
+            <span class="hero-tag">中金研究院</span>
+            <h1>Token启示录（三）：大模型商业模式的中观分析</h1>
+            <div class="hero-meta">
+                <span>📊 中金点睛</span>
+                <span>📅 2026年6月22日</span>
+                <span>⏱️ 阅读约 25 分钟</span>
+            </div>
+        </header>
+
+        <!-- Overview Section -->
+        <section class="section" id="overview">
+            <div class="section-header">
+                <div class="section-icon">📋</div>
+                <h2>报告概览</h2>
+            </div>
+            <p>2026年初至今，Claude Code、Codex、OpenClaw等Agent产品的相继爆火带动Token关注度进一步跃升。大模型随着智能程度的提高进入真实复杂生产力场景，整体商业化变现进程持续加速。</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">450亿</div>
+                    <div class="stat-label">Anthropic ARR (2026.5)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10亿</div>
+                    <div class="stat-label">ChatGPT 月活</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">9亿</div>
+                    <div class="stat-label">Gemini 月活</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">1-3万亿</div>
+                    <div class="stat-label">Agentic AI TAM</div>
+                </div>
+            </div>
+
+            <div id="summary" class="key-point">
+                <div class="key-point-title">💡 核心观点</div>
+                <p><strong>B端</strong>：以API为核心的Token Factory具备高确定性，模型智能水平和效率是核心。</p>
+                <p><strong>C端</strong>：通过订阅制和广告进行商业转化，Agentic AI潜力可期。</p>
+                <p><strong>成本端</strong>：推理端毛利率趋势性提升，远期模型厂商有望盈利。</p>
+            </div>
+        </section>
+
+        <!-- Revenue Section -->
+        <section class="section" id="revenue">
+            <div class="section-header">
+                <div class="section-icon">📈</div>
+                <h2>收入端：B端曲线加速，C端潜力可期</h2>
+            </div>
+            <p>AI大模型迈入真实生产力场景，商业化变现进程持续加速。从最初的ChatBot到能够处理长链复杂任务的Agent，从简单文本生成到多模态视频制作，大模型已赋能人类真实生产力提升。</p>
+
+            <div class="concept-grid">
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>直接商业化</h4>
+                    <p>C端订阅 + B端API</p>
+                    <div class="definition">用户直接为模型能力付费，包括个人订阅和企业API调用两种模式。</div>
+                </div>
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>间接商业化</h4>
+                    <p>广告、电商</p>
+                    <div class="definition">通过广告覆盖免费用户成本，或通过电商等场景实现商业化。</div>
+                </div>
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>Token分层</h4>
+                    <p>不同场景不同价值</p>
+                    <div class="definition">轻量级场景用订阅+广告，复杂企业场景用API，AI原生应用探索产品化收费。</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- B2B Section -->
+        <section class="section" id="b2b">
+            <div class="section-header">
+                <div class="section-icon">🏢</div>
+                <h2>B端：以API为核心的Token Factory</h2>
+            </div>
+            <p>针对长程复杂任务，用户愿意为"聪明"模型付费。2025年是转折之年，AI coding的破圈让模型真正进入了企业级场景。</p>
+
+            <div class="key-point">
+                <div class="key-point-title">🔑 关键洞察</div>
+                <p>Coding基于<strong>可验证环境+高质量数据</strong>成为首个进入真实生产力级别的应用，为其他场景实现Agentic奠定了基础。</p>
+            </div>
+
+            <div id="coding" class="expandable">
+                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    AI Coding：提升编程生产力的突破口
+                </div>
+                <div class="expandable-content">
+                    <p>对于程序员而言，Coding已从最初简单的代码补全到实现端到端Agentic engineering，大幅提升编程生产力。</p>
+                    <p><strong>数据支撑：</strong>根据Stack Overflow全球开发者调查，2025年84%的程序员日常使用AI编程。</p>
+                    <p><strong>ROI测算：</strong>假设中国程序员每日花费116美元（对应每年22万元），AI coding节省约4.5小时ROI就可以转正。</p>
+                </div>
+            </div>
+
+            <div class="expandable">
+                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    TAM测算：全球白领市场分析
+                </div>
+                <div class="expandable-content">
+                    <p>我们按照不同群体对AI Agent的依赖程度对全球10亿白领分类：</p>
+                    <ul style="margin: 16px 0; padding-left: 20px;">
+                        <li><strong>5%重度用户</strong>：软件工程师、AI工程师等，ARPU约1.2万美元/年</li>
+                        <li><strong>20%中度用户</strong>：金融分析、法律、咨询等，付费约1000美元/年</li>
+                        <li><strong>75%轻度用户</strong>：广义白领，以订阅ChatBot为主</li>
+                    </ul>
+                    <p>基准情形下全球AI Agent TAM为1万亿美元，乐观情形下将达到3万亿美元。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- B2C Section -->
+        <section class="section" id="b2c">
+            <div class="section-header">
+                <div class="section-icon">👥</div>
+                <h2>C端：订阅制和广告进行商业转化</h2>
+            </div>
+            <p>2023年GPT基于AI问答和搜索引入ChatBot模式开始覆盖C端市场，2026年5月ChatGPT和Gemini的C端月活分别达到10亿/9亿。</p>
+
+            <div class="key-point">
+                <div class="key-point-title">💰 商业模式核心</div>
+                <p>通过模型的智能化水平获取流量入口以及提升Token付费质量，包括引入广告覆盖免费用户的Token成本，以及探索单Token价值量更高的Agentic AI市场。</p>
+            </div>
+
+            <div class="expandable">
+                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    广告模式：覆盖免费用户成本
+                </div>
+                <div class="expandable-content">
+                    <p>对于C端免费用户，模型厂商需要找到方式覆盖其Token消耗成本。广告模式是一种潜在的解决方案，可以在用户体验和商业化之间找到平衡。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cost Section -->
+        <section class="section" id="cost">
+            <div class="section-header">
+                <div class="section-icon">⚙️</div>
+                <h2>成本端：推理端毛利率趋势性提升</h2>
+            </div>
+
+            <div id="training" class="expandable">
+                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    训练成本：参数规模持续扩大
+                </div>
+                <div class="expandable-content">
+                    <p>2026年海内外模型厂商仍加码模型预训练，参数量将更上一个台阶，带动训练端算力成本持续提升。</p>
+                    <p>但随着下游需求加速释放带动模型厂商收入放量，模型训练和人员费用将被摊薄。</p>
+                </div>
+            </div>
+
+            <div id="inference" class="expandable">
+                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    推理成本：效率优化驱动毛利率提升
+                </div>
+                <div class="expandable-content">
+                    <p>推理端随着底层算力效率和模型智能水平提高，毛利率将趋势性提升。</p>
+                    <p>关键因素包括：</p>
+                    <ul style="margin: 16px 0; padding-left: 20px;">
+                        <li>底层算力效率优化</li>
+                        <li>模型智能水平提高</li>
+                        <li>推理规模带来的收入增长</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profit Section -->
+        <section class="section" id="profit">
+            <div class="section-header">
+                <div class="section-icon">💎</div>
+                <h2>盈利展望</h2>
+            </div>
+            <p>随着下游需求加速释放带动模型厂商收入放量，模型训练和人员费用将被摊薄，中长期模型厂商将实现盈利。</p>
+
+            <div class="key-point">
+                <div class="key-point-title">⏰ 盈利时间线</div>
+                <p>训练端的算力与人员成本会被持续摊薄，<strong>中期维度会达到整体净利润端的盈亏平衡点</strong>，这一平衡点可能会在未来5年左右的区间内达到，且长期来看利润空间也相当可观。</p>
+            </div>
+        </section>
+
+        <!-- Risks Section -->
+        <section class="section" id="risks">
+            <div class="section-header">
+                <div class="section-icon">⚠️</div>
+                <h2>风险提示</h2>
+            </div>
+
+            <div class="concept-grid">
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>算力持续涨价</h4>
+                    <p>上游算力成本压力</p>
+                    <div class="definition">存储、PCB、GPU等持续涨价，可能影响模型公司推理毛利率和训练投入。</div>
+                </div>
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>Agent泛化能力不及预期</h4>
+                    <p>TAM扩张受阻</p>
+                    <div class="definition">目前Agent使用率较高的场景主要在Coding，如果泛化能力和速度不及预期，可能影响整体Agent TAM的扩张。</div>
+                </div>
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>API价格竞争</h4>
+                    <p>毛利率承压</p>
+                    <div class="definition">如果模型厂商为了获得更多市场份额开始API价格竞争，将对毛利率和盈利时间产生影响。</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="quiz-section" id="quiz">
+            <div class="quiz-title">🧠 知识检验</div>
+
+            <div class="quiz-question">
+                <p>1. 根据报告，2026年5月Anthropic的ARR达到多少？</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">A. 90亿美元</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">B. 450亿美元</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">C. 1000亿美元</div>
+                </div>
+                <div class="quiz-feedback"></div>
+            </div>
+
+            <div class="quiz-question">
+                <p>2. 基准情形下，全球AI Agent TAM预计达到多少？</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">A. 5000亿美元</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">B. 1万亿美元</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">C. 3万亿美元</div>
+                </div>
+                <div class="quiz-feedback"></div>
+            </div>
+
+            <div class="quiz-question">
+                <p>3. 模型厂商预计在多长时间内达到盈亏平衡？</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">A. 1-2年</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">B. 3年</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">C. 5年左右</div>
+                </div>
+                <div class="quiz-feedback"></div>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="summary-section" id="takeaways">
+            <div class="summary-title">📚 学习总结</div>
+
+            <div class="takeaway-grid">
+                <div class="takeaway-card">
+                    <div class="takeaway-number">1</div>
+                    <h4>B端：Token Factory模式</h4>
+                    <p>以API为核心，用户愿意为智能高效的模型付费，Coding是突破口，TAM可达1-3万亿美元。</p>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-number">2</div>
+                    <h4>C端：订阅+广告</h4>
+                    <p>通过订阅和广告覆盖不同用户群体，Agentic AI将带来更高单Token价值。</p>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-number">3</div>
+                    <h4>成本：推理效率提升</h4>
+                    <p>训练成本持续上升，但推理端毛利率将趋势性提升，规模效应摊薄成本。</p>
+                </div>
+                <div class="takeaway-card">
+                    <div class="takeaway-number">4</div>
+                    <h4>盈利：5年可达平衡</h4>
+                    <p>中长期模型厂商将实现盈利，长期利润空间可观。</p>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <h3 style="margin: 24px 0 16px; font-size: 18px;">学习清单</h3>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-text">理解B端Token Factory商业模式</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-text">掌握AI Coding对企业级市场的影响</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-text">了解C端订阅和广告的商业化路径</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-text">分析模型厂商的成本结构和盈利前景</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('checked')">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-text">识别主要风险因素</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-meta">
+                原文来源：中金点睛 | 2026年6月22日<br>
+                分析师：于钟海、王之昊、袁佳妮
+            </div>
+            <a href="https://mp.weixin.qq.com/s/hGr4Uy5o3wpaj4ngWS7ZZw" class="footer-link" target="_blank">
+                查看原文 →
+            </a>
+            <div class="footer-meta" style="margin-top: 16px;">
+                交互式网页生成于 2026年6月25日
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Update TOC active state
+            const sections = document.querySelectorAll('.section, .quiz-section, .summary-section');
+            let current = '';
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 100) {
+                    current = section.id;
+                }
+            });
+
+            document.querySelectorAll('.toc-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // TOC Toggle (Mobile)
+        document.getElementById('tocToggle').addEventListener('click', () => {
+            document.getElementById('tocSidebar').classList.toggle('open');
+        });
+
+        // Close TOC when clicking on link (Mobile)
+        document.querySelectorAll('.toc-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    document.getElementById('tocSidebar').classList.remove('open');
+                }
+            });
+        });
+
+        // Quiz functionality
+        function checkQuiz(element, correct) {
+            const question = element.closest('.quiz-question');
+            const feedback = question.querySelector('.quiz-feedback');
+            const options = question.querySelectorAll('.quiz-option');
+
+            // Disable further clicks
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            if (correct) {
+                element.classList.add('correct');
+                feedback.textContent = '✅ 正确！根据报告，Anthropic的ARR从2025年底的90亿美元增长5倍至2026年5月的450亿美元。';
+                feedback.className = 'quiz-feedback show correct';
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                options[1].classList.add('correct');
+                feedback.textContent = '❌ 不正确。正确答案是450亿美元。Anthropic的ARR从2025年底的90亿美元增长5倍。';
+                feedback.className = 'quiz-feedback show incorrect';
+            }
+        }
+
+        // Checklist functionality
+        document.querySelectorAll('.checklist-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('checked');
+            });
+        });
+
+        // Smooth scroll for TOC links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
