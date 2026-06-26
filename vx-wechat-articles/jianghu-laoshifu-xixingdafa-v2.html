@@ -29,6 +29,16 @@
         .section p { margin-bottom: 16px; font-size: 16px; }
         .key-point { background: linear-gradient(135deg, #fff3cd, #fff9e6); border-left: 4px solid #ffc107; padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
         .key-point-title { font-weight: 600; color: #856404; margin-bottom: 8px; }
+        .logic-flow { display: flex; flex-direction: column; gap: 16px; margin: 24px 0; }
+        .logic-step { display: flex; gap: 16px; align-items: flex-start; }
+        .logic-step-number { min-width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; }
+        .logic-step-content { flex: 1; }
+        .logic-step-content h4 { font-size: 16px; margin-bottom: 8px; color: var(--primary); }
+        .logic-step-content p { font-size: 14px; color: var(--text-secondary); margin: 0; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .comparison-table th, .comparison-table td { padding: 12px 16px; border: 1px solid var(--border); text-align: left; }
+        .comparison-table th { background: var(--primary); color: white; font-weight: 500; }
+        .comparison-table tr:nth-child(even) { background: var(--bg); }
         .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 24px 0; }
         .concept-card { background: var(--primary-light); padding: 20px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
         .concept-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
@@ -45,6 +55,9 @@
         .expandable.expanded .expandable-content { max-height: 2000px; padding: 20px; }
         .warning-box { background: #fce4ec; border-left: 4px solid var(--primary); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
         .warning-box-title { font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+        .bullet-list { margin: 16px 0; padding-left: 24px; }
+        .bullet-list li { margin-bottom: 12px; font-size: 15px; }
+        .bullet-list li strong { color: var(--primary); }
         .summary-section { background: linear-gradient(135deg, #fce4ec, #fff3e0); padding: 40px; border-radius: var(--radius); margin: 48px 0; }
         .summary-title { font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center; color: var(--primary); }
         .takeaway-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
@@ -87,50 +100,191 @@
                 <span>⏱️ 阅读约 15 分钟</span>
             </div>
         </header>
+
         <section class="section" id="intro">
             <div class="section-header"><div class="section-icon">📖</div><h2>导读</h2></div>
             <div class="key-point"><div class="key-point-title">💡 核心观点</div><p>"吸星大法"和"吃鸡缩圈"重现江湖！索罗斯式的反身性循环中，脆弱性的信号正在不断浮现。</p></div>
-            <p>当前全球金融市场正处于结构性脆弱、高度集中且流动性分层加剧的微妙时刻。当市场上几乎所有人都在为人工智能疯狂时，江湖老师傅却悄然察觉到一丝不寻常的迹象。</p>
+            <p>当前全球金融市场正处于结构性脆弱、高度集中且流动性分层加剧的微妙时刻。当市场上几乎所有人都在为人工智能疯狂时，付鹏却悄然察觉到一丝不寻常的迹象。</p>
         </section>
+
         <section class="section" id="context">
             <div class="section-header"><div class="section-icon">🌍</div><h2>当前背景：流动性边际的压力</h2></div>
-            <div id="liquidity"><h3>流动性环境趋紧</h3><p>从去年年底到今年年初，整体流动性环境正逐步趋紧。这是资产反身性循环的第一个关键"初始条件"。</p></div>
-            <div id="warsh"><h3>沃什的政策取向</h3><p>凯文·沃什被选为接任美联储主席，代表"回归传统主义与保守主义"的货币政策取向。</p>
-            <div class="concept-grid">
-                <div class="concept-card" onclick="this.classList.toggle('expanded')"><h4>QT 缩表</h4><p>逐步退出扩表与宽松流动性供给</p><div class="detail">技术进步抬高长期增长中枢时，央行需主动收缩资产负债表。</div></div>
-                <div class="concept-card" onclick="this.classList.toggle('expanded')"><h4>降息对冲</h4><p>短端利率下行</p><div class="detail">降息短端利率下行并没有带动长端利率的下行。</div></div>
-            </div></div>
-            <div class="warning-box"><div class="warning-box-title">⚠️ P+Q 双紧局面</div><p>QT 与 TGA 重建等因素带来流动性边际压力，P+Q 双紧局面依旧存在。</p></div>
+            <div id="liquidity">
+                <h3>流动性环境趋紧</h3>
+                <div class="logic-flow">
+                    <div class="logic-step">
+                        <div class="logic-step-number">1</div>
+                        <div class="logic-step-content">
+                            <h4>初始条件</h4>
+                            <p>从去年年底到今年年初，整体流动性环境正逐步趋紧</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">2</div>
+                        <div class="logic-step-content">
+                            <h4>触发因素</h4>
+                            <p>QT与TGA重建等因素带来流动性边际压力</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">3</div>
+                        <div class="logic-step-content">
+                            <h4>结果</h4>
+                            <p>P+Q双紧局面依旧存在，并开始产生结构性紧张</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="warsh">
+                <h3>沃什的政策取向</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>政策</th>
+                            <th>内容</th>
+                            <th>影响</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>QT 缩表</strong></td>
+                            <td>逐步退出扩表与宽松流动性供给</td>
+                            <td>技术进步抬高长期增长中枢时，央行需主动收缩资产负债表</td>
+                        </tr>
+                        <tr>
+                            <td><strong>降息对冲</strong></td>
+                            <td>短端利率下行</td>
+                            <td>10年期国债收益率持续锚定在4.2%-4.4%，长端利率未跟随下行</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="warning-box"><div class="warning-box-title">⚠️ P+Q 双紧局面</div><p>QT 与 TGA 重建等因素带来流动性边际压力，P+Q 双紧局面依旧存在，并开始产生结构性紧张。</p></div>
         </section>
+
         <section class="section" id="mechanism">
             <div class="section-header"><div class="section-icon">🌀</div><h2>核心机制：吸星大法与吃鸡缩圈</h2></div>
-            <div id="absorb"><h3>吸星大法：流动性虹吸效应</h3><p>确定性资产持续从系统抽取流动性，形成资本与资金的单向或加速集中。</p>
-            <div class="key-point"><div class="key-point-title">🔑 关键特征</div><p>这不是简单的"资金荒"，总量未必极度短缺，但<strong>"可用性"与"流向"高度分化</strong>。</p></div></div>
-            <div id="shrink"><h3>吃鸡缩圈：风险资产边缘化</h3><p>风险厌恶上升时，资本涌向少数被市场共识为"确定"的标的，而风险资产面临去杠杆压力。</p></div>
-        </section>
-        <section class="section" id="window">
-            <div class="section-header"><div class="section-icon">⏰</div><h2>确定性与不确定性共存的窗口期</h2></div>
-            <p>不确定性来自霍尔木兹海峡局势对能源、通胀及利率的连锁影响。</p>
-            <div class="key-point"><div class="key-point-title">💡 缓冲期</div><p>霍尔木兹海峡紧张局势存在 <strong>60 至 90 天的缓冲期</strong>。</p></div>
-        </section>
-        <section class="section" id="risk">
-            <div class="section-header"><div class="section-icon">⚠️</div><h2>风险信号</h2></div>
-            <div class="warning-box"><div class="warning-box-title">索罗斯式反身性循环</div><p>近期更多的脆弱性的信号正在不断的浮现出来。</p></div>
-            <div class="concept-grid">
-                <div class="concept-card" onclick="this.classList.toggle('expanded')"><h4>流动性分层</h4><p>资本流向高度集中</p><div class="detail">确定性资产虹吸资金，边缘资产面临去杠杆压力。</div></div>
-                <div class="concept-card" onclick="this.classList.toggle('expanded')"><h4>能源冲击</h4><p>地缘政治风险</p><div class="detail">霍尔木兹海峡局势可能引发油价波动。</div></div>
-                <div class="concept-card" onclick="this.classList.toggle('expanded')"><h4>政策转向</h4><p>美联储保守主义回归</p><div class="detail">QT缩表与降息并行，政策框架面临重大调整。</div></div>
+            <div id="absorb">
+                <h3>吸星大法：流动性虹吸效应</h3>
+                <div class="logic-flow">
+                    <div class="logic-step">
+                        <div class="logic-step-number">1</div>
+                        <div class="logic-step-content">
+                            <h4>背景</h4>
+                            <p>流动性总量面临收紧压力</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">2</div>
+                        <div class="logic-step-content">
+                            <h4>机制</h4>
+                            <p>确定性资产持续从系统抽取流动性</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">3</div>
+                        <div class="logic-step-content">
+                            <h4>结果</h4>
+                            <p>形成资本与资金的单向或加速集中</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="key-point"><div class="key-point-title">🔑 关键特征</div><p>这不是简单的"资金荒"，总量未必极度短缺，但<strong>"可用性"与"流向"高度分化</strong>。</p></div>
+            </div>
+            <div id="shrink">
+                <h3>吃鸡缩圈：风险资产边缘化</h3>
+                <div class="logic-flow">
+                    <div class="logic-step">
+                        <div class="logic-step-number">1</div>
+                        <div class="logic-step-content">
+                            <h4>触发</h4>
+                            <p>风险厌恶上升</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">2</div>
+                        <div class="logic-step-content">
+                            <h4>资本流向</h4>
+                            <p>涌向少数被市场共识为"确定"的标的</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">3</div>
+                        <div class="logic-step-content">
+                            <h4>边缘资产</h4>
+                            <p>面临融资成本上升、抵押品价值波动与去杠杆压力</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
+
+        <section class="section" id="window">
+            <div class="section-header"><div class="section-icon">⏰</div><h2>确定性与不确定性共存的窗口期</h2></div>
+            <div class="logic-flow">
+                <div class="logic-step">
+                    <div class="logic-step-number">1</div>
+                    <div class="logic-step-content">
+                        <h4>不确定性来源</h4>
+                        <p>霍尔木兹海峡局势对能源、通胀及利率的连锁影响</p>
+                    </div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-step-number">2</div>
+                    <div class="logic-step-content">
+                        <h4>缓冲机制</h4>
+                        <p>航运周期调节、各国战略石油储备释放、炼厂库存与开工率的自我平衡</p>
+                    </div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-step-number">3</div>
+                    <div class="logic-step-content">
+                        <h4>缓冲期</h4>
+                        <p><strong>60 至 90 天</strong></p>
+                    </div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-step-number">4</div>
+                    <div class="logic-step-content">
+                        <h4>窗口期特征</h4>
+                        <p>确定性和不确定性共存</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="risk">
+            <div class="section-header"><div class="section-icon">⚠️</div><h2>风险信号</h2></div>
+            <div class="warning-box"><div class="warning-box-title">索罗斯式反身性循环</div><p>标准的索罗斯式的反身性循环中，近期更多的脆弱性的信号正在不断的浮现出来。</p></div>
+            <div class="concept-grid">
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>流动性分层</h4>
+                    <p>资本流向高度集中</p>
+                    <div class="detail">确定性资产虹吸资金，边缘资产面临去杠杆压力。</div>
+                </div>
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>能源冲击</h4>
+                    <p>地缘政治风险</p>
+                    <div class="detail">霍尔木兹海峡局势可能引发油价波动，影响通胀预期。</div>
+                </div>
+                <div class="concept-card" onclick="this.classList.toggle('expanded')">
+                    <h4>政策转向</h4>
+                    <p>美联储保守主义回归</p>
+                    <div class="detail">QT缩表与降息并行，政策框架面临重大调整。</div>
+                </div>
+            </div>
+        </section>
+
         <section class="summary-section" id="takeaways">
             <div class="summary-title">📚 核心总结</div>
             <div class="takeaway-grid">
-                <div class="takeaway-card"><div class="takeaway-number">1</div><h4>流动性边际收紧</h4><p>QT、TGA重建等因素导致整体流动性环境趋紧。</p></div>
-                <div class="takeaway-card"><div class="takeaway-number">2</div><h4>吸星大法效应</h4><p>确定性资产虹吸流动性，资本流向高度分化。</p></div>
-                <div class="takeaway-card"><div class="takeaway-number">3</div><h4>窗口期与缓冲</h4><p>霍尔木兹海峡局势有60-90天缓冲期。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">1</div><h4>流动性边际收紧</h4><p>QT、TGA重建等因素导致整体流动性环境趋紧，形成P+Q双紧局面。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">2</div><h4>吸星大法效应</h4><p>确定性资产虹吸流动性，资本流向高度分化，形成反身性螺旋。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">3</div><h4>窗口期与缓冲</h4><p>霍尔木兹海峡局势有60-90天缓冲期，确定性与不确定性共存。</p></div>
                 <div class="takeaway-card"><div class="takeaway-number">4</div><h4>脆弱性信号</h4><p>索罗斯式反身性循环中，脆弱性的信号正在浮现。</p></div>
             </div>
         </section>
+
         <footer class="footer">
             <div class="footer-meta">原文来源：付鹏的财经世界 | 2026年6月4日</div>
             <a href="https://mp.weixin.qq.com/s/aLMAX4oC6gU3g5Qun640Vw" class="footer-link" target="_blank">查看原文 →</a>
