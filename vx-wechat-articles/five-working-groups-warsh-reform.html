@@ -29,6 +29,12 @@
         .section p { margin-bottom: 16px; font-size: 16px; }
         .key-point { background: linear-gradient(135deg, #e8f4fd, #f0f9ff); border-left: 4px solid var(--primary); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
         .key-point-title { font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+        .logic-flow { display: flex; flex-direction: column; gap: 16px; margin: 24px 0; }
+        .logic-step { display: flex; gap: 16px; align-items: flex-start; }
+        .logic-step-number { min-width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; }
+        .logic-step-content { flex: 1; }
+        .logic-step-content h4 { font-size: 16px; margin-bottom: 8px; color: var(--primary); }
+        .logic-step-content p { font-size: 14px; color: var(--text-secondary); margin: 0; }
         .work-group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 24px 0; }
         .work-group-card { background: var(--primary-light); padding: 20px; border-radius: 10px; cursor: pointer; transition: all 0.2s; border-left: 4px solid var(--primary); }
         .work-group-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
@@ -36,6 +42,10 @@
         .work-group-card p { font-size: 14px; color: var(--text-secondary); margin: 0; }
         .work-group-card .detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text); }
         .work-group-card.expanded .detail { display: block; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .comparison-table th, .comparison-table td { padding: 12px 16px; border: 1px solid var(--border); text-align: left; }
+        .comparison-table th { background: var(--primary); color: white; font-weight: 500; }
+        .comparison-table tr:nth-child(even) { background: var(--bg); }
         .expandable { margin: 20px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
         .expandable-header { padding: 16px 20px; background: var(--bg); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 500; transition: background 0.2s; }
         .expandable-header:hover { background: var(--primary-light); }
@@ -50,6 +60,10 @@
         .timeline-item { position: relative; margin-bottom: 24px; }
         .timeline-item::before { content: ''; position: absolute; left: -24px; top: 8px; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; }
         .timeline-item h4 { color: var(--primary); margin-bottom: 8px; }
+        .timeline-item p { font-size: 14px; color: var(--text-secondary); margin: 0; }
+        .bullet-list { margin: 16px 0; padding-left: 24px; }
+        .bullet-list li { margin-bottom: 12px; font-size: 15px; }
+        .bullet-list li strong { color: var(--primary); }
         .summary-section { background: linear-gradient(135deg, #e8f4fd, #e8f8f0); padding: 40px; border-radius: var(--radius); margin: 48px 0; }
         .summary-title { font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center; color: var(--primary); }
         .takeaway-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
@@ -72,10 +86,6 @@
         <a href="#intro" class="toc-item active">导读</a>
         <a href="#five-groups" class="toc-item">五大工作小组</a>
         <a href="#communication" class="toc-item sub">沟通工作组</a>
-        <a href="#balance-sheet" class="toc-item sub">资产负债表工作组</a>
-        <a href="#data" class="toc-item sub">数据工作组</a>
-        <a href="#productivity" class="toc-item sub">生产力与就业工作组</a>
-        <a href="#inflation" class="toc-item sub">通胀框架工作组</a>
         <a href="#disagreement" class="toc-item">分歧核心议题</a>
         <a href="#timeline" class="toc-item">改革时间表</a>
         <a href="#personnel" class="toc-item">参与人员</a>
@@ -97,103 +107,186 @@
         <section class="section" id="intro">
             <div class="section-header"><div class="section-icon">📖</div><h2>导读</h2></div>
             <div class="key-point"><div class="key-point-title">💡 核心观点</div><p>用五个工作小组宣告改革开始，向保守主义的复位与传统原则的回归。</p></div>
-            <p>凯文·沃什（Kevin Warsh）首次会议及声明的核心可总结为"五个工作小组改革正式启动"。沃什在其主持的首次联邦公开市场委员会（FOMC）利率会议后的新闻发布会上明确表示："我将成立五个工作组，聚焦货币政策实践中的五个核心领域。"</p>
-            <p>在我看来，这五个工作小组涉及到的核心领域是关键所在——它们实际上代表了美联储未来在重要政策领域的调整方向。</p>
-            <p><strong>日记链接：</strong><a href="https://mp.weixin.qq.com/s/V727TpGvRjo5RvYRGZl6oA" target="_blank">沃什的提名：美联储向保守主义的复位与传统原则的回归</a></p>
+            <div class="logic-flow">
+                <div class="logic-step">
+                    <div class="logic-step-number">1</div>
+                    <div class="logic-step-content">
+                        <h4>背景</h4>
+                        <p>凯文·沃什首次主持FOMC利率会议</p>
+                    </div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-step-number">2</div>
+                    <div class="logic-step-content">
+                        <h4>宣布</h4>
+                        <p>"我将成立五个工作组，聚焦货币政策实践中的五个核心领域"</p>
+                    </div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-step-number">3</div>
+                    <div class="logic-step-content">
+                        <h4>付鹏解读</h4>
+                        <p>这五个工作小组代表了美联储未来在重要政策领域的调整方向</p>
+                    </div>
+                </div>
+            </div>
+            <p><strong>相关阅读：</strong><a href="https://mp.weixin.qq.com/s/V727TpGvRjo5RvYRGZl6oA" target="_blank">沃什的提名：美联储向保守主义的复位与传统原则的回归</a></p>
         </section>
 
         <section class="section" id="five-groups">
             <div class="section-header"><div class="section-icon">👥</div><h2>五大工作小组：改革的开始</h2></div>
-            <p>凯文·沃什在此次会议中明确对这类市场沟通工具进行大刀阔斧的精简，因为他认为这类工具已不再适用于当前的货币政策，除必要的经济形势分析外，其他前瞻性指引均不再提供。</p>
             
+            <div class="key-point"><div class="key-point-title">🎯 沃什的核心逻辑</div><p>市场沟通工具已不再适用于当前货币政策，需要大刀阔斧精简。</p></div>
+
             <div id="communication">
                 <h3>沟通工作组：点阵图的命运</h3>
-                <p>至于经济预测摘要（SEP）中最核心关注的点阵图，<strong>年内肯定会被取消</strong>。在本次公布的点阵图中，19名决策者里仅有18人提交了利率预测，出现了一人空缺。虽然无法确定具体是谁未提交或投票，但外界普遍猜测此人是凯文·沃什。</p>
-                <p>他曾明确表示，对他个人而言，提交点阵图预测对政策执行没有任何意义。这也印证了他对强计划性政策工具的反感：他将点阵图比作"带橡皮的铅笔"，认为点阵图等前瞻指引"噪音过大"、限制政策灵活性、其会扭曲市场，曾导致2021-2022年通胀误判后被迫激进加息。</p>
-                <p>这恰好对应沃什上任后宣布设立的五大专项工作组中关于沟通机制的变革中"沟通工作组"明确负责审查美联储的沟通方式，包括对SEP的调整（如点阵图的呈现形式、其在决策中的权重等）。</p>
-            </div>
-
-            <div class="expandable">
-                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
-                    数据工作组：方法论改革
+                <div class="logic-flow">
+                    <div class="logic-step">
+                        <div class="logic-step-number">1</div>
+                        <div class="logic-step-content">
+                            <h4>现状</h4>
+                            <p>本次点阵图19名决策者中仅18人提交利率预测，出现一人空缺</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">2</div>
+                        <div class="logic-step-content">
+                            <h4>猜测</h4>
+                            <p>外界普遍猜测未提交者是凯文·沃什本人</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">3</div>
+                        <div class="logic-step-content">
+                            <h4>沃什立场</h4>
+                            <p>点阵图对政策执行没有意义，"噪音过大"、限制灵活性、扭曲市场</p>
+                        </div>
+                    </div>
+                    <div class="logic-step">
+                        <div class="logic-step-number">4</div>
+                        <div class="logic-step-content">
+                            <h4>结论</h4>
+                            <p><strong>点阵图年内肯定会被取消</strong></p>
+                        </div>
+                    </div>
                 </div>
-                <div class="expandable-content">
-                    <p>之后的讲话中凯文沃什又以"数据工作组"的为例，核心意图就是继续传达改革方向——即对数据来源及方法论进行调整。由于央行目前依赖的大部分数据仍来自传统调查，数据工作组正针对官方统计提出改进建议。</p>
-                </div>
-            </div>
-
-            <p>通过"沟通工作组"的明确调整和"数据工作组"的职能解释，让市场就非常容易理解五个工作小组的本质：就是要对现有框架进行较大幅度的调整：</p>
-
-            <div class="work-group-grid">
-                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
-                    <h4>📢 沟通工作组</h4>
-                    <p>审查美联储沟通方式</p>
-                    <div class="detail">包括对SEP的调整（如点阵图的呈现形式、其在决策中的权重等），减少前瞻指引"噪音"和过多官员表态。</div>
-                </div>
-                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
-                    <h4>📊 资产负债表工作组</h4>
-                    <p>评估债券持有结构</p>
-                    <div class="detail">评估充足准备金制度的利弊及替代方案，探讨货币政策实施的备选框架。</div>
-                </div>
-                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
-                    <h4>📈 数据来源/收集工作组</h4>
-                    <p>解决数据滞后问题</p>
-                    <div class="detail">评估新信息来源和方法改进，以获得更及时的经济洞见。</div>
-                </div>
-                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
-                    <h4>🤖 生产力与就业工作组</h4>
-                    <p>审查AI对劳动力市场的影响</p>
-                    <div class="detail">审查AI等通用技术对生产力、劳动力市场的影响及对美联储政策的含义。</div>
-                </div>
-                <div class="work-group-card" onclick="this.classList.toggle('expanded')">
-                    <h4>💰 通胀框架工作组</h4>
-                    <p>重新审视通胀驱动因素</p>
-                    <div class="detail">重新审视通胀驱动因素和价格稳定方法（部分报道指出2%目标本身可能不在直接评估范围内，但框架整体会检讨），这意味着可能对通胀背后的驱动因子进行重大调整。</div>
+                <div class="expandable">
+                    <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        沃什的比喻：点阵图是"带橡皮的铅笔"
+                    </div>
+                    <div class="expandable-content">
+                        <p>沃什认为点阵图等前瞻指引曾导致2021-2022年通胀误判后被迫激进加息。</p>
+                    </div>
                 </div>
             </div>
+
+            <h3>五大工作组职能一览</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>工作组</th>
+                        <th>核心职能</th>
+                        <th>关键议题</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>沟通工作组</strong></td>
+                        <td>审查美联储沟通方式</td>
+                        <td>SEP/点阵图调整，减少前瞻指引"噪音"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>资产负债表工作组</strong></td>
+                        <td>评估债券持有结构</td>
+                        <td>充足准备金制度的利弊及替代方案</td>
+                    </tr>
+                    <tr>
+                        <td><strong>数据来源/收集工作组</strong></td>
+                        <td>解决数据滞后问题</td>
+                        <td>新信息来源和方法改进</td>
+                    </tr>
+                    <tr>
+                        <td><strong>生产力与就业工作组</strong></td>
+                        <td>审查AI对劳动力市场影响</td>
+                        <td>通用技术对生产力、就业及政策的含义</td>
+                    </tr>
+                    <tr>
+                        <td><strong>通胀框架工作组</strong></td>
+                        <td>重新审视通胀驱动因素</td>
+                        <td>价格稳定方法（2%目标可能不在直接评估范围内）</td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
         <section class="section" id="disagreement">
-            <div class="section-header"><div class="section-icon">⚡</div><h2>分歧核心的议题会是什么？</h2></div>
-            <p>另外值得关注的还有，其中一个工作组还将研究一个长期处于沃什与美联储分歧核心的议题，虽然没有表明究竟哪个是分歧的核心，但是研究审查"充足准备金制度"（ample reserves regime）及其替代方案。<strong>这100%是沃什与美联储（尤其是后危机时代政策路径）分歧核心的议题内容。</strong></p>
+            <div class="section-header"><div class="section-icon">⚡</div><h2>分歧核心议题</h2></div>
             
-            <div class="expandable">
-                <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
-                    充裕准备金体制的利弊
-                </div>
-                <div class="expandable-content">
-                    <p>充裕准备金体制在后危机时代在利率控制精准性和金融稳定方面优于传统稀缺准备金框架。美联储通过QT成功将准备金从"过剩"引导至"最小充裕"水平（2025年底左右完成阶段性过渡）。</p>
-                    <p>然而，其成本（资产负债表相关亏损、市场扭曲、正常化难度）真实存在且不可忽视。框架并非"免费午餐"，需要在控制力、稳定性和效率/成本之间持续权衡。</p>
-                </div>
-            </div>
+            <div class="key-point"><div class="key-point-title">🔑 核心分歧</div><p>研究审查"充足准备金制度"（ample reserves regime）及其替代方案。<strong>这100%是沃什与美联储分歧核心的议题。</strong></p></div>
+
+            <h3>两种框架的对比</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>维度</th>
+                        <th>充裕准备金体制（现状）</th>
+                        <th>传统稀缺准备金框架（沃什倾向）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>利率控制</strong></td>
+                        <td>精准性更高</td>
+                        <td>精准性较低</td>
+                    </tr>
+                    <tr>
+                        <td><strong>金融稳定</strong></td>
+                        <td>更优</td>
+                        <td>较差</td>
+                    </tr>
+                    <tr>
+                        <td><strong>成本</strong></td>
+                        <td>资产负债表亏损、市场扭曲</td>
+                        <td>较低</td>
+                    </tr>
+                    <tr>
+                        <td><strong>正常化难度</strong></td>
+                        <td>高</td>
+                        <td>低</td>
+                    </tr>
+                </tbody>
+            </table>
 
             <div class="expandable">
                 <div class="expandable-header" onclick="this.parentElement.classList.toggle('expanded')">
-                    沃什的长期主张
+                    沃什的长期主张（2005-2011年任职期间）
                 </div>
                 <div class="expandable-content">
-                    <p>沃什曾于2005年至2011年担任美联储理事，他长期对美联储资产负债表规模持续扩张表示不满，并颇具争议地认为，美联储持有的债券过多，正对经济造成负面影响。</p>
-                    <p>沃什认为，美联储在经济危机时期购入的大量债券持仓扭曲了市场信号，并使美联储被迫承担本应由民选官员作出的决策职责。他曾多次公开主张大幅有序缩表、回归更小规模/更传统框架，而非维持当前充裕准备金范式。</p>
-                    <p>这与美联储后2008年（尤其是2019年后正式化）的操作框架形成长期结构性分歧，也被视为他改革议程中"长期批评的一项政策问题"的核心。</p>
+                    <ul class="bullet-list">
+                        <li>长期对美联储资产负债表规模持续扩张表示不满</li>
+                        <li>认为美联储持有的债券过多，正对经济造成负面影响</li>
+                        <li>主张大幅有序缩表、回归更小规模/更传统框架</li>
+                        <li>认为危机时期购入的大量债券持仓扭曲了市场信号</li>
+                        <li>认为美联储被迫承担本应由民选官员作出的决策职责</li>
+                    </ul>
                 </div>
             </div>
 
             <div class="warning-box">
-                <div class="warning-box-title">⚠️ 现任官员的不同看法</div>
-                <p>虽然不少现任美联储官员及经济学家持不同看法，他们认为当前的政策执行框架在控制短期利率方面运行良好，所谓市场被扭曲的说法并不成立。</p>
-                <p>并且，在此次会议上沃什虽然为现行资产负债表政策"留出空间"，委员会重申维持银行体系充足准备金的政策"，但是五个工作小组接下来的工作，论证审查，以及沃什安排更多的市场派（经济学领域外）的人士参与，这才是关键的核心。</p>
-                <p>究竟是保持美联储当前"最小必要规模"策略（维持充裕 + 储备管理购买），还是会回归更小规模/更传统框架，而非维持当前充裕准备金范式。这都会随着之后的资产负债表工作组的评估结果对缩表节奏和货币政策实施的影响，<strong>在半年内逐步的明朗</strong>。</p>
+                <div class="warning-box-title">⚠️ 现状与未来</div>
+                <ul class="bullet-list">
+                    <li><strong>现状：</strong>沃什为现行资产负债表政策"留出空间"，委员会重申维持银行体系充足准备金的政策</li>
+                    <li><strong>关键变量：</strong>沃什安排更多的市场派（经济学领域外）人士参与工作组</li>
+                    <li><strong>核心问题：</strong>保持"最小必要规模"策略，还是回归更传统框架？</li>
+                    <li><strong>时间线：</strong>将在<strong>半年内</strong>逐步明朗</li>
+                </ul>
             </div>
         </section>
 
         <section class="section" id="timeline">
-            <div class="section-header"><div class="section-icon">📅</div><h2>改革开始的时间表格</h2></div>
-            <p>沃什在讲话中提到："领导层更替之际是审视整体操作方法、重申使命的恰当时机"。这句话应指向美国大选前后美联储进行重大框架性调整的关键节点。结合他此前提及的工作小组工作时间与计划来看，这一表态也与相关安排相吻合。</p>
+            <div class="section-header"><div class="section-icon">📅</div><h2>改革时间表</h2></div>
             
-            <div class="key-point">
-                <div class="key-point-title">⏰ 时间规划</div>
-                <p>这一意图的表述已十分明确：这些工作小组将在<strong>未来几周内快速启动</strong>，到<strong>第三季度（秋季）逐步提供更多信息和框架性观点</strong>，并<strong>力争在年底前完成大部分工作</strong>。</p>
-            </div>
+            <div class="key-point"><div class="key-point-title">💡 沃什的表态</div><p>"领导层更替之际是审视整体操作方法、重申使命的恰当时机"——指向美国大选前后美联储进行重大框架性调整的关键节点。</p></div>
 
             <div class="timeline">
                 <div class="timeline-item">
@@ -213,26 +306,51 @@
 
         <section class="section" id="personnel">
             <div class="section-header"><div class="section-icon">👥</div><h2>参与人员：打破传统框架</h2></div>
-            <p>值得注意的是，这些独立工作小组将邀请经济学领域内外的优秀人才参与，这里的"内外"既包括传统经济学框架内的专业人士，也涵盖非传统领域的人才。</p>
-            <p>从美国政府当前在关键岗位的用人倾向来看，后者主要指活跃在一线市场的非学者型人才，通过这种"破坏式重构"打破原有僵化的组织框架，使其更贴合一线实际。</p>
-            <p>例如，<strong>财长本森特出身对冲基金</strong>，这类背景的人员正推动组织框架向更市场化的方向调整。</p>
             
-            <div class="key-point">
-                <div class="key-point-title">💡 沃什的风格</div>
-                <p>这一点从凯文·沃什后续的表述中也能得到印证，他更贴近市场、相信市场力量，而非依赖计划性的政策手段。以"前瞻性指引"为例，他明确表达了对这类带有强烈计划性的政策工具的反感。</p>
+            <div class="logic-flow">
+                <div class="logic-step">
+                    <div class="logic-step-number">1</div>
+                    <div class="logic-step-content">
+                        <h4>人才来源</h4>
+                        <p>经济学领域内外的优秀人才，包括传统经济学家和非传统领域人才</p>
+                    </div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-step-number">2</div>
+                    <div class="logic-step-content">
+                        <h4>"内外"含义</h4>
+                        <p>"外"主要指活跃在一线市场的非学者型人才</p>
+                    </div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-step-number">3</div>
+                    <div class="logic-step-content">
+                        <h4>目的</h4>
+                        <p>通过"破坏式重构"打破原有僵化的组织框架，使其更贴合一线实际</p>
+                    </div>
+                </div>
+                <div class="logic-step">
+                    <div class="logic-step-number">4</div>
+                    <div class="logic-step-content">
+                        <h4>案例</h4>
+                        <p>财长本森特出身对冲基金，推动组织框架向更市场化方向调整</p>
+                    </div>
+                </div>
             </div>
 
-            <p>五个工作小组，五个主要方向，核心依旧体现了沃什的"重塑框架、回归本位"的整体思路。</p>
+            <div class="key-point"><div class="key-point-title">💡 付鹏解读</div><p>沃什更贴近市场、相信市场力量，而非依赖计划性的政策手段。以"前瞻性指引"为例，他明确表达了对这类带有强烈计划性的政策工具的反感。</p></div>
+
+            <p><strong>总结：</strong>五个工作小组，五个主要方向，核心体现了沃什的"重塑框架、回归本位"的整体思路。</p>
         </section>
 
         <section class="summary-section" id="takeaways">
             <div class="summary-title">📚 核心总结</div>
             <div class="takeaway-grid">
                 <div class="takeaway-card"><div class="takeaway-number">1</div><h4>五大工作组启动</h4><p>沟通、资产负债表、数据、生产力与就业、通胀框架五大领域改革正式启动。</p></div>
-                <div class="takeaway-card"><div class="takeaway-number">2</div><h4>点阵图年内取消</h4><p>沃什认为点阵图"噪音过大"、限制政策灵活性，19名决策者中仅18人提交预测，沃什可能未提交。</p></div>
-                <div class="takeaway-card"><div class="takeaway-number">3</div><h4>分歧核心议题</h4><p>充足准备金制度及其替代方案是沃什与美联储分歧的核心，将在半年内逐步明朗。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">2</div><h4>点阵图年内取消</h4><p>沃什认为点阵图"噪音过大"，19名决策者中仅18人提交预测。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">3</div><h4>分歧核心议题</h4><p>充足准备金制度及其替代方案，将在半年内逐步明朗。</p></div>
                 <div class="takeaway-card"><div class="takeaway-number">4</div><h4>改革时间表</h4><p>未来几周启动，秋季提供更多信息，年底前完成大部分工作。</p></div>
-                <div class="takeaway-card"><div class="takeaway-number">5</div><h4>市场派参与</h4><p>工作小组将邀请经济学领域内外人才，包括市场派人士，打破传统框架。</p></div>
+                <div class="takeaway-card"><div class="takeaway-number">5</div><h4>市场派参与</h4><p>工作小组将邀请经济学领域内外人才，打破传统框架。</p></div>
             </div>
         </section>
 
