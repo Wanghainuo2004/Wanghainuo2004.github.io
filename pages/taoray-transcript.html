@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陶瑞 TaoRay - 直播文字版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(90deg, #f093fb, #f5576c, #fda085);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 1.1em;
+        }
+        .meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .toc {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .toc h2 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #f5576c;
+        }
+        .toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        .toc li a {
+            color: #aaa;
+            text-decoration: none;
+            padding: 10px 16px;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .toc li a:hover {
+            background: rgba(245,87,108,0.15);
+            color: #f5576c;
+            border-color: rgba(245,87,108,0.3);
+        }
+        .toc li a .num {
+            color: #f5576c;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.3s;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+        }
+        .section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #f093fb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section h2 .emoji {
+            font-size: 1.2em;
+        }
+        .section p {
+            line-height: 1.9;
+            margin-bottom: 15px;
+            color: #ccc;
+            font-size: 1.05em;
+            text-align: justify;
+        }
+        .highlight {
+            background: rgba(245,87,108,0.15);
+            padding: 20px 25px;
+            border-radius: 12px;
+            border-left: 4px solid #f5576c;
+            margin: 20px 0;
+            font-style: italic;
+            color: #ddd;
+        }
+        .search-box {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: rgba(15,12,41,0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-box input:focus {
+            border-color: #f5576c;
+        }
+        .search-box input::placeholder {
+            color: #555;
+        }
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #444;
+            font-size: 0.9em;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 40px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .section { padding: 25px 20px; }
+            .meta { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>陶瑞 TaoRay 直播文字版</h1>
+            <p class="subtitle">市场、投资与人生感悟</p>
+            <div class="meta">
+                <span>时长: 2小时17分钟</span>
+                <span>来源: TaoRay X.mp4</span>
+                <span>转录: AI Whisper</span>
+            </div>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索内容..." oninput="searchText()">
+        </div>
+
+        <div class="toc">
+            <h2>目录</h2>
+            <ul>
+                <li><a href="#section1"><span class="num">01</span>权力的游戏与波士顿恐袭</a></li>
+                <li><a href="#section2"><span class="num">02</span>波士顿生物医药行业兴衰</a></li>
+                <li><a href="#section3"><span class="num">03</span>哈佛大学的投资基金</a></li>
+                <li><a href="#section4"><span class="num">04</span>市场定价与不确定性</a></li>
+                <li><a href="#section5"><span class="num">05</span>黄金与投资策略</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="section1">
+            <h2><span class="emoji">01</span> 权力的游戏与波士顿恐袭</h2>
+            <p>大家好,大家好,在我们等更多朋友之前,我们先随便聊一聊。我刚刚在上来之前,我看了一会儿电视,我发现有一个美剧叫做《权力的游戏》,很多朋友都看过,有一个衍生剧叫做《龙之家族》,我突然发现他第三季已经上线了。</p>
+            <p>我刚刚在HBO上面看了一会儿,我就想起来,我一开始接触到这个《权力的游戏》,以前我上班的那个地方有一个同事,他经常看,上班的时候他也看,那个单位里面就管得比较松,他上班就在电脑上面看。</p>
+            <p>看了以后,我就说你看什么这么津津有味儿,他就说《权力的游戏》。我那时候还不知道这是个什么剧,然后他就讲里面的情节啊,什么魔法啊,奇幻啊,我听他讲的挺有意思的。但是一直到第六季吧,我才去看,一三年的时候吧。</p>
+            <p>有一次我上班的时候,他又在盯着那个屏幕在看,我看了他那个表情啊,特别的凝重。我就问他你在看什么,他说波士顿爆炸。当时波士顿马拉松有一个恐怖袭击嘛,就爆炸。当时我因为英语不太好,我也没注意听,光听他说什么爆炸什么的,我以为他讲的是《权力的游戏》里面的什么桥段。</p>
+            <p>他就说那个爆炸,很多人都炸死了。我没听到他说波士顿,我就说有趣。然后他就说,是有趣,但是非常的恐怖。我上班以后刷手机一看,才知道原来他讲的不是电视剧,讲的是这个恐怖袭击。</p>
+            <div class="highlight">
+                "后面比较巧,我后面去了波士顿。在波士顿的时候,我认识一个加拿大人,他正好在爆炸的15分钟之前离开了那个位置。本来他站的那个位置,15分钟以后就爆炸了。如果他当时还在那个位置,他肯定就被炸死了。所以以后他的生活是非常感恩的,因为真的是人生无常。"
+            </div>
+            <p>那个炸弹隐藏成一个书包,里面放了很多的钉子。一爆炸的时候,钉子就往旁边飞,一个中国女孩就被炸死了,而且还有好几个人周围的是导致终身残疾。</p>
+            <p>我这个加拿大朋友,经历过这个事情以后,很多事情都看淡了。所以职场上面的起起落落,他也看得比较云淡风轻。人整个的生活状态就比较好。</p>
+        </div>
+
+        <div class="section" id="section2">
+            <h2><span class="emoji">02</span> 波士顿生物医药行业兴衰</h2>
+            <p>他是搞生物医药的。大家知道波士顿是全世界的生物医药的大本营嘛。在疫情的时候就有一个超级大爆发,就是资本那时候全部都去追逐生物医药。整个波士顿就因为生物医药的这个产业就大火了。</p>
+            <p>有一些是名不见经传的公司,像Moderna那些是不是就是靠着这一波资本,还有疫情的东风,一下子就变得炙手可热。所以他当时是找到了非常非常好的工作,他以前也有工作但是他就一路跳槽。</p>
+            <p>当时热到什么程度啊?我认识一个朋友他是社区大学的学历,他都不是学生物医药的,他只是一个社区大学的会计专业。但是他在这个生物医药公司的体系里面,他就比较熟悉这些公司里面的流程,他在里面一步一步跳。</p>
+            <p>疫情之前呢,他的工资大概也就是几万美金一年,因为这个学历也不是需要很高嘛,也不是什么专业的。但是通过疫情那几年,他基本上在这个系统里面就可以拿到20万美金的年薪了。大家要知道20万其实在美国不低了,哈佛的正教授平均工资也只有30万美金。</p>
+            <div class="highlight">
+                "但是这个转向也很快啊,而且这个转向是很多人没有意识到的。就像我这个加拿大朋友他工作的那个公司,是美国一个很大的制药公司。他不是光研发还制作,他买了一个很大的厂房,那个位置就是哈佛过了查尔斯河,挨着商学院的那个位置。公司租了99年,其实就是买下来了。结果这个楼没有多少年,过了一年多,这个公司就倒闭了。"
+            </div>
+            <p>如果他们当时知道资本市场的转向会如此的快速的话,怎么也不应该去在最核心的地方、最贵的地方买一个租99年的楼。哈佛大学的一栋楼啊,你想想一般公司都不会买在学校的这种核心资产的。</p>
+            <p>但是他当时的那种资本的狂热的状态,这个公司他相信肯定会一直景气的,没想到一年以后就急转之下。我这个朋友他也失业了,失业以后重新找工作,但是他就比较尴尬,有点高不成低不就。</p>
+            <p>你想想那几年疫情的资本狂热,他们在这里面都是拿非常高的薪水。那现在行业景气周期过去以后,就比较困难,要想找到以前这么好的工作也很难。但是他心态比较好,因为经历过波士顿的恐怖袭击以后,他就觉得这些都是身外之物。</p>
+        </div>
+
+        <div class="section" id="section3">
+            <h2><span class="emoji">03</span> 哈佛大学的投资基金</h2>
+            <p>讲到这个呢,我再讲讲哈佛。哈佛最赚钱的是什么?哈佛他有钱对吧,校友的捐款很多,几百亿美金。</p>
+            <p>学校他每年分两部分来维持他的运营。一部分是他每年新拿到的钱,这些钱可能就是他申请的科研项目的经费,还有他发行的债券的借款,各种各样的。主要是科研经费是一大头,学费倒是占比不大了。</p>
+            <p>对于常青藤来说,因为现在美国讲究学生的生源多样化嘛,为了公平就把学费降了。其实现在都有奖学金,现在的奖学金都变成按需来分的,就是你家庭收入低于多少美金以下的,他就一定会给你奖学金。比如说哈佛以前是你家庭收入每年少于7万美金,他是给你学费全免的,不管你成绩怎么样。</p>
+            <p>所以学费倒不是现在学校收入的一大头了,主要是联邦政府的科研经费。那么另外的人员的工资,就不是通过科研经费里面进来的。</p>
+            <div class="highlight">
+                "那么教授的工资是从哪里来的呢?就是从哈佛大学的基金池的每年的投资收益率的利息,一部分用来发人员的工资。一个教授当年,正教授大概是30万美金一年。那6百万美金作为基金池,如果说百分之八的投资回报,那这个钱就够发教授的工资。"
+            </div>
+            <p>每个正教授的职位背后,基金池里面要有6百万美金。那么6百万美金作为基金池每年的投资收益,用来发这个教授的工资。剩下的钱呢还可以作为福利、退休储备,可能还有一些钱在本金里面滚。</p>
+            <p>所以他学校的时候就有一个非常大的投资公司。我们今天说美国的机构主导的这个机构的钱,其实就是这些钱。美国所有的大学都是这样子,但是每个大学背后的基金池规模是不一样的。</p>
+            <p>哈佛自己的基金池太大了,他就有一个自己专门的投资公司。这个投资公司里面的人的收入也是对标华尔街一线的职业经理人的收入。十年前我记得,哈佛自己投资公司的那个头儿的收入就差不多2000万美金了。哈佛还有自己的银行,他是整一个自己的体系。</p>
+        </div>
+
+        <div class="section" id="section4">
+            <h2><span class="emoji">04</span> 市场定价与不确定性</h2>
+            <p>所以给大家讲这个市场里面,我们要充满敬畏。就是你有时候看到的一个很确定的方向,甚至是这个行业里面的人,你想想这个制药公司,他不是简单的投资者看财报的,他是在这个行业的最核心圈里面,直接跟一级市场的投资人打交道,直接跟供应商直接跟市场打交道的。</p>
+            <p>他当时敢这么重仓,那是因为他肯定当时没有任何的危机的迹象。那么市场的转向也是很快的,甚至超过他们行业里面的人自己的估计。</p>
+            <p>我下一个主题想给大家讲什么?这一次其实我讲的主要是市场定价的一个错误。下一次我就给大家讲市场定价的矛盾性。比如说同一个方向,它为什么可以有不同的解读,它可以有一个完全不同的定价方向。</p>
+            <div class="highlight">
+                "就像有时候人家说,这个财报好坏不重要,重要的是华尔街如何解读这个财报。所以在市场里面,它没有绝对的两头通吃。它为什么有这么大的不确定性?就是因为它有同样的数据,可以有完全相反不同的解读。"
+            </div>
+            <p>那么下一次我们就从市场里面去挑一些明显的例子,来看一下有哪些东西是可以完全相反不同的解读。那么我们又如何辨别到底哪一个解读的方向可能是客观的,它慢慢会向一个价值进行收敛。</p>
+        </div>
+
+        <div class="section" id="section5">
+            <h2><span class="emoji">05</span> 黄金与投资策略</h2>
+            <p>那如果你持有七八年以上,那它更发生。那你觉得我现在买的,值得持有吗?我觉得你可以持有。因为你买的时候都会有一个时间差的东西,所以你买了你可以就先放着。因为短期的时间,这些东西它的任何的手续费什么,这些都可以忽略不计。</p>
+            <p>黄金它的一个超级周期的到来,不会超过一年半到两年的时间,它一定会有一个超级的周期。</p>
+            <div class="highlight">
+                "今天我就先给大家讲这些,下一次的内容是市场定价的矛盾性。好,谢谢大家。"
+            </div>
+        </div>
+
+        <footer>
+            <p>本文本由 AI (Whisper) 自动转录,可能存在部分识别错误</p>
+            <p>来源: 陶瑞 TaoRay TaoRay X.mp4 | 时长: 2小时17分钟</p>
+        </footer>
+    </div>
+
+    <script>
+        function searchText() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const sections = document.querySelectorAll('.section');
+
+            sections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                if (query === '' || text.includes(query)) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
