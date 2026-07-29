@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>功能测试</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .btn { padding: 10px 20px; margin: 10px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 5px; min-width: 150px; }
+        .dropdown-content a { display: block; padding: 8px; cursor: pointer; }
+        .dropdown-content a:hover { background: #f0f0f0; }
+        #result { margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>功能测试页面</h1>
+
+    <h2>测试1：知识检查按钮</h2>
+    <button class="btn" onclick="testQuiz()">✅ 测试知识检查</button>
+
+    <h2>测试2：下拉菜单</h2>
+    <div class="dropdown">
+        <button class="btn" onclick="toggleDropdown()">🔄 重置进度 ▾</button>
+        <div id="testDropdown" class="dropdown-content">
+            <a onclick="testReset(1)">重置第一章</a>
+            <a onclick="testReset(2)">重置第二章</a>
+            <a onclick="testReset(3)">重置全部</a>
+        </div>
+    </div>
+
+    <div id="result">
+        <strong>测试结果：</strong>
+        <p id="output">等待测试...</p>
+    </div>
+
+    <script>
+        let currentChapter = 1;
+
+        function testQuiz() {
+            const output = document.getElementById('output');
+            output.textContent = `✅ 知识检查按钮工作正常！当前章节：${currentChapter}`;
+            output.style.color = 'green';
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('testDropdown');
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                dropdown.style.display = 'block';
+            }
+        }
+
+        function testReset(chapter) {
+            const output = document.getElementById('output');
+            if (chapter === 3) {
+                output.textContent = `✅ 重置全部功能正常！`;
+            } else {
+                output.textContent = `✅ 重置第${chapter}章功能正常！`;
+            }
+            output.style.color = 'green';
+            document.getElementById('testDropdown').style.display = 'none';
+        }
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('testDropdown');
+            const dropdownBtn = event.target.closest('.dropdown');
+            if (!dropdownBtn && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
