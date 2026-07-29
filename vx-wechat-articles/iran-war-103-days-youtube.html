@@ -521,6 +521,29 @@
             animation: fadeIn 0.5s ease-out;
         }
 
+        /* Dropdown */
+        .dropdown-content a:hover {
+            background: var(--accent-light);
+        }
+
+        /* Reset Chapter Button */
+        .reset-chapter-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+        .reset-chapter-btn:hover {
+            border-color: #d63031;
+            color: #d63031;
+            background: rgba(214, 48, 49, 0.1);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero { padding: 40px 15px 30px; }
@@ -558,7 +581,17 @@
                 <a onclick="showSection('learning')" class="active" id="nav-learning">🎯 学习目标</a>
                 <a onclick="showSection('content')" id="nav-content">📖 内容学习</a>
                 <a onclick="showSection('quiz')" id="nav-quiz">✅ 知识检查</a>
-                <a onclick="resetProgress()">🔄 重置进度</a>
+                <div class="dropdown" style="position: relative; display: inline-block;">
+                    <a onclick="toggleDropdown()" style="cursor: pointer;">🔄 重置进度 ▾</a>
+                    <div id="resetDropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 0; min-width: 180px; box-shadow: var(--shadow); z-index: 1000;">
+                        <a onclick="resetChapterProgress(1)" style="display: block; padding: 8px 16px; color: var(--text); text-decoration: none; font-size: 13px; cursor: pointer;">🇺🇸 重置第一章</a>
+                        <a onclick="resetChapterProgress(2)" style="display: block; padding: 8px 16px; color: var(--text); text-decoration: none; font-size: 13px; cursor: pointer;">🇮🇱 重置第二章</a>
+                        <a onclick="resetChapterProgress(3)" style="display: block; padding: 8px 16px; color: var(--text); text-decoration: none; font-size: 13px; cursor: pointer;">🇮🇷 重置第三章</a>
+                        <a onclick="resetChapterProgress(4)" style="display: block; padding: 8px 16px; color: var(--text); text-decoration: none; font-size: 13px; cursor: pointer;">🌍 重置第四章</a>
+                        <div style="border-top: 1px solid var(--border); margin: 4px 0;"></div>
+                        <a onclick="resetProgress()" style="display: block; padding: 8px 16px; color: #d63031; text-decoration: none; font-size: 13px; cursor: pointer;">🗑️ 重置全部进度</a>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -794,9 +827,14 @@
                     <div class="chapter-complete" id="complete-chapter1">
                         <h4>🎉 恭喜完成第一章！</h4>
                         <p>你已经掌握了美国在伊朗战争中的三大目标及其失败原因。</p>
-                        <button class="btn btn-primary" onclick="showChapter(2)" style="margin-top: 12px;">
-                            继续学习第二章 →
-                        </button>
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 12px;">
+                            <button class="btn btn-primary" onclick="showChapter(2)">
+                                继续学习第二章 →
+                            </button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(1)">
+                                🔄 重置本章
+                            </button>
+                        </div>
                     </div>
 
                     <div class="quiz-nav">
@@ -910,9 +948,14 @@
                     <div class="chapter-complete" id="complete-chapter2">
                         <h4>🎉 恭喜完成第二章！</h4>
                         <p>你已经了解了以色列在战争中的三大目标及其复杂结果。</p>
-                        <button class="btn btn-primary" onclick="showChapter(3)" style="margin-top: 12px;">
-                            继续学习第三章 →
-                        </button>
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 12px;">
+                            <button class="btn btn-primary" onclick="showChapter(3)">
+                                继续学习第三章 →
+                            </button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(2)">
+                                🔄 重置本章
+                            </button>
+                        </div>
                     </div>
 
                     <div class="quiz-nav">
@@ -1038,9 +1081,14 @@
                     <div class="chapter-complete" id="complete-chapter3">
                         <h4>🎉 恭喜完成第三章！</h4>
                         <p>你已经理解了伊朗如何在这场战争中获得了意想不到的收获。</p>
-                        <button class="btn btn-primary" onclick="showChapter(4)" style="margin-top: 12px;">
-                            继续学习第四章 →
-                        </button>
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 12px;">
+                            <button class="btn btn-primary" onclick="showChapter(4)">
+                                继续学习第四章 →
+                            </button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(3)">
+                                🔄 重置本章
+                            </button>
+                        </div>
                     </div>
 
                     <div class="quiz-nav">
@@ -1148,9 +1196,14 @@
                     <div class="chapter-complete" id="complete-chapter4">
                         <h4>🎉 恭喜完成全部学习！</h4>
                         <p>你已经全面理解了伊朗战争103天的来龙去脉及其深远影响。</p>
-                        <button class="btn btn-primary" onclick="showFinalSummary()" style="margin-top: 12px;">
-                            查看学习总结 →
-                        </button>
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 12px;">
+                            <button class="btn btn-primary" onclick="showFinalSummary()">
+                                查看学习总结 →
+                            </button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(4)">
+                                🔄 重置本章
+                            </button>
+                        </div>
                     </div>
 
                     <div class="quiz-nav">
@@ -1242,8 +1295,18 @@
                 showChapter(currentChapter || 1);
                 document.getElementById('nav-content').classList.add('active');
             } else if (section === 'quiz') {
-                showChapter(currentChapter || 1);
+                // 显示当前章节（如果没有则默认第一章）
+                const chapter = currentChapter || 1;
+                showChapter(chapter);
                 document.getElementById('nav-quiz').classList.add('active');
+
+                // 延迟滚动到测试部分
+                setTimeout(() => {
+                    const quizSection = document.querySelector(`#section-chapter${chapter} .quiz-section`);
+                    if (quizSection) {
+                        quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
             }
         }
 
@@ -1429,9 +1492,104 @@
             updateTOC();
         }
 
+        // 切换下拉菜单
+        function toggleDropdown() {
+            const dropdown = document.getElementById('resetDropdown');
+            if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('resetDropdown');
+            const dropdownBtn = event.target.closest('.dropdown');
+            if (!dropdownBtn && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // 重置单个章节进度
+        function resetChapterProgress(chapter) {
+            const chapterNames = {
+                1: '美国的战争目标',
+                2: '以色列的战略野心',
+                3: '伊朗的反击与收获',
+                4: '战争的深远影响'
+            };
+
+            if (confirm(`确定要重置「${chapterNames[chapter]}」的学习进度吗？\n\n这将清除该章节的完成状态和测试记录。`)) {
+                // 删除该章节的学习状态
+                delete readSections[chapter];
+                localStorage.setItem('iran-war-read', JSON.stringify(readSections));
+
+                // 删除该章节的测试分数
+                delete quizScores[chapter];
+                localStorage.setItem('iran-war-scores', JSON.stringify(quizScores));
+
+                // 重置该章节的测试题
+                const chapterSection = document.getElementById(`section-chapter${chapter}`);
+                if (chapterSection) {
+                    // 重置所有题目显示状态
+                    chapterSection.querySelectorAll('.question-card').forEach(card => {
+                        card.classList.remove('active');
+                    });
+
+                    // 重置所有选项状态
+                    chapterSection.querySelectorAll('.option-item').forEach(item => {
+                        item.classList.remove('selected', 'correct', 'wrong');
+                        item.style.pointerEvents = '';
+                    });
+
+                    // 重置所有反馈
+                    chapterSection.querySelectorAll('.feedback').forEach(fb => {
+                        fb.classList.remove('show');
+                    });
+
+                    // 隐藏章节完成提示
+                    const completeSection = document.getElementById(`complete-chapter${chapter}`);
+                    if (completeSection) {
+                        completeSection.classList.remove('show');
+                    }
+
+                    // 重置题目计数
+                    currentQuestion[chapter] = 1;
+                    const currentSpan = document.getElementById(`q${chapter}-current`);
+                    if (currentSpan) {
+                        currentSpan.textContent = '1';
+                    }
+
+                    // 显示第一题
+                    const firstQuestion = document.getElementById(`q${chapter}-1`);
+                    if (firstQuestion) {
+                        firstQuestion.classList.add('active');
+                    }
+
+                    // 更新按钮状态
+                    updateQuizButtons(chapter);
+                }
+
+                // 更新统计和TOC
+                updateStats();
+                updateTOC();
+
+                // 关闭下拉菜单
+                document.getElementById('resetDropdown').style.display = 'none';
+
+                // 如果当前正在查看被重置的章节，刷新显示
+                if (currentChapter === chapter) {
+                    showChapter(chapter);
+                }
+
+                alert(`✅「${chapterNames[chapter]}」的进度已重置！`);
+            }
+        }
+
         // 重置进度
         function resetProgress() {
-            if (confirm('确定要重置所有学习进度吗？这将清除所有已学习状态和测试记录。')) {
+            if (confirm('确定要重置所有学习进度吗？\n\n这将清除所有章节的学习状态和测试记录，此操作不可撤销。')) {
                 localStorage.removeItem('iran-war-read');
                 localStorage.removeItem('iran-war-scores');
                 readSections = {};
@@ -1461,6 +1619,11 @@
                 document.getElementById('q2-1').classList.add('active');
                 document.getElementById('q3-1').classList.add('active');
                 document.getElementById('q4-1').classList.add('active');
+
+                // 关闭下拉菜单
+                document.getElementById('resetDropdown').style.display = 'none';
+
+                alert('✅ 所有进度已重置！');
             }
         }
 
