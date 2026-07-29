@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简化测试版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .nav { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .nav-links { display: flex; gap: 15px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; cursor: pointer; background: #e0e0e0; border-radius: 4px; text-decoration: none; color: #333; }
+        .nav-links a:hover { background: #d0d0d0; }
+        .nav-links a.active { background: #007bff; color: white; }
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ddd; border-radius: 4px; padding: 8px 0; min-width: 180px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; }
+        .dropdown-content a { display: block; padding: 10px 16px; cursor: pointer; color: #333; background: transparent; border-radius: 0; }
+        .dropdown-content a:hover { background: #f0f0f0; }
+        .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .btn-secondary { background: #6c757d; }
+        .question { background: #f9f9f9; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .option { padding: 10px; margin: 5px 0; border: 2px solid #ddd; border-radius: 4px; cursor: pointer; }
+        .option:hover { border-color: #007bff; background: #e7f3ff; }
+        .option.correct { border-color: #28a745; background: #d4edda; }
+        .option.wrong { border-color: #dc3545; background: #f8d7da; }
+        .feedback { padding: 10px; margin-top: 10px; border-radius: 4px; display: none; }
+        .feedback.show { display: block; }
+        .feedback.correct { background: #d4edda; color: #155724; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; }
+        #output { margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 4px; min-height: 50px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 简化测试版 - 功能验证</h1>
+
+        <nav class="nav">
+            <div class="nav-links">
+                <a onclick="showSection('learning')" class="active" id="nav-learning">🎯 学习目标</a>
+                <a onclick="showSection('quiz')" id="nav-quiz">✅ 知识检查</a>
+                <div class="dropdown">
+                    <a onclick="toggleDropdown()">🔄 重置进度 ▾</a>
+                    <div id="resetDropdown" class="dropdown-content">
+                        <a onclick="resetChapter(1)">重置第一章</a>
+                        <a onclick="resetChapter(2)">重置第二章</a>
+                        <a onclick="resetAll()">重置全部</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 学习目标 -->
+        <div class="section" id="section-learning">
+            <h2>🎯 学习目标</h2>
+            <ul>
+                <li>理解伊朗战争的背景</li>
+                <li>分析三方战争目标</li>
+                <li>评估战争结果</li>
+            </ul>
+            <button class="btn" onclick="showSection('quiz')" style="margin-top: 15px;">开始测试 →</button>
+        </div>
+
+        <!-- 测试部分 -->
+        <div class="section" id="section-quiz" style="display: none;">
+            <h2>✅ 知识检查 - 第一章</h2>
+
+            <div class="question" id="q1">
+                <p><strong>问题1：</strong>美国发动伊朗战争的首要理由是什么？</p>
+                <div class="option" onclick="checkAnswer(this, 'q1', false)">A. 推翻伊朗政权</div>
+                <div class="option" onclick="checkAnswer(this, 'q1', true)">B. 阻止伊朗获得核武器</div>
+                <div class="option" onclick="checkAnswer(this, 'q1', false)">C. 控制霍尔木兹海峡</div>
+                <div class="option" onclick="checkAnswer(this, 'q1', false)">D. 保护以色列安全</div>
+                <div class="feedback" id="feedback-q1"></div>
+            </div>
+
+            <div class="question" id="q2">
+                <p><strong>问题2：</strong>根据美国情报机构的评估，战争对伊朗核计划造成了什么影响？</p>
+                <div class="option" onclick="checkAnswer(this, 'q2', false)">A. 彻底摧毁</div>
+                <div class="option" onclick="checkAnswer(this, 'q2', true)">B. 仅受到有限损害</div>
+                <div class="option" onclick="checkAnswer(this, 'q2', false)">C. 完全没有影响</div>
+                <div class="option" onclick="checkAnswer(this, 'q2', false)">D. 反而加速发展</div>
+                <div class="feedback" id="feedback-q2"></div>
+            </div>
+        </div>
+
+        <div id="output">
+            <strong>操作日志：</strong>
+            <p id="log">页面加载完成，等待操作...</p>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 'learning';
+
+        function log(message) {
+            document.getElementById('log').textContent = message;
+            console.log(message);
+        }
+
+        function showSection(section) {
+            log(`切换到: ${section}`);
+
+            // 隐藏所有部分
+            document.getElementById('section-learning').style.display = 'none';
+            document.getElementById('section-quiz').style.display = 'none';
+
+            // 显示目标部分
+            document.getElementById(`section-${section}`).style.display = 'block';
+
+            // 更新导航状态
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.getElementById(`nav-${section}`).classList.add('active');
+
+            currentSection = section;
+
+            // 如果是测试部分，滚动到顶部
+            if (section === 'quiz') {
+                document.getElementById('section-quiz').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            log(`✅ 已切换到: ${section}`);
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('resetDropdown');
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+                log('关闭下拉菜单');
+            } else {
+                dropdown.style.display = 'block';
+                log('打开下拉菜单');
+            }
+        }
+
+        function checkAnswer(element, questionId, isCorrect) {
+            // 移除之前的选择
+            const parent = element.parentElement;
+            parent.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+
+            // 标记选择
+            if (isCorrect) {
+                element.classList.add('correct');
+                showFeedback(questionId, true);
+                log(`✅ 问题${questionId.slice(1)}：回答正确！`);
+            } else {
+                element.classList.add('wrong');
+                showFeedback(questionId, false);
+
+                // 显示正确答案
+                parent.querySelectorAll('.option').forEach(opt => {
+                    if (opt.getAttribute('onclick').includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+                log(`❌ 问题${questionId.slice(1)}：回答错误`);
+            }
+
+            // 禁用进一步选择
+            parent.querySelectorAll('.option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+        }
+
+        function showFeedback(questionId, isCorrect) {
+            const feedback = document.getElementById(`feedback-${questionId}`);
+            if (isCorrect) {
+                feedback.textContent = '✅ 回答正确！';
+                feedback.className = 'feedback show correct';
+            } else {
+                feedback.textContent = '❌ 回答错误，请查看正确答案。';
+                feedback.className = 'feedback show wrong';
+            }
+        }
+
+        function resetChapter(chapter) {
+            if (confirm(`确定要重置第${chapter}章吗？`)) {
+                // 重置测试题
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('correct', 'wrong');
+                    opt.style.pointerEvents = '';
+                });
+                document.querySelectorAll('.feedback').forEach(fb => {
+                    fb.classList.remove('show');
+                });
+
+                document.getElementById('resetDropdown').style.display = 'none';
+                log(`✅ 已重置第${chapter}章`);
+                alert(`第${chapter}章已重置！`);
+            }
+        }
+
+        function resetAll() {
+            if (confirm('确定要重置全部进度吗？')) {
+                // 重置测试题
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('correct', 'wrong');
+                    opt.style.pointerEvents = '';
+                });
+                document.querySelectorAll('.feedback').forEach(fb => {
+                    fb.classList.remove('show');
+                });
+
+                document.getElementById('resetDropdown').style.display = 'none';
+                log('✅ 已重置全部进度');
+                alert('全部进度已重置！');
+            }
+        }
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('resetDropdown');
+            const dropdownBtn = event.target.closest('.dropdown');
+            if (!dropdownBtn && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        log('✅ 页面初始化完成');
+    </script>
+</body>
+</html>
