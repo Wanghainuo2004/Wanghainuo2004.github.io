@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>伊朗战争103天：深度解析 - 莫兰迪版</title>
+    <style>
+        /* 莫兰迪色系 */
+        :root {
+            --bg: #F0EBE3;
+            --card: #FFFFFF;
+            --text: #5C5350;
+            --text-secondary: #8A7F7A;
+            --accent: #9AABB8;
+            --accent-hover: #8A9CAA;
+            --accent-light: #E8EFF3;
+            --success: #A5B5A0;
+            --warning: #D4C5A5;
+            --info: #9AABB8;
+            --pink: #D4A5A5;
+            --purple: #B5A5C5;
+            --border: #E0D8D0;
+            --shadow: 0 2px 12px rgba(92, 83, 80, 0.08);
+            --radius: 12px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            /* 可爱的铅笔光标 */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="%239AABB8"/></svg>') 0 20, auto;
+        }
+        
+        a, button, .clickable, .option-item, .toc-link, .btn, .nav-links a {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="%23D4A5A5" opacity="0.8"/><circle cx="12" cy="12" r="4" fill="white"/></svg>') 10 10, pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #D4A5A5 0%, #B5A5C5 50%, #9AABB8 100%);
+            color: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            margin-bottom: 16px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        .hero-description {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 15px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pink), var(--accent), var(--purple));
+            z-index: 1000;
+            transition: width 0.3s;
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        .sidebar-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .sidebar-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Stats */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* TOC */
+        .toc-list {
+            list-style: none;
+        }
+        .toc-item {
+            margin-bottom: 6px;
+        }
+        .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .toc-link:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        .toc-link.completed {
+            background: rgba(165, 181, 160, 0.2);
+            color: var(--success);
+        }
+        .toc-icon {
+            font-size: 20px;
+        }
+        .toc-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .content {
+            min-width: 0;
+        }
+
+        /* Chapter Section */
+        .chapter-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--accent);
+        }
+        .chapter-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .chapter-title {
+            font-size: 22px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .chapter-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Knowledge Card */
+        .knowledge-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .knowledge-card:last-child {
+            margin-bottom: 0;
+        }
+        .conclusion {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(181, 165, 197, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-left: 4px solid var(--pink);
+        }
+        .conclusion-icon {
+            font-size: 22px;
+        }
+        .explanation {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text);
+            margin-bottom: 16px;
+            padding-left: 16px;
+        }
+        .examples {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding-left: 16px;
+        }
+        .examples strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .example-item {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .example-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-top: 28px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--warning);
+        }
+        .quiz-header {
+            margin-bottom: 24px;
+        }
+        .quiz-header h3 {
+            font-size: 20px;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .quiz-progress {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .question-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            display: none;
+            border: 1px solid var(--border);
+        }
+        .question-card.active {
+            display: block;
+        }
+        .question-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+        .options-list {
+            list-style: none;
+        }
+        .option-item {
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .option-item:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            transform: translateX(4px);
+        }
+        .option-item.selected {
+            border-color: var(--info);
+            background: rgba(154, 171, 184, 0.15);
+        }
+        .option-item.correct {
+            border-color: var(--success);
+            background: rgba(165, 181, 160, 0.2);
+        }
+        .option-item.wrong {
+            border-color: var(--pink);
+            background: rgba(212, 165, 165, 0.2);
+        }
+
+        .feedback {
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .feedback.correct {
+            background: rgba(165, 181, 160, 0.2);
+            border: 1px solid var(--success);
+            color: #5a7a52;
+        }
+        .feedback.wrong {
+            background: rgba(212, 165, 165, 0.2);
+            border: 1px solid var(--pink);
+            color: #8a5a5a;
+        }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Chapter Complete */
+        .chapter-complete {
+            background: linear-gradient(135deg, var(--success), #8fa889);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 24px;
+            display: none;
+        }
+        .chapter-complete.show {
+            display: block;
+        }
+        .chapter-complete h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .chapter-complete p {
+            font-size: 14px;
+            opacity: 0.95;
+            margin-bottom: 16px;
+        }
+
+        /* Reset Button */
+        .reset-chapter-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-chapter-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 0;
+            min-width: 180px;
+            box-shadow: 0 8px 24px rgba(92, 83, 80, 0.15);
+            z-index: 1000;
+            margin-top: 8px;
+        }
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: transparent;
+            border-radius: 0;
+        }
+        .dropdown-content a:hover {
+            background: var(--bg);
+        }
+        .dropdown-content a.danger {
+            color: var(--pink);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .knowledge-card, .quiz-section {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero { padding: 40px 15px 30px; }
+            .nav-inner { flex-direction: column; align-items: stretch; }
+            .nav-links { justify-content: center; }
+            .chapter-section { padding: 20px; }
+            .knowledge-card { padding: 18px; }
+            .quiz-section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <h1>🎓 伊朗战争103天：深度解析</h1>
+        <div class="hero-meta">
+            <span>📺 YouTube视频</span>
+            <span>⏱️ 约22分钟</span>
+            <span>📚 4个章节</span>
+            <span>🎯 12个知识点</span>
+            <span>📝 15道测试题</span>
+        </div>
+        <p class="hero-description">
+            本视频深度解析了持续103天的伊朗战争，涵盖美国、以色列和伊朗三方的战争目标、实际成果以及对全球地缘政治的深远影响。
+        </p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-links">
+                <a onclick="showSection('learning')" class="active" id="nav-learning">🎯 学习目标</a>
+                <a onclick="showSection('content')" id="nav-content">📖 内容学习</a>
+                <a onclick="showSection('quiz')" id="nav-quiz">✅ 知识检查</a>
+                <div class="dropdown">
+                    <a onclick="toggleDropdown()">🔄 重置进度 ▾</a>
+                    <div id="resetDropdown" class="dropdown-content">
+                        <a onclick="resetChapterProgress(1)">🇺🇸 重置第一章</a>
+                        <a onclick="resetChapterProgress(2)">🇮🇱 重置第二章</a>
+                        <a onclick="resetChapterProgress(3)">🇮🇷 重置第三章</a>
+                        <a onclick="resetChapterProgress(4)">🌍 重置第四章</a>
+                        <a onclick="resetProgress()" class="danger">🗑️ 重置全部进度</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3>📊 学习进度</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="readCount">0</div>
+                        <div class="stat-label">已学习</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="quizScore">0</div>
+                        <div class="stat-label">测试得分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">总知识点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">总测试题</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>📑 章节导航</h3>
+                <ul class="toc-list">
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(0)" id="toc-0">
+                            <span class="toc-icon">📋</span>
+                            <span class="toc-text">学习目标与导读</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(1)" id="toc-1">
+                            <span class="toc-icon">🇺🇸</span>
+                            <span class="toc-text">美国的战争目标</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(2)" id="toc-2">
+                            <span class="toc-icon">🇮🇱</span>
+                            <span class="toc-text">以色列的战略野心</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(3)" id="toc-3">
+                            <span class="toc-icon">🇮🇷</span>
+                            <span class="toc-text">伊朗的反击与收获</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(4)" id="toc-4">
+                            <span class="toc-icon">🌍</span>
+                            <span class="toc-text">战争的深远影响</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="content" id="content">
+            <!-- Learning Objectives -->
+            <section id="section-learning" class="chapter-section">
+                <div style="background: linear-gradient(135deg, rgba(165, 181, 160, 0.2), rgba(154, 171, 184, 0.2)); padding: 24px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid var(--success);">
+                    <h2 style="color: var(--success); margin-bottom: 16px; font-size: 20px;">🎯 学习目标</h2>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">学完本视频，你将能够：</p>
+                    <ul style="list-style: none;">
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            理解伊朗战争的根本原因和历史背景
+                        </li>
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            分析美国、以色列、伊朗三方的战争目标与实际成果
+                        </li>
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            评估和平协议的具体内容及其对各方的影响
+                        </li>
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            掌握霍尔木兹海峡在全球能源格局中的战略地位
+                        </li>
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            预测这场战争对中东地缘政治的长期影响
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(154, 171, 184, 0.2), rgba(181, 165, 197, 0.2)); padding: 24px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid var(--accent);">
+                    <h2 style="color: var(--accent); margin-bottom: 12px; font-size: 20px;">📝 1分钟导读</h2>
+                    <p style="font-size: 15px; line-height: 1.8; color: var(--text);">
+                        这场持续103天的伊朗战争是近年来中东地区最重大的地缘政治事件。美国和以色列联合对伊朗发动军事攻击，
+                        试图摧毁其核计划和导弹能力，但最终的和平协议却出人意料——美国不仅未能实现其核心目标，反而向伊朗提供了
+                        大规模经济援助。视频通过详细分析三方的战争目标与实际成果，揭示了这场战争如何重塑了中东权力格局。
+                    </p>
+                </div>
+
+                <button class="btn btn-primary" onclick="startLearning()" style="width: 100%;">
+                    开始学习第一章 →
+                </button>
+            </section>
+
+            <!-- Chapter 1 -->
+            <section id="section-chapter1" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">🇺🇸 第一章：美国的战争目标</h2>
+                    <p class="chapter-meta">4个知识点 · 4道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>美国的首要目标是摧毁伊朗核计划，但最终结果是承认伊朗核计划的现状</span>
+                    </div>
+                    <div class="explanation">
+                        特朗普将阻止伊朗获得核武器作为发动战争的首要理由，承诺"彻底摧毁"伊朗的核设施。
+                        然而，美国情报机构的报告显示，战争对伊朗核计划造成的损害有限，伊朗制造核武器的时间表并未改变。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">和平协议第八条：伊朗重申不获取或发展核武器（但这已是伊朗十多年来的官方立场）</div>
+                        <div class="example-item">第九条：在最终协议达成前，伊朗将维持其核计划现状</div>
+                        <div class="example-item">美国情报评估：伊朗核计划仅受到"有限损害"</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>摧毁伊朗导弹能力的目标完全失败，特朗普最终承认伊朗有权拥有导弹</span>
+                    </div>
+                    <div class="explanation">
+                        美国在战争初期高调宣布要"彻底摧毁伊朗的导弹和导弹产业"，但战争期间伊朗持续发射导弹。
+                        更关键的是，特朗普在战后表态出现180度大转弯，承认伊朗作为主权国家拥有防御性武器的合理性。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">特朗普战后发言："如果其他国家都有导弹，他们没有一些是不公平的"</div>
+                        <div class="example-item">这标志着美国十多年来对伊朗"零导弹"政策的彻底放弃</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>"委内瑞拉模式"的政权更迭计划完全失败，伊朗反而获得了大规模经济援助</span>
+                    </div>
+                    <div class="explanation">
+                        特朗普多次表示要像对待委内瑞拉那样对待伊朗：除掉领导人，扶植亲美政权。
+                        然而，和平协议反而向伊朗提供了数百亿美元的经济援助。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">美国解除对伊朗石油出口的制裁：每年为伊朗带来600亿美元收入</div>
+                        <div class="example-item">解冻伊朗在海外被冻结的资产：500-1000亿美元</div>
+                        <div class="example-item">视频评价："伊朗对我们进行了委内瑞拉式操作"</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>美国战争目标的全面失败：三大核心目标均未实现</span>
+                    </div>
+                    <div class="explanation">
+                        视频对美国战争目标的评估结果是：三个核心目标全部失败。
+                        摧毁核计划——失败；摧毁导弹——失败；政权更迭——失败。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 评分总结：</strong>
+                        <div class="example-item">目标1 摧毁核计划：❌ 失败</div>
+                        <div class="example-item">目标2 摧毁导弹：❌ 失败</div>
+                        <div class="example-item">目标3 政权更迭：❌ 失败</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第一章</h3>
+                        <p class="quiz-progress">问题 <span id="q1-current">1</span>/4</p>
+                    </div>
+
+                    <div class="question-card active" id="q1-1">
+                        <p class="question-text">1. 美国发动伊朗战争的首要理由是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">A. 推翻伊朗政权</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', true)">B. 阻止伊朗获得核武器</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">C. 控制霍尔木兹海峡</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">D. 保护以色列安全</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q1-2">
+                        <p class="question-text">2. 根据美国情报机构的评估，战争对伊朗核计划造成了什么影响？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">A. 彻底摧毁，无法恢复</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', true)">B. 仅受到有限损害</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">C. 完全没有影响</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">D. 反而加速了发展</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q1-3">
+                        <p class="question-text">3. 特朗普在战后对伊朗导弹问题的立场发生了什么变化？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">A. 继续坚持零导弹政策</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', true)">B. 承认伊朗有权拥有导弹</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">C. 要求伊朗减少导弹数量</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">D. 将问题留给下一任总统</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q1-4">
+                        <p class="question-text">4. 和平协议中，美国向伊朗提供了哪些经济援助？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">A. 仅解除石油出口制裁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">B. 仅解冻被冻结资产</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">C. 仅提供重建援助</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', true)">D. 以上全部</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-4"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter1">
+                        <h4>🎉 恭喜完成第一章！</h4>
+                        <p>你已经掌握了美国在伊朗战争中的三大目标及其失败原因。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(2)">继续学习第二章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(1)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q1-prev" onclick="prevQuestion(1)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q1-next" onclick="nextQuestion(1)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 2 -->
+            <section id="section-chapter2" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">🇮🇱 第二章：以色列的战略野心</h2>
+                    <p class="chapter-meta">3个知识点 · 3道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>以色列的首要目标是政权更迭，但伊朗政府不仅存活下来，还证明了自己能承受美国的攻击</span>
+                    </div>
+                    <div class="explanation">
+                        内塔尼亚胡几十年来一直试图说服美国帮助推翻伊朗政府。然而，伊朗政府不仅生存下来，还通过承受战争证明了自己的韧性。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">特朗普战后评价伊朗领导人："非常理性的人，强大、聪明"</div>
+                        <div class="example-item">伊朗证明：即使面对核超级大国的攻击，也能生存下来</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>以色列利用战争作掩护，成功占领黎巴嫩南部，但面临国际压力</span>
+                    </div>
+                    <div class="explanation">
+                        以色列的第二个目标是占领黎巴嫩南部，建立所谓的"安全区"。目前以色列已经控制了面积为加沙两倍的区域。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">以色列占领区：黎巴嫩南部利塔尼河以南，面积是加沙的两倍</div>
+                        <div class="example-item">和平协议第一条明确提到"包括在黎巴嫩的军事行动终止"</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>战争未能拯救内塔尼亚胡的政治前途，反而加速了其政治危机</span>
+                    </div>
+                    <div class="explanation">
+                        内塔尼亚胡面临腐败指控，可能入狱。民调显示大多数以色列人认为战争损害了国家利益。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">52%的以色列人认为内塔尼亚胡的行为损害了国家利益</div>
+                        <div class="example-item">59%的以色列人认为内塔尼亚胡不应再次参选</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第二章</h3>
+                        <p class="quiz-progress">问题 <span id="q2-current">1</span>/3</p>
+                    </div>
+
+                    <div class="question-card active" id="q2-1">
+                        <p class="question-text">1. 以色列在这场战争中占领了哪个地区？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">A. 加沙地带</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', true)">B. 黎巴嫩南部</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">C. 叙利亚戈兰高地</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">D. 约旦河西岸</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q2-2">
+                        <p class="question-text">2. 根据民调，多少以色列人认为内塔尼亚胡不应再次参选？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">A. 33%</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">B. 43%</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', true)">C. 59%</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">D. 52%</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q2-3">
+                        <p class="question-text">3. 和平协议中哪一条款对以色列的黎巴嫩占领构成挑战？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', true)">A. 第一条：终止包括在黎巴嫩的军事行动</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">B. 第八条：伊朗核计划条款</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">C. 第十条：石油出口制裁解除</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">D. 第十一条：资产解冻条款</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-3"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter2">
+                        <h4>🎉 恭喜完成第二章！</h4>
+                        <p>你已经了解了以色列在战争中的三大目标及其复杂结果。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(3)">继续学习第三章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(2)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q2-prev" onclick="prevQuestion(2)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q2-next" onclick="nextQuestion(2)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 3 -->
+            <section id="section-chapter3" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">🇮🇷 第三章：伊朗的反击与收获</h2>
+                    <p class="chapter-meta">3个知识点 · 4道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>伊朗的首要目标是生存并获得重建资金，通过和平协议获得了大规模经济援助</span>
+                    </div>
+                    <div class="explanation">
+                        通过和平协议，伊朗不仅获得了石油出口解冻（每年600亿美元），还可能解冻500-1000亿美元的海外资产。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">石油出口解冻：每年600亿美元收入</div>
+                        <div class="example-item">解冻资产：500-1000亿美元</div>
+                        <div class="example-item">重建援助承诺：至少3000亿美元（需达成核协议）</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>伊朗通过控制霍尔木兹海峡，正在将其转化为自己的领土并收取通行费</span>
+                    </div>
+                    <div class="explanation">
+                        战前，霍尔木兹海峡是完全开放的国际水道。现在伊朗正在重新开放海峡，但保留控制权，要求所有船只支付通行费。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">霍尔木兹海峡：全球20%的石油和天然气供应通过此处</div>
+                        <div class="example-item">伊朗正在测试收取通行费，如果成功，将证明海峡已成为其领土</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>伊朗成功建立了对美国的威慑，证明了攻击伊朗的代价是美国无法承受的</span>
+                    </div>
+                    <div class="explanation">
+                        伊朗通过给美国造成足够的损失，希望阻止未来的攻击。视频分析认为，伊朗可能已经成功实现了这一目标。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">伊朗证明：即使面对核超级大国的攻击，也能生存并反击</div>
+                        <div class="example-item">美国被迫签署对其不利的和平协议</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第三章</h3>
+                        <p class="quiz-progress">问题 <span id="q3-current">1</span>/4</p>
+                    </div>
+
+                    <div class="question-card active" id="q3-1">
+                        <p class="question-text">1. 伊朗通过和平协议获得的石油出口收入是多少？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">A. 每年100亿美元</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">B. 每年300亿美元</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', true)">C. 每年600亿美元</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">D. 每年1000亿美元</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q3-2">
+                        <p class="question-text">2. 战前霍尔木兹海峡是什么性质？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', true)">A. 完全开放的国际水道</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">B. 伊朗控制的封闭水域</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">C. 美国控制的军事区域</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">D. 联合国管理的国际区域</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q3-3">
+                        <p class="question-text">3. 伊朗现在对霍尔木兹海峡采取什么政策？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-3', false)">A. 完全开放，不收取任何费用</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-3', false)">B. 继续关闭，禁止通行</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-3', true)">C. 开放但收取通行费</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-3', false)">D. 交给联合国管理</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q3-4">
+                        <p class="question-text">4. 伊朗的"威慑目标"是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-4', false)">A. 摧毁美国的军事基地</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-4', false)">B. 入侵以色列</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-4', true)">C. 让美国认识到攻击伊朗不符合其利益</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-4', false)">D. 获得核武器</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-4"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter3">
+                        <h4>🎉 恭喜完成第三章！</h4>
+                        <p>你已经理解了伊朗如何在这场战争中获得了意想不到的收获。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(4)">继续学习第四章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(3)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q3-prev" onclick="prevQuestion(3)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q3-next" onclick="nextQuestion(3)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 4 -->
+            <section id="section-chapter4" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">🌍 第四章：战争的深远影响</h2>
+                    <p class="chapter-meta">2个知识点 · 4道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>这场战争可能标志着美国在中东影响力的转折点</span>
+                    </div>
+                    <div class="explanation">
+                        美国在这场战争中的失败可能标志着其在中东地区影响力的衰退。未能实现任何一个核心目标，反而被迫签署对其不利的和平协议。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">美国三大战争目标全部失败</div>
+                        <div class="example-item">被迫向伊朗提供大规模经济援助</div>
+                        <div class="example-item">特朗普对伊朗领导人的评价从"邪恶"变为"理性、聪明"</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>伊朗通过这场战争确立了地区强国地位，可能引发中东权力格局重组</span>
+                    </div>
+                    <div class="explanation">
+                        伊朗不仅生存下来，还获得了大规模经济援助和战略优势（控制霍尔木兹海峡），成为中东地区更加强大的玩家。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">伊朗获得每年600亿美元石油收入</div>
+                        <div class="example-item">控制霍尔木兹海峡，掌握全球能源命脉</div>
+                        <div class="example-item">证明了能承受核超级大国的攻击</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第四章</h3>
+                        <p class="quiz-progress">问题 <span id="q4-current">1</span>/4</p>
+                    </div>
+
+                    <div class="question-card active" id="q4-1">
+                        <p class="question-text">1. 这场战争对美国在中东的影响力意味着什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">A. 增强了美国的影响力</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', true)">B. 可能是影响力的转折点</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">C. 没有任何影响</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">D. 只影响了伊朗一个国家</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q4-2">
+                        <p class="question-text">2. 伊朗通过这场战争获得了什么战略优势？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">A. 核武器</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">B. 美国的军事基地</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', true)">C. 控制霍尔木兹海峡</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">D. 以色列的领土</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q4-3">
+                        <p class="question-text">3. 特朗普对伊朗领导人的评价发生了什么变化？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-3', false)">A. 没有变化</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-3', false)">B. 从"理性"变为"邪恶"</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-3', true)">C. 从"邪恶"变为"理性、聪明"</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-3', false)">D. 从"强大"变为"软弱"</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q4-4">
+                        <p class="question-text">4. 视频认为这场战争对中东地区的主要影响是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-4', false)">A. 实现了地区和平</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-4', false)">B. 没有任何改变</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-4', true)">C. 可能引发权力格局重组</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-4', false)">D. 只影响了伊朗和美国的关系</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-4"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter4">
+                        <h4>🎉 恭喜完成全部学习！</h4>
+                        <p>你已经全面理解了伊朗战争103天的来龙去脉及其深远影响。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showFinalSummary()">查看学习总结 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(4)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q4-prev" onclick="prevQuestion(4)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q4-next" onclick="nextQuestion(4)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Final Summary -->
+            <section id="section-summary" class="chapter-section" style="display: none;">
+                <div style="background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(181, 165, 197, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid var(--pink);">
+                    <h2 style="color: var(--pink); margin-bottom: 16px; font-size: 22px;">🎓 学习总结</h2>
+                    <p style="font-size: 15px; line-height: 1.8; margin-bottom: 20px;">
+                        恭喜你完成了《伊朗战争103天：深度解析》的全部学习内容！
+                    </p>
+                    <h3 style="font-size: 18px; margin: 20px 0 12px;">📊 知识框架回顾</h3>
+                    <ul style="list-style: none; font-size: 15px;">
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>🇺🇸 美国：</strong>三大目标全部失败，被迫签署对其不利的和平协议
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>🇮🇱 以色列：</strong>占领黎巴嫩南部，但政权更迭失败，内塔尼亚胡面临政治危机
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>🇮🇷 伊朗：</strong>生存下来并获得大规模经济援助，控制霍尔木兹海峡，建立威慑
+                        </li>
+                        <li style="padding: 10px 0;">
+                            <strong>🌍 全球：</strong>中东权力格局可能重组，美国影响力面临转折点
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(154, 171, 184, 0.2), rgba(181, 165, 197, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid var(--accent);">
+                    <h2 style="color: var(--accent); margin-bottom: 12px; font-size: 20px;">💡 核心洞察</h2>
+                    <p style="font-size: 15px; line-height: 1.8;">
+                        这场战争的最大讽刺在于：美国发动战争时声称要"摧毁"伊朗的核计划和导弹能力，
+                        但最终的和平协议却正式承认了伊朗核计划的现状，并承认伊朗有权拥有导弹。
+                        更令人意外的是，美国不仅未能实现任何一个核心目标，
+                        反而向伊朗提供了数千亿美元的经济援助。
+                        <br><br>
+                        这场战争可能标志着美国在中东地区影响力的历史性转折点，
+                        同时确立了伊朗作为地区强国的地位。
+                    </p>
+                </div>
+
+                <button class="btn btn-primary" onclick="resetProgress()" style="width: 100%;">
+                    🔄 重新学习
+                </button>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>📚 莫兰迪学习站 · 优雅学习 · 2026</p>
+    </footer>
+
+    <script>
+        let currentChapter = 0;
+        let currentQuestion = {1: 1, 2: 1, 3: 1, 4: 1};
+        let readSections = JSON.parse(localStorage.getItem('iran-war-read') || '{}');
+        let quizScores = JSON.parse(localStorage.getItem('iran-war-scores') || '{}');
+
+        function init() {
+            updateStats();
+            restoreProgress();
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.chapter-section').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+
+            if (section === 'learning') {
+                document.getElementById('section-learning').style.display = 'block';
+                document.getElementById('nav-learning').classList.add('active');
+            } else if (section === 'content') {
+                showChapter(currentChapter || 1);
+                document.getElementById('nav-content').classList.add('active');
+            } else if (section === 'quiz') {
+                const chapter = currentChapter || 1;
+                showChapter(chapter);
+                document.getElementById('nav-quiz').classList.add('active');
+                setTimeout(() => {
+                    const quizSection = document.querySelector(`#section-chapter${chapter} .quiz-section`);
+                    if (quizSection) {
+                        quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            }
+        }
+
+        function startLearning() {
+            showChapter(1);
+            document.getElementById('nav-content').classList.add('active');
+            document.getElementById('nav-learning').classList.remove('active');
+        }
+
+        function showChapter(chapterNum) {
+            currentChapter = chapterNum;
+            document.querySelectorAll('.chapter-section').forEach(el => {
+                el.style.display = 'none';
+            });
+            const sectionId = chapterNum === 0 ? 'section-learning' :
+                             chapterNum === 5 ? 'section-summary' :
+                             `section-chapter${chapterNum}`;
+            document.getElementById(sectionId).style.display = 'block';
+            updateTOC();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (chapterNum > 0 && chapterNum < 5) {
+                readSections[chapterNum] = true;
+                localStorage.setItem('iran-war-read', JSON.stringify(readSections));
+                updateStats();
+            }
+        }
+
+        function showFinalSummary() {
+            showChapter(5);
+        }
+
+        function scrollToChapter(chapterNum) {
+            showChapter(chapterNum);
+        }
+
+        function updateTOC() {
+            for (let i = 0; i <= 4; i++) {
+                const toc = document.getElementById(`toc-${i}`);
+                if (toc) {
+                    if (readSections[i]) {
+                        toc.classList.add('completed');
+                    } else {
+                        toc.classList.remove('completed');
+                    }
+                    if (i === currentChapter) {
+                        toc.style.background = 'var(--accent-light)';
+                    } else {
+                        toc.style.background = '';
+                    }
+                }
+            }
+        }
+
+        function selectOption(element, questionId, isCorrect) {
+            const parent = element.parentElement;
+            parent.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected', 'correct', 'wrong');
+            });
+            element.classList.add('selected');
+            if (isCorrect) {
+                element.classList.add('correct');
+                showFeedback(questionId, true);
+            } else {
+                element.classList.add('wrong');
+                showFeedback(questionId, false);
+                parent.querySelectorAll('.option-item').forEach(item => {
+                    if (item.getAttribute('onclick').includes('true')) {
+                        item.classList.add('correct');
+                    }
+                });
+            }
+            parent.querySelectorAll('.option-item').forEach(item => {
+                item.style.pointerEvents = 'none';
+            });
+            const chapter = questionId.split('-')[0].replace('q', '');
+            if (!quizScores[chapter]) quizScores[chapter] = {correct: 0, total: 0};
+            quizScores[chapter].total++;
+            if (isCorrect) quizScores[chapter].correct++;
+            localStorage.setItem('iran-war-scores', JSON.stringify(quizScores));
+            updateStats();
+        }
+
+        function showFeedback(questionId, isCorrect) {
+            const feedback = document.getElementById(`feedback-${questionId}`);
+            if (isCorrect) {
+                feedback.textContent = '✅ 回答正确！你已经掌握了这个知识点。';
+                feedback.className = 'feedback show correct';
+            } else {
+                feedback.textContent = '❌ 回答错误。请查看上方的正确答案。';
+                feedback.className = 'feedback show wrong';
+            }
+        }
+
+        function nextQuestion(chapter) {
+            const maxQuestions = {1: 4, 2: 3, 3: 4, 4: 4};
+            if (currentQuestion[chapter] < maxQuestions[chapter]) {
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.remove('active');
+                currentQuestion[chapter]++;
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.add('active');
+                document.getElementById(`q${chapter}-current`).textContent = currentQuestion[chapter];
+                updateQuizButtons(chapter);
+            } else {
+                document.getElementById(`complete-chapter${chapter}`).classList.add('show');
+            }
+        }
+
+        function prevQuestion(chapter) {
+            if (currentQuestion[chapter] > 1) {
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.remove('active');
+                currentQuestion[chapter]--;
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.add('active');
+                document.getElementById(`q${chapter}-current`).textContent = currentQuestion[chapter];
+                updateQuizButtons(chapter);
+            }
+        }
+
+        function updateQuizButtons(chapter) {
+            const maxQuestions = {1: 4, 2: 3, 3: 4, 4: 4};
+            const prevBtn = document.getElementById(`q${chapter}-prev`);
+            const nextBtn = document.getElementById(`q${chapter}-next`);
+            prevBtn.disabled = currentQuestion[chapter] === 1;
+            if (currentQuestion[chapter] === maxQuestions[chapter]) {
+                nextBtn.textContent = '完成 ✓';
+            } else {
+                nextBtn.textContent = '下一题 →';
+            }
+        }
+
+        function updateStats() {
+            const readCount = Object.keys(readSections).length;
+            document.getElementById('readCount').textContent = readCount;
+            let totalCorrect = 0;
+            Object.values(quizScores).forEach(score => {
+                totalCorrect += score.correct;
+            });
+            document.getElementById('quizScore').textContent = totalCorrect;
+        }
+
+        function restoreProgress() {
+            updateTOC();
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('resetDropdown');
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                dropdown.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('resetDropdown');
+            const dropdownBtn = event.target.closest('.dropdown');
+            if (!dropdownBtn && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        function resetChapterProgress(chapter) {
+            const chapterNames = {
+                1: '美国的战争目标',
+                2: '以色列的战略野心',
+                3: '伊朗的反击与收获',
+                4: '战争的深远影响'
+            };
+            if (confirm(`确定要重置「${chapterNames[chapter]}」吗？`)) {
+                delete readSections[chapter];
+                localStorage.setItem('iran-war-read', JSON.stringify(readSections));
+                delete quizScores[chapter];
+                localStorage.setItem('iran-war-scores', JSON.stringify(quizScores));
+                
+                const chapterSection = document.getElementById(`section-chapter${chapter}`);
+                if (chapterSection) {
+                    chapterSection.querySelectorAll('.question-card').forEach(card => {
+                        card.classList.remove('active');
+                    });
+                    chapterSection.querySelectorAll('.option-item').forEach(item => {
+                        item.classList.remove('selected', 'correct', 'wrong');
+                        item.style.pointerEvents = '';
+                    });
+                    chapterSection.querySelectorAll('.feedback').forEach(fb => {
+                        fb.classList.remove('show');
+                    });
+                    const completeSection = document.getElementById(`complete-chapter${chapter}`);
+                    if (completeSection) {
+                        completeSection.classList.remove('show');
+                    }
+                    currentQuestion[chapter] = 1;
+                    const currentSpan = document.getElementById(`q${chapter}-current`);
+                    if (currentSpan) {
+                        currentSpan.textContent = '1';
+                    }
+                    const firstQuestion = document.getElementById(`q${chapter}-1`);
+                    if (firstQuestion) {
+                        firstQuestion.classList.add('active');
+                    }
+                    updateQuizButtons(chapter);
+                }
+                updateStats();
+                updateTOC();
+                document.getElementById('resetDropdown').style.display = 'none';
+                if (currentChapter === chapter) {
+                    showChapter(chapter);
+                }
+                alert(`✅「${chapterNames[chapter]}」已重置！`);
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('确定要重置所有学习进度吗？')) {
+                localStorage.removeItem('iran-war-read');
+                localStorage.removeItem('iran-war-scores');
+                readSections = {};
+                quizScores = {};
+                currentChapter = 0;
+                currentQuestion = {1: 1, 2: 1, 3: 1, 4: 1};
+                updateStats();
+                showSection('learning');
+                document.querySelectorAll('.question-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                document.querySelectorAll('.option-item').forEach(item => {
+                    item.classList.remove('selected', 'correct', 'wrong');
+                    item.style.pointerEvents = '';
+                });
+                document.querySelectorAll('.feedback').forEach(fb => {
+                    fb.classList.remove('show');
+                });
+                document.querySelectorAll('.chapter-complete').forEach(cc => {
+                    cc.classList.remove('show');
+                });
+                document.getElementById('q1-1').classList.add('active');
+                document.getElementById('q2-1').classList.add('active');
+                document.getElementById('q3-1').classList.add('active');
+                document.getElementById('q4-1').classList.add('active');
+                document.getElementById('resetDropdown').style.display = 'none';
+                alert('✅ 所有进度已重置！');
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+
+        init();
+    </script>
+</body>
+</html>
