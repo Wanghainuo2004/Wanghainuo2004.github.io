@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习小站 - 伊朗战争深度解析</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 莫兰迪色系变量 */
+        :root {
+            --morandi-pink: #D4A5A5;
+            --morandi-blue: #9AABB8;
+            --morandi-green: #A5B5A0;
+            --morandi-yellow: #D4C5A5;
+            --morandi-purple: #B5A5C5;
+            --morandi-orange: #D4B5A5;
+            --morandi-gray: #B0A8A0;
+            --morandi-dark: #5C5350;
+            --morandi-light: #F5F0EB;
+            --morandi-white: #FAF8F5;
+            --morandi-bg: #F0EBE3;
+            --morandi-card: #FFFFFF;
+            --morandi-shadow: rgba(92, 83, 80, 0.08);
+            --morandi-shadow-hover: rgba(92, 83, 80, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--morandi-bg);
+            color: var(--morandi-dark);
+            min-height: 100vh;
+            padding: 20px;
+            /* 可爱的铅笔光标 */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="%23D4A5A5"/></svg>') 0 24, auto;
+        }
+
+        a, button, .clickable {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%239AABB8" opacity="0.8"/><path d="M12 6v6l4 2" stroke="white" stroke-width="2" fill="none"/></svg>') 12 12, pointer;
+        }
+
+        /* 头部区域 */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--morandi-pink) 0%, var(--morandi-blue) 100%);
+            border-radius: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        .header h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-emoji {
+            font-size: 48px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Bento Grid 布局 */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 900px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Bento 卡片基础样式 */
+        .bento-card {
+            background: var(--morandi-card);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 12px var(--morandi-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--morandi-shadow-hover);
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* 不同颜色的卡片 */
+        .card-pink::before { background: var(--morandi-pink); }
+        .card-blue::before { background: var(--morandi-blue); }
+        .card-green::before { background: var(--morandi-green); }
+        .card-yellow::before { background: var(--morandi-yellow); }
+        .card-purple::before { background: var(--morandi-purple); }
+        .card-orange::before { background: var(--morandi-orange); }
+
+        /* 特殊尺寸卡片 */
+        .span-2 { grid-column: span 2; }
+        .span-3 { grid-column: span 3; }
+        .span-4 { grid-column: span 4; }
+        .row-2 { grid-row: span 2; }
+
+        /* 导航卡片 */
+        .nav-card {
+            grid-column: span 4;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        @media (max-width: 900px) {
+            .nav-card { grid-column: span 2; }
+        }
+
+        @media (max-width: 500px) {
+            .nav-card { grid-column: span 1; }
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--morandi-light);
+            color: var(--morandi-dark);
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-btn.active {
+            background: var(--morandi-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(154, 171, 184, 0.4);
+        }
+
+        /* 学习目标卡片 */
+        .objectives-card {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 500px) {
+            .objectives-card { grid-column: span 1; }
+        }
+
+        .objectives-card h3 {
+            font-size: 18px;
+            color: var(--morandi-green);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .objectives-list {
+            list-style: none;
+        }
+
+        .objectives-list li {
+            padding: 10px 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 14px;
+            color: var(--morandi-dark);
+            border-bottom: 1px dashed var(--morandi-light);
+        }
+
+        .objectives-list li:last-child {
+            border-bottom: none;
+        }
+
+        .objectives-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--morandi-green);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* 导读卡片 */
+        .summary-card {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 500px) {
+            .summary-card { grid-column: span 1; }
+        }
+
+        .summary-card h3 {
+            font-size: 18px;
+            color: var(--morandi-blue);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--morandi-dark);
+            opacity: 0.9;
+        }
+
+        /* 章节导航卡片 */
+        .chapter-nav-card {
+            grid-column: span 4;
+        }
+
+        @media (max-width: 900px) {
+            .chapter-nav-card { grid-column: span 2; }
+        }
+
+        @media (max-width: 500px) {
+            .chapter-nav-card { grid-column: span 1; }
+        }
+
+        .chapter-nav-card h3 {
+            font-size: 18px;
+            color: var(--morandi-purple);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .chapter-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 500px) {
+            .chapter-grid { grid-template-columns: 1fr; }
+        }
+
+        .chapter-item {
+            background: var(--morandi-light);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .chapter-item:hover {
+            background: var(--morandi-white);
+            transform: scale(1.02);
+        }
+
+        .chapter-item.active {
+            background: var(--morandi-blue);
+            color: white;
+        }
+
+        .chapter-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .chapter-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .chapter-meta {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* 测试题卡片 */
+        .quiz-card {
+            grid-column: span 3;
+        }
+
+        @media (max-width: 900px) {
+            .quiz-card { grid-column: span 2; }
+        }
+
+        @media (max-width: 500px) {
+            .quiz-card { grid-column: span 1; }
+        }
+
+        .quiz-card h3 {
+            font-size: 18px;
+            color: var(--morandi-orange);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question {
+            background: var(--morandi-light);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .question-text {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--morandi-dark);
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            background: var(--morandi-card);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .option-item:hover {
+            border-color: var(--morandi-blue);
+            transform: translateX(4px);
+        }
+
+        .option-item.selected {
+            border-color: var(--morandi-blue);
+            background: rgba(154, 171, 184, 0.1);
+        }
+
+        .option-item.correct {
+            border-color: var(--morandi-green);
+            background: rgba(165, 181, 160, 0.2);
+        }
+
+        .option-item.wrong {
+            border-color: var(--morandi-pink);
+            background: rgba(212, 165, 165, 0.2);
+        }
+
+        .feedback {
+            padding: 14px;
+            border-radius: 12px;
+            margin-top: 12px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .feedback.show { display: block; }
+        .feedback.correct {
+            background: rgba(165, 181, 160, 0.2);
+            color: #5a7a52;
+        }
+        .feedback.wrong {
+            background: rgba(212, 165, 165, 0.2);
+            color: #8a5a5a;
+        }
+
+        /* 进度卡片 */
+        .progress-card {
+            grid-column: span 1;
+        }
+
+        @media (max-width: 900px) {
+            .progress-card { grid-column: span 2; }
+        }
+
+        @media (max-width: 500px) {
+            .progress-card { grid-column: span 1; }
+        }
+
+        .progress-card h3 {
+            font-size: 18px;
+            color: var(--morandi-yellow);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: var(--morandi-light);
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--morandi-dark);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--morandi-gray);
+            margin-top: 4px;
+        }
+
+        /* 下拉菜单 */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--morandi-card);
+            border: none;
+            border-radius: 16px;
+            padding: 12px 0;
+            min-width: 200px;
+            box-shadow: 0 8px 24px var(--morandi-shadow-hover);
+            z-index: 1000;
+            margin-top: 8px;
+        }
+
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            color: var(--morandi-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--morandi-light);
+        }
+
+        .dropdown-content a.danger {
+            color: var(--morandi-pink);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--morandi-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #8a9caa;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: var(--morandi-light);
+            color: var(--morandi-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--morandi-gray);
+            color: white;
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 30px;
+            color: var(--morandi-gray);
+            font-size: 13px;
+        }
+
+        /* 装饰元素 */
+        .decoration {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .decoration-1 {
+            top: 10%;
+            left: 5%;
+            font-size: 100px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .decoration-2 {
+            bottom: 10%;
+            right: 5%;
+            font-size: 80px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        /* 隐藏状态 */
+        .hidden {
+            display: none !important;
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bento-card {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .header { padding: 30px 15px; border-radius: 18px; }
+            .bento-card { padding: 18px; border-radius: 16px; }
+            .chapter-grid { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 装饰元素 -->
+    <div class="decoration decoration-1">📚</div>
+    <div class="decoration decoration-2">✏️</div>
+
+    <!-- 头部 -->
+    <header class="header">
+        <div class="header-emoji">🎓</div>
+        <h1>伊朗战争103天：深度解析</h1>
+        <p>交互式学习 · 结构化知识 · 主动回忆</p>
+    </header>
+
+    <!-- Bento Grid -->
+    <div class="bento-grid">
+        <!-- 导航卡片 -->
+        <div class="bento-card nav-card">
+            <button class="nav-btn active" onclick="showSection('learning')" id="nav-learning">
+                🎯 学习目标
+            </button>
+            <button class="nav-btn" onclick="showSection('content')" id="nav-content">
+                📖 内容学习
+            </button>
+            <button class="nav-btn" onclick="showSection('quiz')" id="nav-quiz">
+                ✅ 知识检查
+            </button>
+            <div class="dropdown">
+                <button class="nav-btn" onclick="toggleDropdown()">
+                    🔄 重置进度 ▾
+                </button>
+                <div id="resetDropdown" class="dropdown-content">
+                    <a onclick="resetChapter(1)">🇺🇸 重置第一章</a>
+                    <a onclick="resetChapter(2)">🇮🇱 重置第二章</a>
+                    <a onclick="resetChapter(3)">🇮🇷 重置第三章</a>
+                    <a onclick="resetChapter(4)">🌍 重置第四章</a>
+                    <a onclick="resetAll()" class="danger">🗑️ 重置全部进度</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学习目标卡片 -->
+        <div class="bento-card card-green objectives-card" id="section-learning">
+            <h3>🎯 学习目标</h3>
+            <ul class="objectives-list">
+                <li>理解伊朗战争的根本原因和历史背景</li>
+                <li>分析美国、以色列、伊朗三方的战争目标</li>
+                <li>评估和平协议的具体内容及影响</li>
+                <li>掌握霍尔木兹海峡的战略地位</li>
+                <li>预测战争对中东地缘政治的长期影响</li>
+            </ul>
+        </div>
+
+        <!-- 导读卡片 -->
+        <div class="bento-card card-blue summary-card">
+            <h3>📝 1分钟导读</h3>
+            <p class="summary-text">
+                这场持续103天的伊朗战争是近年来中东最重大的地缘政治事件。美国和以色列联合攻击伊朗，
+                试图摧毁其核计划和导弹能力，但最终的和平协议却出人意料——美国不仅未能实现核心目标，
+                反而向伊朗提供大规模经济援助。本视频深度解析三方的战争目标与实际成果，
+                揭示这场战争如何重塑中东权力格局。
+            </p>
+        </div>
+
+        <!-- 章节导航卡片 -->
+        <div class="bento-card card-purple chapter-nav-card">
+            <h3>📑 章节导航</h3>
+            <div class="chapter-grid">
+                <div class="chapter-item active" onclick="showChapter(1)" id="toc-1">
+                    <div class="chapter-icon">🇺🇸</div>
+                    <div class="chapter-title">美国的战争目标</div>
+                    <div class="chapter-meta">4个知识点</div>
+                </div>
+                <div class="chapter-item" onclick="showChapter(2)" id="toc-2">
+                    <div class="chapter-icon">🇮🇱</div>
+                    <div class="chapter-title">以色列的战略野心</div>
+                    <div class="chapter-meta">3个知识点</div>
+                </div>
+                <div class="chapter-item" onclick="showChapter(3)" id="toc-3">
+                    <div class="chapter-icon">🇮🇷</div>
+                    <div class="chapter-title">伊朗的反击与收获</div>
+                    <div class="chapter-meta">3个知识点</div>
+                </div>
+                <div class="chapter-item" onclick="showChapter(4)" id="toc-4">
+                    <div class="chapter-icon">🌍</div>
+                    <div class="chapter-title">战争的深远影响</div>
+                    <div class="chapter-meta">2个知识点</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试题卡片 -->
+        <div class="bento-card card-orange quiz-card hidden" id="section-quiz">
+            <h3>✅ 知识检查 - 第一章</h3>
+
+            <div class="question" id="q1">
+                <p class="question-text">1. 美国发动伊朗战争的首要理由是什么？</p>
+                <ul class="options-list">
+                    <li class="option-item" onclick="checkAnswer(this, 'q1', false)">A. 推翻伊朗政权</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q1', true)">B. 阻止伊朗获得核武器</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q1', false)">C. 控制霍尔木兹海峡</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q1', false)">D. 保护以色列安全</li>
+                </ul>
+                <div class="feedback" id="feedback-q1"></div>
+            </div>
+
+            <div class="question" id="q2">
+                <p class="question-text">2. 根据美国情报机构的评估，战争对伊朗核计划造成了什么影响？</p>
+                <ul class="options-list">
+                    <li class="option-item" onclick="checkAnswer(this, 'q2', false)">A. 彻底摧毁，无法恢复</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q2', true)">B. 仅受到有限损害</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q2', false)">C. 完全没有影响</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q2', false)">D. 反而加速了发展</li>
+                </ul>
+                <div class="feedback" id="feedback-q2"></div>
+            </div>
+
+            <div class="question" id="q3">
+                <p class="question-text">3. 特朗普在战后对伊朗导弹问题的立场发生了什么变化？</p>
+                <ul class="options-list">
+                    <li class="option-item" onclick="checkAnswer(this, 'q3', false)">A. 继续坚持零导弹政策</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q3', true)">B. 承认伊朗有权拥有导弹</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q3', false)">C. 要求伊朗减少导弹数量</li>
+                    <li class="option-item" onclick="checkAnswer(this, 'q3', false)">D. 将问题留给下一任总统</li>
+                </ul>
+                <div class="feedback" id="feedback-q3"></div>
+            </div>
+        </div>
+
+        <!-- 进度卡片 -->
+        <div class="bento-card card-yellow progress-card">
+            <h3>📊 学习进度</h3>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="readCount">0</div>
+                    <div class="stat-label">已学习</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="quizScore">0</div>
+                    <div class="stat-label">测试得分</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">总知识点</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">总测试题</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>📚 学习小站 · 让知识更有趣 · 2026</p>
+    </footer>
+
+    <script>
+        let currentSection = 'learning';
+        let currentChapter = 1;
+        let readSections = {};
+        let quizScores = {};
+
+        // 显示章节
+        function showSection(section) {
+            console.log('切换到:', section);
+
+            // 隐藏所有内容卡片
+            document.getElementById('section-learning').classList.add('hidden');
+            document.getElementById('section-quiz').classList.add('hidden');
+
+            // 显示目标部分
+            if (section === 'learning') {
+                document.getElementById('section-learning').classList.remove('hidden');
+            } else if (section === 'quiz') {
+                document.getElementById('section-quiz').classList.remove('hidden');
+                // 滚动到测试区域
+                setTimeout(() => {
+                    document.getElementById('section-quiz').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }, 100);
+            } else if (section === 'content') {
+                showChapter(currentChapter);
+            }
+
+            // 更新导航状态
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-${section}`).classList.add('active');
+
+            currentSection = section;
+            console.log('✅ 切换完成');
+        }
+
+        // 显示章节
+        function showChapter(chapter) {
+            currentChapter = chapter;
+            
+            // 更新章节导航状态
+            document.querySelectorAll('.chapter-item').forEach((item, index) => {
+                item.classList.remove('active');
+                if (index + 1 === chapter) {
+                    item.classList.add('active');
+                }
+            });
+
+            // 显示测试部分
+            showSection('quiz');
+
+            // 更新测试标题
+            const titles = {
+                1: '✅ 知识检查 - 第一章',
+                2: '✅ 知识检查 - 第二章',
+                3: '✅ 知识检查 - 第三章',
+                4: '✅ 知识检查 - 第四章'
+            };
+            document.querySelector('#section-quiz h3').textContent = titles[chapter];
+
+            // 标记为已读
+            readSections[chapter] = true;
+            updateStats();
+            updateTOC();
+        }
+
+        // 切换下拉菜单
+        function toggleDropdown() {
+            const dropdown = document.getElementById('resetDropdown');
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                dropdown.style.display = 'block';
+            }
+        }
+
+        // 检查答案
+        function checkAnswer(element, questionId, isCorrect) {
+            const parent = element.parentElement;
+            
+            // 移除之前的选择
+            parent.querySelectorAll('.option-item').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'wrong');
+            });
+
+            // 标记选择
+            element.classList.add('selected');
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                showFeedback(questionId, true);
+                console.log(`✅ ${questionId}: 回答正确`);
+            } else {
+                element.classList.add('wrong');
+                showFeedback(questionId, false);
+                
+                // 显示正确答案
+                parent.querySelectorAll('.option-item').forEach(opt => {
+                    if (opt.getAttribute('onclick').includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+                console.log(`❌ ${questionId}: 回答错误`);
+            }
+
+            // 禁用进一步选择
+            parent.querySelectorAll('.option-item').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            // 更新分数
+            if (!quizScores[currentChapter]) {
+                quizScores[currentChapter] = { correct: 0, total: 0 };
+            }
+            quizScores[currentChapter].total++;
+            if (isCorrect) quizScores[currentChapter].correct++;
+            
+            updateStats();
+        }
+
+        // 显示反馈
+        function showFeedback(questionId, isCorrect) {
+            const feedback = document.getElementById(`feedback-${questionId}`);
+            if (isCorrect) {
+                feedback.textContent = '✅ 回答正确！你已经掌握了这个知识点。';
+                feedback.className = 'feedback show correct';
+            } else {
+                feedback.textContent = '❌ 回答错误。请查看上方的正确答案。';
+                feedback.className = 'feedback show wrong';
+            }
+        }
+
+        // 更新统计
+        function updateStats() {
+            const readCount = Object.keys(readSections).length;
+            document.getElementById('readCount').textContent = readCount;
+
+            let totalCorrect = 0;
+            Object.values(quizScores).forEach(score => {
+                totalCorrect += score.correct;
+            });
+            document.getElementById('quizScore').textContent = totalCorrect;
+        }
+
+        // 更新TOC状态
+        function updateTOC() {
+            for (let i = 1; i <= 4; i++) {
+                const toc = document.getElementById(`toc-${i}`);
+                if (toc && readSections[i]) {
+                    toc.style.borderLeft = '4px solid var(--morandi-green)';
+                }
+            }
+        }
+
+        // 重置单个章节
+        function resetChapter(chapter) {
+            const chapterNames = {
+                1: '美国的战争目标',
+                2: '以色列的战略野心',
+                3: '伊朗的反击与收获',
+                4: '战争的深远影响'
+            };
+
+            if (confirm(`确定要重置「${chapterNames[chapter]}」吗？`)) {
+                // 清除该章节数据
+                delete readSections[chapter];
+                delete quizScores[chapter];
+
+                // 重置测试题UI
+                document.querySelectorAll('.option-item').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'wrong');
+                    opt.style.pointerEvents = '';
+                });
+                document.querySelectorAll('.feedback').forEach(fb => {
+                    fb.classList.remove('show');
+                });
+
+                // 更新显示
+                updateStats();
+                updateTOC();
+
+                // 关闭下拉菜单
+                document.getElementById('resetDropdown').style.display = 'none';
+
+                console.log(`✅ 已重置第${chapter}章`);
+                alert(`「${chapterNames[chapter]}」已重置！`);
+            }
+        }
+
+        // 重置全部
+        function resetAll() {
+            if (confirm('确定要重置全部进度吗？此操作不可撤销。')) {
+                readSections = {};
+                quizScores = {};
+
+                // 重置所有测试题UI
+                document.querySelectorAll('.option-item').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'wrong');
+                    opt.style.pointerEvents = '';
+                });
+                document.querySelectorAll('.feedback').forEach(fb => {
+                    fb.classList.remove('show');
+                });
+
+                // 重置TOC样式
+                document.querySelectorAll('.chapter-item').forEach(item => {
+                    item.style.borderLeft = '';
+                });
+
+                updateStats();
+
+                // 关闭下拉菜单
+                document.getElementById('resetDropdown').style.display = 'none';
+
+                console.log('✅ 已重置全部进度');
+                alert('全部进度已重置！');
+            }
+        }
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('resetDropdown');
+            const dropdownBtn = event.target.closest('.dropdown');
+            if (!dropdownBtn && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // 初始化
+        console.log('✅ 页面初始化完成');
+    </script>
+</body>
+</html>
