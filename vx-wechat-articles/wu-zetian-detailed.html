@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>女皇武则天：百家讲坛详细版</title>
+    <style>
+        :root {
+            --bg: #F0EBE3;
+            --card: #FFFFFF;
+            --text: #5C5350;
+            --text-secondary: #8A7F7A;
+            --accent: #9AABB8;
+            --accent-hover: #8A9CAA;
+            --accent-light: #E8EFF3;
+            --success: #A5B5A0;
+            --warning: #D4C5A5;
+            --info: #9AABB8;
+            --pink: #D4A5A5;
+            --purple: #B5A5C5;
+            --border: #E0D8D0;
+            --shadow: 0 2px 12px rgba(92, 83, 80, 0.08);
+            --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+        }
+        .hero {
+            background: linear-gradient(135deg, #D4A5A5 0%, #B5A5C5 50%, #9AABB8 100%);
+            color: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        .hero-description {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 15px;
+            opacity: 0.95;
+        }
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pink), var(--accent), var(--purple));
+            z-index: 1000;
+            transition: width 0.3s;
+        }
+        .nav {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--accent);
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        .sidebar-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .sidebar-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .toc-list { list-style: none; }
+        .toc-item { margin-bottom: 6px; }
+        .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .toc-link:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        .toc-link.completed {
+            background: rgba(165, 181, 160, 0.2);
+            color: var(--success);
+        }
+        .toc-icon { font-size: 18px; }
+        .toc-text { flex: 1; font-weight: 500; }
+        .chapter-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--accent);
+        }
+        .chapter-header {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .chapter-title {
+            font-size: 24px;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        .chapter-meta {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .knowledge-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        .conclusion {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(181, 165, 197, 0.2));
+            border-radius: 12px;
+            border-left: 4px solid var(--pink);
+        }
+        .conclusion-icon { font-size: 22px; margin-right: 10px; }
+        .explanation {
+            font-size: 16px;
+            line-height: 2;
+            color: var(--text);
+            margin-bottom: 20px;
+            padding: 0 16px;
+        }
+        .explanation p {
+            margin-bottom: 16px;
+            text-indent: 2em;
+        }
+        .examples {
+            font-size: 15px;
+            color: var(--text-secondary);
+            padding: 16px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 12px;
+            border: 1px dashed var(--border);
+        }
+        .examples strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        .example-item {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            line-height: 1.6;
+        }
+        .example-item::before {
+            content: '•';
+            position: absolute;
+            left: 8px;
+            color: var(--accent);
+            font-weight: bold;
+        }
+        .quiz-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-top: 32px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--warning);
+        }
+        .quiz-header {
+            margin-bottom: 28px;
+        }
+        .quiz-header h3 {
+            font-size: 22px;
+            color: var(--warning);
+            margin-bottom: 12px;
+        }
+        .quiz-progress {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .question-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid var(--border);
+        }
+        .question-card.active { display: block; }
+        .question-text {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .options-list { list-style: none; }
+        .option-item {
+            padding: 18px 24px;
+            margin-bottom: 14px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .option-item:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+        .option-item.selected {
+            border-color: var(--info);
+            background: rgba(154, 171, 184, 0.15);
+        }
+        .option-item.correct {
+            border-color: var(--success);
+            background: rgba(165, 181, 160, 0.2);
+        }
+        .option-item.wrong {
+            border-color: var(--pink);
+            background: rgba(212, 165, 165, 0.2);
+        }
+        .feedback {
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 18px;
+            display: none;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .feedback.show { display: block; }
+        .feedback.correct {
+            background: rgba(165, 181, 160, 0.2);
+            border: 1px solid var(--success);
+            color: #5a7a52;
+        }
+        .feedback.wrong {
+            background: rgba(212, 165, 165, 0.2);
+            border: 1px solid var(--pink);
+            color: #8a5a5a;
+        }
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 28px;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .chapter-complete {
+            background: linear-gradient(135deg, var(--success), #8fa889);
+            color: white;
+            padding: 28px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 28px;
+            display: none;
+        }
+        .chapter-complete.show { display: block; }
+        .reset-chapter-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 0;
+            min-width: 200px;
+            box-shadow: 0 8px 24px rgba(92, 83, 80, 0.15);
+            z-index: 1000;
+            margin-top: 8px;
+        }
+        .dropdown-content a {
+            display: block;
+            padding: 14px 24px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .dropdown-content a:hover { background: var(--bg); }
+        .dropdown-content a.danger { color: var(--pink); }
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+        @media (max-width: 768px) {
+            .hero { padding: 40px 15px 30px; }
+            .nav-inner { flex-direction: column; align-items: stretch; }
+            .nav-links { justify-content: center; }
+            .chapter-section { padding: 24px; }
+            .knowledge-card { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <header class="hero">
+        <h1>👑 女皇武则天：百家讲坛详细版</h1>
+        <div class="hero-meta">
+            <span>📺 百家讲坛</span>
+            <span>👩‍🏫 蒙曼教授</span>
+            <span>⏱️ 10小时21分钟</span>
+            <span>📚 8个章节</span>
+            <span>🎯 32个知识点</span>
+            <span>📝 35道测试题</span>
+        </div>
+        <p class="hero-description">
+            基于10小时完整讲座，为您详细讲解武则天传奇一生的每个重要阶段。
+            本版本包含详细的背景介绍、历史分析和人物解读，适合深入学习。
+        </p>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-links">
+                <a onclick="showSection('learning')" class="active" id="nav-learning">🎯 学习目标</a>
+                <a onclick="showSection('content')" id="nav-content">📖 内容学习</a>
+                <a onclick="showSection('quiz')" id="nav-quiz">✅ 知识检查</a>
+                <div class="dropdown">
+                    <a onclick="toggleDropdown()">🔄 重置进度 ▾</a>
+                    <div id="resetDropdown" class="dropdown-content">
+                        <a onclick="resetChapterProgress(1)">👑 第1集：不要问我从哪里来</a>
+                        <a onclick="resetChapterProgress(2)">👑 第2集：太宗不爱武则天</a>
+                        <a onclick="resetChapterProgress(3)">👑 第3集：为皇后而战</a>
+                        <a onclick="resetChapterProgress(4)">👑 第4集：小女人的大手笔</a>
+                        <a onclick="resetChapterProgress(5)">👑 第5集：新皇后三把火</a>
+                        <a onclick="resetChapterProgress(6)">👑 第6集：天上有两个太阳</a>
+                        <a onclick="resetChapterProgress(7)">👑 第7集：与儿子斗法</a>
+                        <a onclick="resetChapterProgress(8)">👑 第8集：唐高宗的遗产</a>
+                        <a onclick="resetProgress()" class="danger">🗑️ 重置全部进度</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3>📊 学习进度</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="readCount">0</div>
+                        <div class="stat-label">已学习</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="quizScore">0</div>
+                        <div class="stat-label">测试得分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">32</div>
+                        <div class="stat-label">总知识点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">37</div>
+                        <div class="stat-label">总测试题</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-card">
+                <h3>📑 章节导航</h3>
+                <ul class="toc-list">
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(0)" id="toc-0"><span class="toc-icon">📋</span><span class="toc-text">学习目标与导读</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(1)" id="toc-1"><span class="toc-icon">👑</span><span class="toc-text">第1集：不要问我从哪里来</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(2)" id="toc-2"><span class="toc-icon">👑</span><span class="toc-text">第2集：太宗不爱武则天</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(3)" id="toc-3"><span class="toc-icon">👑</span><span class="toc-text">第3集：为皇后而战</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(4)" id="toc-4"><span class="toc-icon">👑</span><span class="toc-text">第4集：小女人的大手笔</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(5)" id="toc-5"><span class="toc-icon">👑</span><span class="toc-text">第5集：新皇后三把火</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(6)" id="toc-6"><span class="toc-icon">👑</span><span class="toc-text">第6集：天上有两个太阳</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(7)" id="toc-7"><span class="toc-icon">👑</span><span class="toc-text">第7集：与儿子斗法</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(8)" id="toc-8"><span class="toc-icon">👑</span><span class="toc-text">第8集：唐高宗的遗产</span></a></li>
+                </ul>
+            </div>
+        </aside>
+        <main class="content" id="content">
+
+            <section id="section-learning" class="chapter-section">
+                <div style="background: linear-gradient(135deg, rgba(165, 181, 160, 0.2), rgba(154, 171, 184, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 28px; border-left: 4px solid var(--success);">
+                    <h2 style="color: var(--success); margin-bottom: 20px; font-size: 22px;">🎯 学习目标</h2>
+                    <ul style="list-style: none;">
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>全面了解武则天从出生到称帝的完整人生历程</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>理解唐代后宫制度和政治斗争的复杂性</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>分析武则天成功的关键因素：性格、机遇、能力</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>掌握武则天统治时期的重大政治事件和改革</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>客观评价武则天的历史功过和深远影响</li>
+                    </ul>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(154, 171, 184, 0.2), rgba(181, 165, 197, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 28px; border-left: 4px solid var(--accent);">
+                    <h2 style="color: var(--accent); margin-bottom: 16px; font-size: 22px;">📝 课程导读</h2>
+                    <div style="font-size: 16px; line-height: 2;">
+                        <p style="margin-bottom: 16px; text-indent: 2em;">武则天（624-705年），名武曌，是中国历史上唯一的女皇帝。她的一生充满传奇色彩：14岁入宫成为唐太宗的才人，历经12年冷遇后入感业寺为尼；凭借与太子李治的感情重返宫廷，经过激烈斗争登上皇后之位；唐高宗去世后，她先后废黜两个儿子，最终在67岁高龄称帝，建立武周王朝。</p>
+                        <p style="margin-bottom: 16px; text-indent: 2em;">蒙曼教授在百家讲坛中详细讲述了这位传奇女性的政治智慧、性格特点和历史贡献。本课程基于10小时完整讲座，为您提炼32个核心知识点，帮助您像阅读教科书一样系统学习武则天的一生。</p>
+                        <p style="text-indent: 2em;">通过本课程，您将不仅了解武则天的生平事迹，更能深入理解唐代政治制度、社会文化以及女性在历史中的角色与贡献。</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="startLearning()" style="width: 100%;">开始学习第一集 →</button>
+            </section>
+
+            <section id="section-chapter1" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第1集：不要问我从哪里来</h2>
+                    <p class="chapter-meta">武则天的出身与家庭背景 · 4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>基于字幕内容的详细知识点（待完善）</span>
+                    </div>
+                    <div class="explanation">
+                        <p>这里将包含详细的背景介绍、历史分析和人物解读。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">待完善</div>
+                    </div>
+                </div>
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第1集</h3>
+                        <p class="quiz-progress">问题 <span id="q1-current">1</span>/5</p>
+                    </div>
+                    <div class="question-card active" id="q1-1">
+                        <p class="question-text">待完善</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">A. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', true)">B. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">C. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">D. 待完善</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-1"></div>
+                    </div>
+                    <div class="chapter-complete" id="complete-chapter1">
+                        <h4>🎉 恭喜完成第1集！</h4>
+                        <p>你已经了解了武则天的出身与家庭背景。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(2)">继续学习下一集 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(1)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q1-prev" onclick="prevQuestion(1)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q1-next" onclick="nextQuestion(1)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter2" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第2集：太宗不爱武则天</h2>
+                    <p class="chapter-meta">入宫成为唐太宗才人的经历 · 4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>基于字幕内容的详细知识点（待完善）</span>
+                    </div>
+                    <div class="explanation">
+                        <p>这里将包含详细的背景介绍、历史分析和人物解读。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">待完善</div>
+                    </div>
+                </div>
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第2集</h3>
+                        <p class="quiz-progress">问题 <span id="q2-current">1</span>/5</p>
+                    </div>
+                    <div class="question-card active" id="q2-1">
+                        <p class="question-text">待完善</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">A. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', true)">B. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">C. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">D. 待完善</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-1"></div>
+                    </div>
+                    <div class="chapter-complete" id="complete-chapter2">
+                        <h4>🎉 恭喜完成第2集！</h4>
+                        <p>你已经了解了入宫成为唐太宗才人的经历。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(3)">继续学习下一集 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(2)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q2-prev" onclick="prevQuestion(2)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q2-next" onclick="nextQuestion(2)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter3" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第3集：为皇后而战</h2>
+                    <p class="chapter-meta">感业寺回宫与争夺后位 · 4个知识点 · 4道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>基于字幕内容的详细知识点（待完善）</span>
+                    </div>
+                    <div class="explanation">
+                        <p>这里将包含详细的背景介绍、历史分析和人物解读。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">待完善</div>
+                    </div>
+                </div>
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第3集</h3>
+                        <p class="quiz-progress">问题 <span id="q3-current">1</span>/4</p>
+                    </div>
+                    <div class="question-card active" id="q3-1">
+                        <p class="question-text">待完善</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">A. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', true)">B. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">C. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">D. 待完善</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-1"></div>
+                    </div>
+                    <div class="chapter-complete" id="complete-chapter3">
+                        <h4>🎉 恭喜完成第3集！</h4>
+                        <p>你已经了解了感业寺回宫与争夺后位。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(4)">继续学习下一集 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(3)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q3-prev" onclick="prevQuestion(3)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q3-next" onclick="nextQuestion(3)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter4" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第4集：小女人的大手笔</h2>
+                    <p class="chapter-meta">登上皇后之位的艰难历程 · 4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>基于字幕内容的详细知识点（待完善）</span>
+                    </div>
+                    <div class="explanation">
+                        <p>这里将包含详细的背景介绍、历史分析和人物解读。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">待完善</div>
+                    </div>
+                </div>
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第4集</h3>
+                        <p class="quiz-progress">问题 <span id="q4-current">1</span>/5</p>
+                    </div>
+                    <div class="question-card active" id="q4-1">
+                        <p class="question-text">待完善</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">A. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', true)">B. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">C. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">D. 待完善</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-1"></div>
+                    </div>
+                    <div class="chapter-complete" id="complete-chapter4">
+                        <h4>🎉 恭喜完成第4集！</h4>
+                        <p>你已经了解了登上皇后之位的艰难历程。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(5)">继续学习下一集 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(4)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q4-prev" onclick="prevQuestion(4)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q4-next" onclick="nextQuestion(4)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter5" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第5集：新皇后三把火</h2>
+                    <p class="chapter-meta">稳定后宫、太子、外戚 · 4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>基于字幕内容的详细知识点（待完善）</span>
+                    </div>
+                    <div class="explanation">
+                        <p>这里将包含详细的背景介绍、历史分析和人物解读。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">待完善</div>
+                    </div>
+                </div>
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第5集</h3>
+                        <p class="quiz-progress">问题 <span id="q5-current">1</span>/5</p>
+                    </div>
+                    <div class="question-card active" id="q5-1">
+                        <p class="question-text">待完善</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">A. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', true)">B. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">C. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">D. 待完善</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q5-1"></div>
+                    </div>
+                    <div class="chapter-complete" id="complete-chapter5">
+                        <h4>🎉 恭喜完成第5集！</h4>
+                        <p>你已经了解了稳定后宫、太子、外戚。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(6)">继续学习下一集 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(5)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q5-prev" onclick="prevQuestion(5)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q5-next" onclick="nextQuestion(5)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter6" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第6集：天上有两个太阳</h2>
+                    <p class="chapter-meta">二圣临朝与参政议政 · 4个知识点 · 4道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>基于字幕内容的详细知识点（待完善）</span>
+                    </div>
+                    <div class="explanation">
+                        <p>这里将包含详细的背景介绍、历史分析和人物解读。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">待完善</div>
+                    </div>
+                </div>
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第6集</h3>
+                        <p class="quiz-progress">问题 <span id="q6-current">1</span>/4</p>
+                    </div>
+                    <div class="question-card active" id="q6-1">
+                        <p class="question-text">待完善</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">A. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', true)">B. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">C. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">D. 待完善</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q6-1"></div>
+                    </div>
+                    <div class="chapter-complete" id="complete-chapter6">
+                        <h4>🎉 恭喜完成第6集！</h4>
+                        <p>你已经了解了二圣临朝与参政议政。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(7)">继续学习下一集 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(6)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q6-prev" onclick="prevQuestion(6)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q6-next" onclick="nextQuestion(6)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter7" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第7集：与儿子斗法</h2>
+                    <p class="chapter-meta">废立太子与权力巩固 · 4个知识点 · 4道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>基于字幕内容的详细知识点（待完善）</span>
+                    </div>
+                    <div class="explanation">
+                        <p>这里将包含详细的背景介绍、历史分析和人物解读。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">待完善</div>
+                    </div>
+                </div>
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第7集</h3>
+                        <p class="quiz-progress">问题 <span id="q7-current">1</span>/4</p>
+                    </div>
+                    <div class="question-card active" id="q7-1">
+                        <p class="question-text">待完善</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">A. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', true)">B. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">C. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">D. 待完善</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q7-1"></div>
+                    </div>
+                    <div class="chapter-complete" id="complete-chapter7">
+                        <h4>🎉 恭喜完成第7集！</h4>
+                        <p>你已经了解了废立太子与权力巩固。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(8)">继续学习下一集 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(7)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q7-prev" onclick="prevQuestion(7)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q7-next" onclick="nextQuestion(7)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter8" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第8集：唐高宗的遗产</h2>
+                    <p class="chapter-meta">高宗去世与武则天临朝 · 4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>基于字幕内容的详细知识点（待完善）</span>
+                    </div>
+                    <div class="explanation">
+                        <p>这里将包含详细的背景介绍、历史分析和人物解读。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">待完善</div>
+                    </div>
+                </div>
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第8集</h3>
+                        <p class="quiz-progress">问题 <span id="q8-current">1</span>/5</p>
+                    </div>
+                    <div class="question-card active" id="q8-1">
+                        <p class="question-text">待完善</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q8-1', false)">A. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-1', true)">B. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-1', false)">C. 待完善</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-1', false)">D. 待完善</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q8-1"></div>
+                    </div>
+                    <div class="chapter-complete" id="complete-chapter8">
+                        <h4>🎉 恭喜完成第8集！</h4>
+                        <p>你已经了解了高宗去世与武则天临朝。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(9)">继续学习下一集 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(8)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q8-prev" onclick="prevQuestion(8)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q8-next" onclick="nextQuestion(8)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-summary" class="chapter-section" style="display: none;">
+                <div style="background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(181, 165, 197, 0.2)); padding: 32px; border-radius: 16px; margin-bottom: 28px; border-left: 4px solid var(--pink);">
+                    <h2 style="color: var(--pink); margin-bottom: 20px; font-size: 24px;">🎓 学习总结</h2>
+                    <p style="font-size: 16px; line-height: 2; margin-bottom: 24px; text-indent: 2em;">恭喜你完成了《女皇武则天》百家讲坛的全部学习内容！</p>
+                </div>
+                <button class="btn btn-primary" onclick="resetProgress()" style="width: 100%;">🔄 重新学习</button>
+            </section>
+        </main>
+    </div>
+    <footer class="footer">
+        <p>📚 百家讲坛详细版 · 蒙曼教授主讲 · 2026</p>
+    </footer>
+    <script>
+        let currentChapter = 0;
+        let currentQuestion = {1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1};
+        let readSections = JSON.parse(localStorage.getItem('wu-zetian-detailed-read') || '{}');
+        let quizScores = JSON.parse(localStorage.getItem('wu-zetian-detailed-scores') || '{}');
+
+        function init() { updateStats(); restoreProgress(); }
+
+        function showSection(section) {
+            document.querySelectorAll('.chapter-section').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            if (section === 'learning') {
+                document.getElementById('section-learning').style.display = 'block';
+                document.getElementById('nav-learning').classList.add('active');
+            } else if (section === 'content') {
+                showChapter(currentChapter || 1);
+                document.getElementById('nav-content').classList.add('active');
+            } else if (section === 'quiz') {
+                const chapter = currentChapter || 1;
+                showChapter(chapter);
+                document.getElementById('nav-quiz').classList.add('active');
+                setTimeout(() => {
+                    const quizSection = document.querySelector(`#section-chapter${chapter} .quiz-section`);
+                    if (quizSection) { quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+                }, 100);
+            }
+        }
+
+        function startLearning() {
+            showChapter(1);
+            document.getElementById('nav-content').classList.add('active');
+            document.getElementById('nav-learning').classList.remove('active');
+        }
+
+        function showChapter(chapterNum) {
+            currentChapter = chapterNum;
+            document.querySelectorAll('.chapter-section').forEach(el => { el.style.display = 'none'; });
+            const sectionId = chapterNum === 0 ? 'section-learning' : chapterNum === 9 ? 'section-summary' : `section-chapter${chapterNum}`;
+            document.getElementById(sectionId).style.display = 'block';
+            updateTOC();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (chapterNum > 0 && chapterNum < 9) {
+                readSections[chapterNum] = true;
+                localStorage.setItem('wu-zetian-detailed-read', JSON.stringify(readSections));
+                updateStats();
+            }
+        }
+
+        function showFinalSummary() { showChapter(9); }
+        function scrollToChapter(chapterNum) { showChapter(chapterNum); }
+
+        function updateTOC() {
+            for (let i = 0; i <= 8; i++) {
+                const toc = document.getElementById(`toc-${i}`);
+                if (toc) {
+                    if (readSections[i]) { toc.classList.add('completed'); } else { toc.classList.remove('completed'); }
+                    if (i === currentChapter) { toc.style.background = 'var(--accent-light)'; } else { toc.style.background = ''; }
+                }
+            }
+        }
+
+        function selectOption(element, questionId, isCorrect) {
+            const parent = element.parentElement;
+            parent.querySelectorAll('.option-item').forEach(item => { item.classList.remove('selected', 'correct', 'wrong'); });
+            element.classList.add('selected');
+            if (isCorrect) {
+                element.classList.add('correct');
+                showFeedback(questionId, true);
+            } else {
+                element.classList.add('wrong');
+                showFeedback(questionId, false);
+                parent.querySelectorAll('.option-item').forEach(item => { if (item.getAttribute('onclick').includes('true')) { item.classList.add('correct'); } });
+            }
+            parent.querySelectorAll('.option-item').forEach(item => { item.style.pointerEvents = 'none'; });
+            const chapter = questionId.split('-')[0].replace('q', '');
+            if (!quizScores[chapter]) quizScores[chapter] = {correct: 0, total: 0};
+            quizScores[chapter].total++;
+            if (isCorrect) quizScores[chapter].correct++;
+            localStorage.setItem('wu-zetian-detailed-scores', JSON.stringify(quizScores));
+            updateStats();
+        }
+
+        function showFeedback(questionId, isCorrect) {
+            const feedback = document.getElementById(`feedback-${questionId}`);
+            if (isCorrect) {
+                feedback.textContent = '✅ 回答正确！';
+                feedback.className = 'feedback show correct';
+            } else {
+                feedback.textContent = '❌ 回答错误。请查看正确答案。';
+                feedback.className = 'feedback show wrong';
+            }
+        }
+
+        function nextQuestion(chapter) {
+            const maxQ = {1:5, 2:5, 3:4, 4:5, 5:5, 6:4, 7:4, 8:5};
+            if (currentQuestion[chapter] < maxQ[chapter]) {
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.remove('active');
+                currentQuestion[chapter]++;
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.add('active');
+                document.getElementById(`q${chapter}-current`).textContent = currentQuestion[chapter];
+                updateQuizButtons(chapter);
+            } else {
+                document.getElementById(`complete-chapter${chapter}`).classList.add('show');
+            }
+        }
+
+        function prevQuestion(chapter) {
+            if (currentQuestion[chapter] > 1) {
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.remove('active');
+                currentQuestion[chapter]--;
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.add('active');
+                document.getElementById(`q${chapter}-current`).textContent = currentQuestion[chapter];
+                updateQuizButtons(chapter);
+            }
+        }
+
+        function updateQuizButtons(chapter) {
+            const maxQ = {1:5, 2:5, 3:4, 4:5, 5:5, 6:4, 7:4, 8:5};
+            document.getElementById(`q${chapter}-prev`).disabled = currentQuestion[chapter] === 1;
+            document.getElementById(`q${chapter}-next`).textContent = currentQuestion[chapter] === maxQ[chapter] ? '完成 ✓' : '下一题 →';
+        }
+
+        function updateStats() {
+            document.getElementById('readCount').textContent = Object.keys(readSections).length;
+            let totalCorrect = 0;
+            Object.values(quizScores).forEach(score => { totalCorrect += score.correct; });
+            document.getElementById('quizScore').textContent = totalCorrect;
+        }
+
+        function restoreProgress() { updateTOC(); }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('resetDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('resetDropdown');
+            if (!event.target.closest('.dropdown') && dropdown) { dropdown.style.display = 'none'; }
+        });
+
+        function resetChapterProgress(chapter) {
+            const names = {1:'出身之谜', 2:'入宫岁月', 3:'感业寺风云', 4:'争夺后位', 5:'新皇后三把火', 6:'二圣临朝', 7:'与儿子斗法', 8:'高宗遗产'};
+            if (confirm(`确定要重置「${names[chapter]}」吗？`)) {
+                delete readSections[chapter];
+                localStorage.setItem('wu-zetian-detailed-read', JSON.stringify(readSections));
+                delete quizScores[chapter];
+                localStorage.setItem('wu-zetian-detailed-scores', JSON.stringify(quizScores));
+                const section = document.getElementById(`section-chapter${chapter}`);
+                if (section) {
+                    section.querySelectorAll('.question-card').forEach(card => { card.classList.remove('active'); });
+                    section.querySelectorAll('.option-item').forEach(item => { item.classList.remove('selected', 'correct', 'wrong'); item.style.pointerEvents = ''; });
+                    section.querySelectorAll('.feedback').forEach(fb => { fb.classList.remove('show'); });
+                    const complete = document.getElementById(`complete-chapter${chapter}`);
+                    if (complete) complete.classList.remove('show');
+                    currentQuestion[chapter] = 1;
+                    document.getElementById(`q${chapter}-current`).textContent = '1';
+                    document.getElementById(`q${chapter}-1`).classList.add('active');
+                    updateQuizButtons(chapter);
+                }
+                updateStats(); updateTOC();
+                document.getElementById('resetDropdown').style.display = 'none';
+                if (currentChapter === chapter) showChapter(chapter);
+                alert(`✅「${names[chapter]}」已重置！`);
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('确定要重置所有学习进度吗？')) {
+                localStorage.removeItem('wu-zetian-detailed-read');
+                localStorage.removeItem('wu-zetian-detailed-scores');
+                readSections = {}; quizScores = {}; currentChapter = 0;
+                currentQuestion = {1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1};
+                updateStats(); showSection('learning');
+                document.querySelectorAll('.question-card').forEach(card => { card.classList.remove('active'); });
+                document.querySelectorAll('.option-item').forEach(item => { item.classList.remove('selected', 'correct', 'wrong'); item.style.pointerEvents = ''; });
+                document.querySelectorAll('.feedback').forEach(fb => { fb.classList.remove('show'); });
+                document.querySelectorAll('.chapter-complete').forEach(cc => { cc.classList.remove('show'); });
+                for (let i = 1; i <= 8; i++) document.getElementById(`q${i}-1`).classList.add('active');
+                document.getElementById('resetDropdown').style.display = 'none';
+                alert('✅ 所有进度已重置！');
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            document.getElementById('progressBar').style.width = (scrollTop / docHeight) * 100 + '%';
+        });
+
+        init();
+    </script>
+</body>
+</html>
