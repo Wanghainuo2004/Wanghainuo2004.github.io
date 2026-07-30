@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简测试</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+        .section { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>武则天学习测试</h1>
+    
+    <div class="section" id="section-learning">
+        <h2>🎯 学习目标</h2>
+        <ul>
+            <li>了解武则天的一生</li>
+            <li>理解唐代政治</li>
+        </ul>
+        <button class="btn" onclick="showChapter(1)">开始学习</button>
+    </div>
+    
+    <div class="section" id="section-chapter1" style="display: none;">
+        <h2>👑 第1集：不要问我从哪里来</h2>
+        <p>武则天是中国历史上唯一的女皇帝。</p>
+        <button class="btn" onclick="showChapter(2)">下一章</button>
+        <button class="btn" onclick="showChapter(0)">返回</button>
+    </div>
+    
+    <div class="section" id="section-chapter2" style="display: none;">
+        <h2>👑 第2集：太宗不爱武则天</h2>
+        <p>武则天14岁入宫，被封为五品才人。</p>
+        <button class="btn" onclick="showChapter(1)">上一章</button>
+        <button class="btn" onclick="showChapter(3)">下一章</button>
+    </div>
+    
+    <div class="section" id="section-chapter3" style="display: none;">
+        <h2>👑 第3集：为皇后而战</h2>
+        <p>武则天重返宫廷，争夺后位。</p>
+        <button class="btn" onclick="showChapter(2)">上一章</button>
+        <button class="btn" onclick="showChapter(0)">返回</button>
+    </div>
+    
+    <script>
+        function showChapter(num) {
+            document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+            if (num === 0) {
+                document.getElementById('section-learning').style.display = 'block';
+            } else {
+                document.getElementById('section-chapter' + num).style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
