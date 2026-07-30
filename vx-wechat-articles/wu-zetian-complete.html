@@ -450,6 +450,98 @@
         </p>
     </header>
 
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-links">
+                <a onclick="showSection('learning')" class="active" id="nav-learning">🎯 学习目标</a>
+                <a onclick="showSection('content')" id="nav-content">📖 内容学习</a>
+                <a onclick="showSection('quiz')" id="nav-quiz">✅ 知识检查</a>
+                <div class="dropdown">
+                    <a onclick="toggleDropdown()">🔄 重置进度 ▾</a>
+                    <div id="resetDropdown" class="dropdown-content">
+                        <a onclick="resetChapterProgress(1)">👑 第1集：不要问我从哪里来</a>
+                        <a onclick="resetChapterProgress(2)">👑 第2集：太宗不爱武则天</a>
+                        <a onclick="resetChapterProgress(3)">👑 第3集：为皇后而战</a>
+                        <a onclick="resetChapterProgress(4)">👑 第4集：小女人的大手笔</a>
+                        <a onclick="resetChapterProgress(5)">👑 第5集：新皇后三把火</a>
+                        <a onclick="resetChapterProgress(6)">👑 第6集：天上有两个太阳</a>
+                        <a onclick="resetChapterProgress(7)">👑 第7集：与儿子斗法</a>
+                        <a onclick="resetChapterProgress(8)">👑 第8集：唐高宗的遗产</a>
+                        <a onclick="resetChapterProgress(9)">👑 第9集：重用酷吏</a>
+                        <a onclick="resetChapterProgress(10)">👑 第10集：摆平大叛乱</a>
+                        <a onclick="resetChapterProgress(11)">👑 第11集：大唐新气象</a>
+                        <a onclick="resetProgress()" class="danger">🗑️ 重置全部进度</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3>📊 学习进度</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="readCount">0</div>
+                        <div class="stat-label">已学习</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="quizScore">0</div>
+                        <div class="stat-label">测试得分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">总知识点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">50</div>
+                        <div class="stat-label">总测试题</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-card">
+                <h3>📑 章节导航</h3>
+                <ul class="toc-list">
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(0)" id="toc-0"><span class="toc-icon">📋</span><span class="toc-text">学习目标与导读</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(1)" id="toc-1"><span class="toc-icon">👑</span><span class="toc-text">第1集：不要问我从哪里来</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(2)" id="toc-2"><span class="toc-icon">👑</span><span class="toc-text">第2集：太宗不爱武则天</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(3)" id="toc-3"><span class="toc-icon">👑</span><span class="toc-text">第3集：为皇后而战</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(4)" id="toc-4"><span class="toc-icon">👑</span><span class="toc-text">第4集：小女人的大手笔</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(5)" id="toc-5"><span class="toc-icon">👑</span><span class="toc-text">第5集：新皇后三把火</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(6)" id="toc-6"><span class="toc-icon">👑</span><span class="toc-text">第6集：天上有两个太阳</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(7)" id="toc-7"><span class="toc-icon">👑</span><span class="toc-text">第7集：与儿子斗法</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(8)" id="toc-8"><span class="toc-icon">👑</span><span class="toc-text">第8集：唐高宗的遗产</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(9)" id="toc-9"><span class="toc-icon">👑</span><span class="toc-text">第9集：重用酷吏</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(10)" id="toc-10"><span class="toc-icon">👑</span><span class="toc-text">第10集：摆平大叛乱</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(11)" id="toc-11"><span class="toc-icon">👑</span><span class="toc-text">第11集：大唐新气象</span></a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="content" id="content">
+            <section id="section-learning" class="chapter-section">
+                <div style="background: linear-gradient(135deg, rgba(165, 181, 160, 0.2), rgba(154, 171, 184, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 28px; border-left: 4px solid var(--success);">
+                    <h2 style="color: var(--success); margin-bottom: 20px; font-size: 22px;">🎯 学习目标</h2>
+                    <ul style="list-style: none;">
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>全面了解武则天从出生到称帝的完整人生历程</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>理解唐代后宫制度和政治斗争的复杂性</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>分析武则天成功的关键因素：性格、机遇、能力</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>掌握武则天统治时期的重大政治事件和改革</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>客观评价武则天的历史功过和深远影响</li>
+                    </ul>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(154, 171, 184, 0.2), rgba(181, 165, 197, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 28px; border-left: 4px solid var(--accent);">
+                    <h2 style="color: var(--accent); margin-bottom: 16px; font-size: 22px;">📝 课程导读</h2>
+                    <div style="font-size: 16px; line-height: 2;">
+                        <p style="margin-bottom: 16px; text-indent: 2em;">武则天（624-705年），名武曌，是中国历史上唯一的女皇帝。她的一生充满传奇色彩：14岁入宫成为唐太宗的才人，历经12年冷遇后入感业寺为尼；凭借与太子李治的感情重返宫廷，经过激烈斗争登上皇后之位；唐高宗去世后，她先后废黜两个儿子，最终在67岁高龄称帝，建立武周王朝。</p>
+                        <p style="margin-bottom: 16px; text-indent: 2em;">蒙曼教授在百家讲坛中详细讲述了这位传奇女性的政治智慧、性格特点和历史贡献。本课程基于10小时完整讲座，为您提炼42个核心知识点，帮助您像阅读教科书一样系统学习武则天的一生。</p>
+                        <p style="text-indent: 2em;">通过本课程，您将不仅了解武则天的生平事迹，更能深入理解唐代政治制度、社会文化以及女性在历史中的角色与贡献。</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="startLearning()" style="width: 100%;">开始学习第一集 →</button>
+            </section>
+
             <section id="section-chapter1" class="chapter-section" style="display: none;">
                 <div class="chapter-header">
                     <h2 class="chapter-title">👑 第1集：不要问我从哪里来</h2>
