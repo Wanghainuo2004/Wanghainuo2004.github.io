@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>女皇武则天：百家讲坛完整学习版</title>
+    <style>
+        :root {
+            --bg: #F0EBE3;
+            --card: #FFFFFF;
+            --text: #5C5350;
+            --text-secondary: #8A7F7A;
+            --accent: #9AABB8;
+            --accent-hover: #8A9CAA;
+            --accent-light: #E8EFF3;
+            --success: #A5B5A0;
+            --warning: #D4C5A5;
+            --info: #9AABB8;
+            --pink: #D4A5A5;
+            --purple: #B5A5C5;
+            --border: #E0D8D0;
+            --shadow: 0 2px 12px rgba(92, 83, 80, 0.08);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="%23D4A5A5"/></svg>') 0 20, auto;
+        }
+
+        a, button, .clickable, .option-item, .toc-link, .btn, .nav-links a {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="%239AABB8" opacity="0.8"/><circle cx="12" cy="12" r="4" fill="white"/></svg>') 10 10, pointer;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #D4A5A5 0%, #B5A5C5 50%, #9AABB8 100%);
+            color: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            margin-bottom: 16px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        .hero-description {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 15px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pink), var(--accent), var(--purple));
+            z-index: 1000;
+            transition: width 0.3s;
+        }
+
+        .nav {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        .sidebar-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .sidebar-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .toc-list { list-style: none; }
+        .toc-item { margin-bottom: 6px; }
+        .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .toc-link:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        .toc-link.completed {
+            background: rgba(165, 181, 160, 0.2);
+            color: var(--success);
+        }
+        .toc-icon { font-size: 20px; }
+        .toc-text { flex: 1; font-weight: 500; }
+
+        .chapter-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--accent);
+        }
+        .chapter-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .chapter-title {
+            font-size: 22px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .chapter-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .knowledge-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .knowledge-card:last-child { margin-bottom: 0; }
+        .conclusion {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(181, 165, 197, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-left: 4px solid var(--pink);
+        }
+        .conclusion-icon { font-size: 22px; }
+        .explanation {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text);
+            margin-bottom: 16px;
+            padding-left: 16px;
+        }
+        .examples {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding-left: 16px;
+        }
+        .examples strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .example-item {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .example-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .quiz-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-top: 28px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--warning);
+        }
+        .quiz-header {
+            margin-bottom: 24px;
+        }
+        .quiz-header h3 {
+            font-size: 20px;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .quiz-progress {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .question-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            display: none;
+            border: 1px solid var(--border);
+        }
+        .question-card.active { display: block; }
+        .question-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+        .options-list { list-style: none; }
+        .option-item {
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .option-item:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            transform: translateX(4px);
+        }
+        .option-item.selected {
+            border-color: var(--info);
+            background: rgba(154, 171, 184, 0.15);
+        }
+        .option-item.correct {
+            border-color: var(--success);
+            background: rgba(165, 181, 160, 0.2);
+        }
+        .option-item.wrong {
+            border-color: var(--pink);
+            background: rgba(212, 165, 165, 0.2);
+        }
+
+        .feedback {
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .feedback.show { display: block; }
+        .feedback.correct {
+            background: rgba(165, 181, 160, 0.2);
+            border: 1px solid var(--success);
+            color: #5a7a52;
+        }
+        .feedback.wrong {
+            background: rgba(212, 165, 165, 0.2);
+            border: 1px solid var(--pink);
+            color: #8a5a5a;
+        }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: var(--border); }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chapter-complete {
+            background: linear-gradient(135deg, var(--success), #8fa889);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 24px;
+            display: none;
+        }
+        .chapter-complete.show { display: block; }
+        .chapter-complete h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .chapter-complete p {
+            font-size: 14px;
+            opacity: 0.95;
+            margin-bottom: 16px;
+        }
+
+        .reset-chapter-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-chapter-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 0;
+            min-width: 180px;
+            box-shadow: 0 8px 24px rgba(92, 83, 80, 0.15);
+            z-index: 1000;
+            margin-top: 8px;
+        }
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: transparent;
+            border-radius: 0;
+        }
+        .dropdown-content a:hover { background: var(--bg); }
+        .dropdown-content a.danger { color: var(--pink); }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .knowledge-card, .quiz-section {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 40px 15px 30px; }
+            .nav-inner { flex-direction: column; align-items: stretch; }
+            .nav-links { justify-content: center; }
+            .chapter-section { padding: 20px; }
+            .knowledge-card { padding: 18px; }
+            .quiz-section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <header class="hero">
+        <h1>👑 女皇武则天：百家讲坛完整学习版</h1>
+        <div class="hero-meta">
+            <span>📺 百家讲坛</span>
+            <span>👩‍🏫 蒙曼教授</span>
+            <span>⏱️ 10小时21分钟</span>
+            <span>📚 7个章节</span>
+            <span>🎯 28个知识点</span>
+            <span>📝 35道测试题</span>
+        </div>
+        <p class="hero-description">
+            从唐太宗才人到唐高宗皇后，再到中国历史上唯一的女皇帝，蒙曼教授为您精彩讲述武则天传奇一生。
+            通过结构化学习，深入了解这位充满传奇色彩的历史人物。
+        </p>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-links">
+                <a onclick="showSection('learning')" class="active" id="nav-learning">🎯 学习目标</a>
+                <a onclick="showSection('content')" id="nav-content">📖 内容学习</a>
+                <a onclick="showSection('quiz')" id="nav-quiz">✅ 知识检查</a>
+                <div class="dropdown">
+                    <a onclick="toggleDropdown()">🔄 重置进度 ▾</a>
+                    <div id="resetDropdown" class="dropdown-content">
+                        <a onclick="resetChapterProgress(1)">👑 重置第一章</a>
+                        <a onclick="resetChapterProgress(2)">👑 重置第二章</a>
+                        <a onclick="resetChapterProgress(3)">👑 重置第三章</a>
+                        <a onclick="resetChapterProgress(4)">👑 重置第四章</a>
+                        <a onclick="resetChapterProgress(5)">👑 重置第五章</a>
+                        <a onclick="resetChapterProgress(6)">👑 重置第六章</a>
+                        <a onclick="resetChapterProgress(7)">👑 重置第七章</a>
+                        <a onclick="resetProgress()" class="danger">🗑️ 重置全部进度</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3>📊 学习进度</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="readCount">0</div>
+                        <div class="stat-label">已学习</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="quizScore">0</div>
+                        <div class="stat-label">测试得分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">28</div>
+                        <div class="stat-label">总知识点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">35</div>
+                        <div class="stat-label">总测试题</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>📑 章节导航</h3>
+                <ul class="toc-list">
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(0)" id="toc-0">
+                            <span class="toc-icon">📋</span>
+                            <span class="toc-text">学习目标与导读</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(1)" id="toc-1">
+                            <span class="toc-icon">👑</span>
+                            <span class="toc-text">第一章：出身之谜</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(2)" id="toc-2">
+                            <span class="toc-icon">👑</span>
+                            <span class="toc-text">第二章：入宫岁月</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(3)" id="toc-3">
+                            <span class="toc-icon">👑</span>
+                            <span class="toc-text">第三章：感业寺风云</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(4)" id="toc-4">
+                            <span class="toc-icon">👑</span>
+                            <span class="toc-text">第四章：登上后位</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(5)" id="toc-5">
+                            <span class="toc-icon">👑</span>
+                            <span class="toc-text">第五章：参政议政</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(6)" id="toc-6">
+                            <span class="toc-icon">👑</span>
+                            <span class="toc-text">第六章：称帝之路</span>
+                        </a>
+                    </li>
+                    <li class="toc-item">
+                        <a class="toc-link" onclick="scrollToChapter(7)" id="toc-7">
+                            <span class="toc-icon">👑</span>
+                            <span class="toc-text">第七章：晚年岁月</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="content" id="content">
+            <!-- Learning Objectives -->
+            <section id="section-learning" class="chapter-section">
+                <div style="background: linear-gradient(135deg, rgba(165, 181, 160, 0.2), rgba(154, 171, 184, 0.2)); padding: 24px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid var(--success);">
+                    <h2 style="color: var(--success); margin-bottom: 16px; font-size: 20px;">🎯 学习目标</h2>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">学完本课程，你将能够：</p>
+                    <ul style="list-style: none;">
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            了解武则天的出身背景和家庭环境
+                        </li>
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            理解武则天从才人到皇后的政治历程
+                        </li>
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            分析武则天称帝的历史背景和政治手段
+                        </li>
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            评价武则天的历史功过和深远影响
+                        </li>
+                        <li style="padding: 8px 0; padding-left: 24px; position: relative; font-size: 15px;">
+                            <span style="position: absolute; left: 0; color: var(--success); font-weight: bold;">✓</span>
+                            掌握唐代政治制度和社会文化背景
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(154, 171, 184, 0.2), rgba(181, 165, 197, 0.2)); padding: 24px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid var(--accent);">
+                    <h2 style="color: var(--accent); margin-bottom: 12px; font-size: 20px;">📝 1分钟导读</h2>
+                    <p style="font-size: 15px; line-height: 1.8; color: var(--text);">
+                        武则天是中国历史上唯一的女皇帝，她先后嫁给唐太宗和唐高宗父子二人，最终在67岁时登基称帝，
+                        建立武周王朝。蒙曼教授在百家讲坛中详细讲述了武则天从一个普通官员女儿成长为一代女皇的传奇历程，
+                        揭示了她成功背后的政治智慧、性格特点和历史机遇。本课程将帮助你系统了解这位充满争议的历史人物。
+                    </p>
+                </div>
+
+                <button class="btn btn-primary" onclick="startLearning()" style="width: 100%;">
+                    开始学习第一章 →
+                </button>
+            </section>
+
+            <!-- Chapter 1 -->
+            <section id="section-chapter1" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第一章：出身之谜</h2>
+                    <p class="chapter-meta">4个知识点 · 5道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天出身于并州文水（今山西文水）的小官僚家庭，父亲武士彟是木材商人出身</span>
+                    </div>
+                    <div class="explanation">
+                        武则天的故乡有多种说法，但按照中国人重视祖籍的习惯，她是并州文水人。
+                        武家属于"小信"阶层，介于世家大族和平头百姓之间，有一定的社会地位但不高。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">祖籍：并州文水（今山西省文水县）</div>
+                        <div class="example-item">出生地：长安（今西安）</div>
+                        <div class="example-item">童年生活地：利州（今四川广元）</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>父亲武士彟通过经商和从军改变命运，成为唐朝开国功臣</span>
+                    </div>
+                    <div class="explanation">
+                        武士彟原本是农民，但他有理想，不愿过"面朝黄土背朝天"的生活。
+                        他先去经商做木材生意，后来在隋末动乱中投奔李渊，成为唐朝开国功臣之一。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">原职业：木材商人</div>
+                        <div class="example-item">功臣身份：唐朝开国功臣</div>
+                        <div class="example-item">官职：工部尚书、荆州都督</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天的母亲杨氏出身隋朝皇室，为她提供了良好的教育背景</span>
+                    </div>
+                    <div class="explanation">
+                        武士彟的原配妻子去世后，他娶了隋朝皇室后裔杨氏。
+                        杨氏为武则天提供了良好的家庭教育，使她从小就接受了文化熏陶。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">母亲：杨氏，隋朝皇室后裔</div>
+                        <div class="example-item">教育：良好的家庭教育，精通文史</div>
+                        <div class="example-item">影响：为日后参政奠定基础</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>各种传说为武则天的出身增添了神秘色彩，但多为后人附会</span>
+                    </div>
+                    <div class="explanation">
+                        各地都有关于武则天的传说，如利州的"龙坛"传说，说武则天的母亲感龙而孕。
+                        这些传说反映了人们对这位女皇帝的神秘化想象，但并非历史事实。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">利州传说：母亲游龙坛，感龙而孕</div>
+                        <div class="example-item">目的：神化武则天的出身</div>
+                        <div class="example-item">实际：普通官僚家庭出身</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第一章</h3>
+                        <p class="quiz-progress">问题 <span id="q1-current">1</span>/5</p>
+                    </div>
+
+                    <div class="question-card active" id="q1-1">
+                        <p class="question-text">1. 武则天的祖籍是哪里？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">A. 长安（今西安）</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', true)">B. 并州文水（今山西文水）</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">C. 利州（今四川广元）</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">D. 洛阳</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q1-2">
+                        <p class="question-text">2. 武则天的父亲武士彟最初从事什么职业？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">A. 农民</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', true)">B. 木材商人</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">C. 官员</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">D. 军人</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q1-3">
+                        <p class="question-text">3. 武则天的母亲杨氏出身于哪个皇室？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">A. 唐朝皇室</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', true)">B. 隋朝皇室</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">C. 汉朝皇室</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">D. 北魏皇室</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q1-4">
+                        <p class="question-text">4. 武家属于什么社会阶层？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">A. 世家大族</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', true)">B. 小信（介于世家和平民之间）</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">C. 平头百姓</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">D. 皇亲国戚</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-4"></div>
+                    </div>
+
+                    <div class="question-card" id="q1-5">
+                        <p class="question-text">5. 武士彟是如何改变家族命运的？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-5', false)">A. 通过科举考试</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-5', false)">B. 通过婚姻</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-5', true)">C. 通过经商和从军</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-5', false)">D. 通过继承遗产</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-5"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter1">
+                        <h4>🎉 恭喜完成第一章！</h4>
+                        <p>你已经了解了武则天的出身背景和家庭环境。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(2)">继续学习第二章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(1)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q1-prev" onclick="prevQuestion(1)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q1-next" onclick="nextQuestion(1)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 2-7 placeholders -->
+            <section id="section-chapter2" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第二章：入宫岁月</h2>
+                    <p class="chapter-meta">4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天14岁入宫，被唐太宗封为五品才人，赐号"武媚"</span>
+                    </div>
+                    <div class="explanation">
+                        贞观十一年（637年），14岁的武则天因美貌被选入宫，成为唐太宗李世民的才人。
+                        才人是后宫嫔妃中的一个等级，主要负责记录宫廷宴乐等事务。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">入宫年龄：14岁（637年）</div>
+                        <div class="example-item">封号：五品才人</div>
+                        <div class="example-item">赐号：武媚</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天在唐太宗时期并未得宠，12年才人生涯平淡无奇</span>
+                    </div>
+                    <div class="explanation">
+                        尽管武则天美貌出众，但唐太宗似乎并不特别宠爱她。
+                        在唐太宗在位的23年中，武则天始终只是五品才人，没有得到晋升。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">才人任期：12年（637-649年）</div>
+                        <div class="example-item">品级变化：无，始终是五品</div>
+                        <div class="example-item">原因：性格刚强，不符合太宗喜好</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天与太子李治（后来的唐高宗）产生了感情</span>
+                    </div>
+                    <div class="explanation">
+                        在唐太宗病重期间，武则天作为才人负责照料，与太子李治朝夕相处，
+                        两人之间产生了感情。这段感情为武则天日后的命运转折埋下了伏笔。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">时机：唐太宗病重期间</div>
+                        <div class="example-item">对象：太子李治（后来的唐高宗）</div>
+                        <div class="example-item">影响：为日后回宫奠定基础</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>唐太宗驾崩后，武则天按例入感业寺为尼</span>
+                    </div>
+                    <div class="explanation">
+                        贞观二十三年（649年），唐太宗驾崩。按照唐代惯例，没有子女的先帝嫔妃
+                        需要出家为尼。武则天被送往感业寺，开始了她的尼姑生涯。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 具体案例与数据：</strong>
+                        <div class="example-item">时间：649年</div>
+                        <div class="example-item">地点：感业寺</div>
+                        <div class="example-item">身份：尼姑</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第二章</h3>
+                        <p class="quiz-progress">问题 <span id="q2-current">1</span>/5</p>
+                    </div>
+
+                    <div class="question-card active" id="q2-1">
+                        <p class="question-text">1. 武则天几岁入宫？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">A. 12岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', true)">B. 14岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">C. 16岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">D. 18岁</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q2-2">
+                        <p class="question-text">2. 唐太宗赐给武则天什么称号？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">A. 武才人</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', true)">B. 武媚</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">C. 武昭仪</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">D. 武皇后</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q2-3">
+                        <p class="question-text">3. 武则天在唐太宗时期担任什么职位？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">A. 昭仪</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', true)">B. 才人</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">C. 婕妤</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">D. 贵妃</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q2-4">
+                        <p class="question-text">4. 武则天与谁产生了感情？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-4', false)">A. 唐太宗</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-4', true)">B. 太子李治</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-4', false)">C. 李元吉</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-4', false)">D. 李建成</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-4"></div>
+                    </div>
+
+                    <div class="question-card" id="q2-5">
+                        <p class="question-text">5. 唐太宗驾崩后，武则天去了哪里？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-5', false)">A. 回到娘家</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-5', true)">B. 感业寺为尼</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-5', false)">C. 继续留在宫中</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-5', false)">D. 被流放</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-5"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter2">
+                        <h4>🎉 恭喜完成第二章！</h4>
+                        <p>你已经了解了武则天的入宫岁月。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(3)">继续学习第三章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(2)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q2-prev" onclick="prevQuestion(2)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q2-next" onclick="nextQuestion(2)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapters 3-7 simplified for brevity -->
+            <section id="section-chapter3" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第三章：感业寺风云</h2>
+                    <p class="chapter-meta">4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天在感业寺并非消极等待，而是积极寻找重返宫廷的机会</span>
+                    </div>
+                    <div class="explanation">
+                        在感业寺期间，武则天保持与唐高宗李治的联系，等待时机。
+                        她深知自己的命运掌握在皇帝手中，必须保持希望和耐心。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">策略：保持与皇帝的联系</div>
+                        <div class="example-item">心态：积极等待，不放弃希望</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>王皇后为了对付萧淑妃，主动将武则天接回宫中</span>
+                    </div>
+                    <div class="explanation">
+                        唐高宗的王皇后与萧淑妃争宠，王皇后为了打压萧淑妃，
+                        主动建议唐高宗将武则天接回宫中，这给了武则天重返宫廷的机会。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">推动者：王皇后</div>
+                        <div class="example-item">目的：对付萧淑妃</div>
+                        <div class="example-item">结果：武则天重返宫廷</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天回宫后迅速获得唐高宗宠爱，被封为昭仪</span>
+                    </div>
+                    <div class="explanation">
+                        武则天回宫后，凭借她的美貌和智慧，迅速获得唐高宗的宠爱。
+                        她被封为昭仪，地位仅次于皇后和贵妃。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">封号：昭仪（二品）</div>
+                        <div class="example-item">地位：仅次于皇后和贵妃</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天开始展现政治野心，为日后登上后位做准备</span>
+                    </div>
+                    <div class="explanation">
+                        武则天不仅满足于后宫的地位，她开始参与政治事务，
+                        培养自己的势力，为日后登上皇后之位做准备。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">策略：参与政治，培养势力</div>
+                        <div class="example-item">目标：登上皇后之位</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第三章</h3>
+                        <p class="quiz-progress">问题 <span id="q3-current">1</span>/5</p>
+                    </div>
+
+                    <div class="question-card active" id="q3-1">
+                        <p class="question-text">1. 谁推动武则天重返宫廷？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">A. 唐高宗</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', true)">B. 王皇后</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">C. 萧淑妃</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">D. 武则天自己</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q3-2">
+                        <p class="question-text">2. 王皇后为什么要接武则天回宫？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">A. 同情武则天</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', true)">B. 为了对付萧淑妃</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">C. 唐高宗的命令</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">D. 太后的旨意</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q3-3">
+                        <p class="question-text">3. 武则天回宫后被封为什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-3', false)">A. 贵妃</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-3', true)">B. 昭仪</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-3', false)">C. 婕妤</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-3', false)">D. 才人</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q3-4">
+                        <p class="question-text">4. 武则天在感业寺期间做了什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-4', false)">A. 彻底放弃希望</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-4', true)">B. 积极寻找重返宫廷的机会</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-4', false)">C. 专心研究佛法</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-4', false)">D. 与外界断绝联系</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-4"></div>
+                    </div>
+
+                    <div class="question-card" id="q3-5">
+                        <p class="question-text">5. 武则天回宫后开始做什么准备？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-5', false)">A. 专心侍奉皇帝</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-5', true)">B. 参与政治，培养势力</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-5', false)">C. 生儿育女</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-5', false)">D. 与皇后交好</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-5"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter3">
+                        <h4>🎉 恭喜完成第三章！</h4>
+                        <p>你已经了解了武则天在感业寺的经历和重返宫廷的过程。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(4)">继续学习第四章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(3)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q3-prev" onclick="prevQuestion(3)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q3-next" onclick="nextQuestion(3)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapters 4-7 simplified -->
+            <section id="section-chapter4" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第四章：登上后位</h2>
+                    <p class="chapter-meta">4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天通过"废王立武"事件登上皇后之位，这是唐代政治的重大转折</span>
+                    </div>
+                    <div class="explanation">
+                        永徽六年（655年），唐高宗不顾大臣反对，废黜王皇后，立武则天为皇后。
+                        这一事件标志着武则天正式登上政治舞台。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">时间：655年</div>
+                        <div class="example-item">事件：废王立武</div>
+                        <div class="example-item">结果：武则天成为皇后</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第四章</h3>
+                        <p class="quiz-progress">问题 <span id="q4-current">1</span>/5</p>
+                    </div>
+
+                    <div class="question-card active" id="q4-1">
+                        <p class="question-text">1. "废王立武"事件发生在哪一年？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">A. 649年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', true)">B. 655年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">C. 660年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">D. 665年</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q4-2">
+                        <p class="question-text">2. 武则天登上皇后之位的主要手段是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">A. 生育皇子</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', true)">B. 废黜王皇后</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">C. 政变夺权</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">D. 太后支持</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q4-3">
+                        <p class="question-text">3. 武则天成为皇后时的年龄大约是？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-3', false)">A. 25岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-3', false)">B. 30岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-3', true)">C. 32岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-3', false)">D. 35岁</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q4-4">
+                        <p class="question-text">4. 武则天成为皇后的意义是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-4', false)">A. 只是后宫之事</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-4', true)">B. 标志着她正式登上政治舞台</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-4', false)">C. 只是婚姻变化</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-4', false)">D. 没有太大意义</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-4"></div>
+                    </div>
+
+                    <div class="question-card" id="q4-5">
+                        <p class="question-text">5. 武则天成为皇后面临的主要阻力是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-5', false)">A. 太后反对</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-5', true)">B. 大臣反对</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-5', false)">C. 军队反对</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-5', false)">D. 民众反对</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-5"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter4">
+                        <h4>🎉 恭喜完成第四章！</h4>
+                        <p>你已经了解了武则天登上皇后之位的过程。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(5)">继续学习第五章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(4)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q4-prev" onclick="prevQuestion(4)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q4-next" onclick="nextQuestion(4)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapters 5-7 simplified placeholders -->
+            <section id="section-chapter5" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第五章：参政议政</h2>
+                    <p class="chapter-meta">4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天在唐高宗患病期间开始参与朝政，逐渐掌握实权</span>
+                    </div>
+                    <div class="explanation">
+                        唐高宗患有头风病，经常无法处理朝政。武则天趁机参与政务，
+                        逐渐形成了"二圣临朝"的局面，与皇帝共同处理国事。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">原因：唐高宗患病</div>
+                        <div class="example-item">局面：二圣临朝</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第五章</h3>
+                        <p class="quiz-progress">问题 <span id="q5-current">1</span>/5</p>
+                    </div>
+
+                    <div class="question-card active" id="q5-1">
+                        <p class="question-text">1. 武则天参政的主要原因是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">A. 唐高宗主动让权</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', true)">B. 唐高宗患病</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">C. 武则天政变夺权</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">D. 太后支持</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q5-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q5-2">
+                        <p class="question-text">2. 武则天与唐高宗共同处理朝政的局面被称为什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q5-2', false)">A. 垂帘听政</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-2', true)">B. 二圣临朝</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-2', false)">C. 摄政</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-2', false)">D. 监国</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q5-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q5-3">
+                        <p class="question-text">3. 唐高宗患的是什么病？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q5-3', false)">A. 心脏病</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-3', true)">B. 头风病</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-3', false)">C. 眼疾</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-3', false)">D. 腿疾</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q5-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q5-4">
+                        <p class="question-text">4. 武则天参政后逐渐掌握了什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q5-4', false)">A. 军事权</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-4', true)">B. 实权</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-4', false)">C. 财政权</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-4', false)">D. 人事权</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q5-4"></div>
+                    </div>
+
+                    <div class="question-card" id="q5-5">
+                        <p class="question-text">5. "二圣临朝"的局面说明了什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q5-5', false)">A. 唐高宗完全放权</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-5', true)">B. 武则天政治地位的提升</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-5', false)">C. 皇后参政是常态</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-5', false)">D. 唐朝制度规定</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q5-5"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter5">
+                        <h4>🎉 恭喜完成第五章！</h4>
+                        <p>你已经了解了武则天参政议政的过程。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(6)">继续学习第六章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(5)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q5-prev" onclick="prevQuestion(5)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q5-next" onclick="nextQuestion(5)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter6" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第六章：称帝之路</h2>
+                    <p class="chapter-meta">4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>67岁的武则天在690年正式称帝，建立武周王朝，成为中国唯一女皇帝</span>
+                    </div>
+                    <div class="explanation">
+                        唐高宗去世后，武则天先后废黜了两个儿子（唐中宗、唐睿宗），
+                        最终在690年正式称帝，改国号为"周"，建立了武周王朝。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">时间：690年</div>
+                        <div class="example-item">年龄：67岁</div>
+                        <div class="example-item">国号：周</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第六章</h3>
+                        <p class="quiz-progress">问题 <span id="q6-current">1</span>/5</p>
+                    </div>
+
+                    <div class="question-card active" id="q6-1">
+                        <p class="question-text">1. 武则天在哪一年正式称帝？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">A. 680年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">B. 685年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', true)">C. 690年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">D. 695年</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q6-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q6-2">
+                        <p class="question-text">2. 武则天称帝时的年龄是多少？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q6-2', false)">A. 57岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-2', false)">B. 62岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-2', true)">C. 67岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-2', false)">D. 72岁</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q6-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q6-3">
+                        <p class="question-text">3. 武则天建立的王朝国号是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q6-3', false)">A. 唐</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-3', true)">B. 周</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-3', false)">C. 汉</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-3', false)">D. 武</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q6-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q6-4">
+                        <p class="question-text">4. 武则天在称帝前废黜了几个儿子？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q6-4', false)">A. 1个</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-4', true)">B. 2个</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-4', false)">C. 3个</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-4', false)">D. 4个</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q6-4"></div>
+                    </div>
+
+                    <div class="question-card" id="q6-5">
+                        <p class="question-text">5. 武则天在中国历史上的地位是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q6-5', false)">A. 第一位女皇帝</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-5', true)">B. 唯一的女皇帝</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-5', false)">C. 最后一位女皇帝</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-5', false)">D. 最有权力的女性</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q6-5"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter6">
+                        <h4>🎉 恭喜完成第六章！</h4>
+                        <p>你已经了解了武则天称帝的过程。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(7)">继续学习第七章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(6)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q6-prev" onclick="prevQuestion(6)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q6-next" onclick="nextQuestion(6)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter7" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👑 第七章：晚年岁月</h2>
+                    <p class="chapter-meta">4个知识点 · 5道测试题</p>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天晚年宠信张易之、张昌宗兄弟，引发朝臣不满</span>
+                    </div>
+                    <div class="explanation">
+                        武则天晚年宠信张氏兄弟，让他们干预朝政，这引起了朝臣的强烈不满。
+                        张氏兄弟的专权成为日后政变的重要原因之一。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">宠臣：张易之、张昌宗</div>
+                        <div class="example-item">问题：干预朝政</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>705年，张柬之等人发动神龙政变，迫使武则天退位</span>
+                    </div>
+                    <div class="explanation">
+                        神龙元年（705年），宰相张柬之等人趁武则天病重，发动政变，
+                        杀死张氏兄弟，迫使武则天传位于太子李显（唐中宗）。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">时间：705年</div>
+                        <div class="example-item">事件：神龙政变</div>
+                        <div class="example-item">结果：武则天退位</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天退位后不久去世，以皇后身份与唐高宗合葬</span>
+                    </div>
+                    <div class="explanation">
+                        武则天退位后被尊为"则天大圣皇帝"，但不久后去世（705年）。
+                        她临终前要求去掉帝号，以皇后身份与唐高宗合葬于乾陵。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">去世时间：705年</div>
+                        <div class="example-item">享年：82岁</div>
+                        <div class="example-item">葬地：乾陵（与唐高宗合葬）</div>
+                    </div>
+                </div>
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>武则天留下无字碑，功过留给后人评说</span>
+                    </div>
+                    <div class="explanation">
+                        武则天的墓前立有一块无字碑，上面没有刻任何文字。
+                        这可能是她有意为之，表示自己的功过是非留给后人评说。
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">无字碑：乾陵前的石碑</div>
+                        <div class="example-item">寓意：功过留给后人评说</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第七章</h3>
+                        <p class="quiz-progress">问题 <span id="q7-current">1</span>/5</p>
+                    </div>
+
+                    <div class="question-card active" id="q7-1">
+                        <p class="question-text">1. 武则天晚年宠信谁？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">A. 李氏宗亲</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', true)">B. 张易之、张昌宗兄弟</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">C. 武氏家族</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">D. 狄仁杰</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q7-1"></div>
+                    </div>
+
+                    <div class="question-card" id="q7-2">
+                        <p class="question-text">2. 神龙政变发生在哪一年？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q7-2', false)">A. 700年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-2', true)">B. 705年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-2', false)">C. 710年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-2', false)">D. 715年</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q7-2"></div>
+                    </div>
+
+                    <div class="question-card" id="q7-3">
+                        <p class="question-text">3. 武则天去世时的年龄是多少？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q7-3', false)">A. 72岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-3', false)">B. 77岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-3', true)">C. 82岁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-3', false)">D. 87岁</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q7-3"></div>
+                    </div>
+
+                    <div class="question-card" id="q7-4">
+                        <p class="question-text">4. 武则天最终与谁合葬？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q7-4', true)">A. 唐高宗</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-4', false)">B. 唐太宗</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-4', false)">C. 单独安葬</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-4', false)">D. 不清楚</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q7-4"></div>
+                    </div>
+
+                    <div class="question-card" id="q7-5">
+                        <p class="question-text">5. 武则天墓前的无字碑象征什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q7-5', false)">A. 没有功绩可写</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-5', true)">B. 功过留给后人评说</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-5', false)">C. 碑文被毁</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-5', false)">D. 来不及刻字</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q7-5"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter7">
+                        <h4>🎉 恭喜完成全部学习！</h4>
+                        <p>你已经全面了解了武则天传奇的一生。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showFinalSummary()">查看学习总结 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(7)">🔄 重置本章</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q7-prev" onclick="prevQuestion(7)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q7-next" onclick="nextQuestion(7)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Final Summary -->
+            <section id="section-summary" class="chapter-section" style="display: none;">
+                <div style="background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(181, 165, 197, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid var(--pink);">
+                    <h2 style="color: var(--pink); margin-bottom: 16px; font-size: 22px;">🎓 学习总结</h2>
+                    <p style="font-size: 15px; line-height: 1.8; margin-bottom: 20px;">
+                        恭喜你完成了《女皇武则天》百家讲坛的全部学习内容！
+                    </p>
+                    <h3 style="font-size: 18px; margin: 20px 0 12px;">📊 武则天生平大事记</h3>
+                    <ul style="list-style: none; font-size: 15px;">
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>624年：</strong>出生于并州文水
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>637年（14岁）：</strong>入宫，被唐太宗封为才人
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>649年：</strong>唐太宗驾崩，入感业寺为尼
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>655年（32岁）：</strong>被立为皇后
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>660年代：</strong>开始参与朝政，"二圣临朝"
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>683年：</strong>唐高宗去世，临朝称制
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>690年（67岁）：</strong>称帝，建立武周王朝
+                        </li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                            <strong>705年：</strong>神龙政变，被迫退位
+                        </li>
+                        <li style="padding: 10px 0;">
+                            <strong>705年（82岁）：</strong>去世，与唐高宗合葬于乾陵
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(154, 171, 184, 0.2), rgba(181, 165, 197, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 24px; border-left: 4px solid var(--accent);">
+                    <h2 style="color: var(--accent); margin-bottom: 12px; font-size: 20px;">💡 核心启示</h2>
+                    <p style="font-size: 15px; line-height: 1.8;">
+                        武则天的一生充满了传奇色彩，她的成功既有时代机遇的因素，也有个人性格和能力的原因。
+                        她打破了男权社会的束缚，成为中国历史上唯一的女皇帝，展现了非凡的政治智慧和领导才能。
+                        然而，她的统治也充满了争议，包括任用酷吏、宠信男宠等问题。
+                        无论如何，武则天都是中国历史上最复杂、最有影响力的政治人物之一。
+                    </p>
+                </div>
+
+                <button class="btn btn-primary" onclick="resetProgress()" style="width: 100%;">
+                    🔄 重新学习
+                </button>
+            </section>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <p>📚 百家讲坛学习站 · 蒙曼教授主讲 · 2026</p>
+    </footer>
+
+    <script>
+        let currentChapter = 0;
+        let currentQuestion = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1};
+        let readSections = JSON.parse(localStorage.getItem('wu-zetian-read') || '{}');
+        let quizScores = JSON.parse(localStorage.getItem('wu-zetian-scores') || '{}');
+
+        function init() {
+            updateStats();
+            restoreProgress();
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.chapter-section').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+
+            if (section === 'learning') {
+                document.getElementById('section-learning').style.display = 'block';
+                document.getElementById('nav-learning').classList.add('active');
+            } else if (section === 'content') {
+                showChapter(currentChapter || 1);
+                document.getElementById('nav-content').classList.add('active');
+            } else if (section === 'quiz') {
+                const chapter = currentChapter || 1;
+                showChapter(chapter);
+                document.getElementById('nav-quiz').classList.add('active');
+                setTimeout(() => {
+                    const quizSection = document.querySelector(`#section-chapter${chapter} .quiz-section`);
+                    if (quizSection) {
+                        quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            }
+        }
+
+        function startLearning() {
+            showChapter(1);
+            document.getElementById('nav-content').classList.add('active');
+            document.getElementById('nav-learning').classList.remove('active');
+        }
+
+        function showChapter(chapterNum) {
+            currentChapter = chapterNum;
+            document.querySelectorAll('.chapter-section').forEach(el => {
+                el.style.display = 'none';
+            });
+            const sectionId = chapterNum === 0 ? 'section-learning' :
+                             chapterNum === 8 ? 'section-summary' :
+                             `section-chapter${chapterNum}`;
+            document.getElementById(sectionId).style.display = 'block';
+            updateTOC();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (chapterNum > 0 && chapterNum < 8) {
+                readSections[chapterNum] = true;
+                localStorage.setItem('wu-zetian-read', JSON.stringify(readSections));
+                updateStats();
+            }
+        }
+
+        function showFinalSummary() {
+            showChapter(8);
+        }
+
+        function scrollToChapter(chapterNum) {
+            showChapter(chapterNum);
+        }
+
+        function updateTOC() {
+            for (let i = 0; i <= 7; i++) {
+                const toc = document.getElementById(`toc-${i}`);
+                if (toc) {
+                    if (readSections[i]) {
+                        toc.classList.add('completed');
+                    } else {
+                        toc.classList.remove('completed');
+                    }
+                    if (i === currentChapter) {
+                        toc.style.background = 'var(--accent-light)';
+                    } else {
+                        toc.style.background = '';
+                    }
+                }
+            }
+        }
+
+        function selectOption(element, questionId, isCorrect) {
+            const parent = element.parentElement;
+            parent.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected', 'correct', 'wrong');
+            });
+            element.classList.add('selected');
+            if (isCorrect) {
+                element.classList.add('correct');
+                showFeedback(questionId, true);
+            } else {
+                element.classList.add('wrong');
+                showFeedback(questionId, false);
+                parent.querySelectorAll('.option-item').forEach(item => {
+                    if (item.getAttribute('onclick').includes('true')) {
+                        item.classList.add('correct');
+                    }
+                });
+            }
+            parent.querySelectorAll('.option-item').forEach(item => {
+                item.style.pointerEvents = 'none';
+            });
+            const chapter = questionId.split('-')[0].replace('q', '');
+            if (!quizScores[chapter]) quizScores[chapter] = {correct: 0, total: 0};
+            quizScores[chapter].total++;
+            if (isCorrect) quizScores[chapter].correct++;
+            localStorage.setItem('wu-zetian-scores', JSON.stringify(quizScores));
+            updateStats();
+        }
+
+        function showFeedback(questionId, isCorrect) {
+            const feedback = document.getElementById(`feedback-${questionId}`);
+            if (isCorrect) {
+                feedback.textContent = '✅ 回答正确！你已经掌握了这个知识点。';
+                feedback.className = 'feedback show correct';
+            } else {
+                feedback.textContent = '❌ 回答错误。请查看上方的正确答案。';
+                feedback.className = 'feedback show wrong';
+            }
+        }
+
+        function nextQuestion(chapter) {
+            const maxQuestions = {1: 5, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5};
+            if (currentQuestion[chapter] < maxQuestions[chapter]) {
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.remove('active');
+                currentQuestion[chapter]++;
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.add('active');
+                document.getElementById(`q${chapter}-current`).textContent = currentQuestion[chapter];
+                updateQuizButtons(chapter);
+            } else {
+                document.getElementById(`complete-chapter${chapter}`).classList.add('show');
+            }
+        }
+
+        function prevQuestion(chapter) {
+            if (currentQuestion[chapter] > 1) {
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.remove('active');
+                currentQuestion[chapter]--;
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.add('active');
+                document.getElementById(`q${chapter}-current`).textContent = currentQuestion[chapter];
+                updateQuizButtons(chapter);
+            }
+        }
+
+        function updateQuizButtons(chapter) {
+            const maxQuestions = {1: 5, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5};
+            const prevBtn = document.getElementById(`q${chapter}-prev`);
+            const nextBtn = document.getElementById(`q${chapter}-next`);
+            prevBtn.disabled = currentQuestion[chapter] === 1;
+            if (currentQuestion[chapter] === maxQuestions[chapter]) {
+                nextBtn.textContent = '完成 ✓';
+            } else {
+                nextBtn.textContent = '下一题 →';
+            }
+        }
+
+        function updateStats() {
+            const readCount = Object.keys(readSections).length;
+            document.getElementById('readCount').textContent = readCount;
+            let totalCorrect = 0;
+            Object.values(quizScores).forEach(score => {
+                totalCorrect += score.correct;
+            });
+            document.getElementById('quizScore').textContent = totalCorrect;
+        }
+
+        function restoreProgress() {
+            updateTOC();
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('resetDropdown');
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                dropdown.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('resetDropdown');
+            const dropdownBtn = event.target.closest('.dropdown');
+            if (!dropdownBtn && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        function resetChapterProgress(chapter) {
+            const chapterNames = {
+                1: '出身之谜',
+                2: '入宫岁月',
+                3: '感业寺风云',
+                4: '登上后位',
+                5: '参政议政',
+                6: '称帝之路',
+                7: '晚年岁月'
+            };
+            if (confirm(`确定要重置「${chapterNames[chapter]}」吗？`)) {
+                delete readSections[chapter];
+                localStorage.setItem('wu-zetian-read', JSON.stringify(readSections));
+                delete quizScores[chapter];
+                localStorage.setItem('wu-zetian-scores', JSON.stringify(quizScores));
+
+                const chapterSection = document.getElementById(`section-chapter${chapter}`);
+                if (chapterSection) {
+                    chapterSection.querySelectorAll('.question-card').forEach(card => {
+                        card.classList.remove('active');
+                    });
+                    chapterSection.querySelectorAll('.option-item').forEach(item => {
+                        item.classList.remove('selected', 'correct', 'wrong');
+                        item.style.pointerEvents = '';
+                    });
+                    chapterSection.querySelectorAll('.feedback').forEach(fb => {
+                        fb.classList.remove('show');
+                    });
+                    const completeSection = document.getElementById(`complete-chapter${chapter}`);
+                    if (completeSection) {
+                        completeSection.classList.remove('show');
+                    }
+                    currentQuestion[chapter] = 1;
+                    const currentSpan = document.getElementById(`q${chapter}-current`);
+                    if (currentSpan) {
+                        currentSpan.textContent = '1';
+                    }
+                    const firstQuestion = document.getElementById(`q${chapter}-1`);
+                    if (firstQuestion) {
+                        firstQuestion.classList.add('active');
+                    }
+                    updateQuizButtons(chapter);
+                }
+                updateStats();
+                updateTOC();
+                document.getElementById('resetDropdown').style.display = 'none';
+                if (currentChapter === chapter) {
+                    showChapter(chapter);
+                }
+                alert(`✅「${chapterNames[chapter]}」已重置！`);
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('确定要重置所有学习进度吗？')) {
+                localStorage.removeItem('wu-zetian-read');
+                localStorage.removeItem('wu-zetian-scores');
+                readSections = {};
+                quizScores = {};
+                currentChapter = 0;
+                currentQuestion = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1};
+                updateStats();
+                showSection('learning');
+                document.querySelectorAll('.question-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                document.querySelectorAll('.option-item').forEach(item => {
+                    item.classList.remove('selected', 'correct', 'wrong');
+                    item.style.pointerEvents = '';
+                });
+                document.querySelectorAll('.feedback').forEach(fb => {
+                    fb.classList.remove('show');
+                });
+                document.querySelectorAll('.chapter-complete').forEach(cc => {
+                    cc.classList.remove('show');
+                });
+                for (let i = 1; i <= 7; i++) {
+                    document.getElementById(`q${i}-1`).classList.add('active');
+                }
+                document.getElementById('resetDropdown').style.display = 'none';
+                alert('✅ 所有进度已重置！');
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+
+        init();
+    </script>
+</body>
+</html>
