@@ -248,6 +248,29 @@
             position: relative;
             line-height: 1.6;
         }
+        .video-container {
+            margin: 24px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .video-container h4 {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+            padding: 14px 20px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .video-container iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: none;
+            display: block;
+        }
+        }
         .example-item::before {
             content: '•';
             position: absolute;
@@ -546,6 +569,16 @@
                 <div class="chapter-header">
                     <h2 class="chapter-title">👑 第1集：不要问我从哪里来</h2>
                     <p class="chapter-meta">武则天的出身与家庭背景 · 4个知识点 · 5道测试题</p>
+                </div>
+
+                <div class="video-container">
+                    <h4>📺 原始视频讲座 - 上集</h4>
+                    <iframe
+                        src="https://www.youtube.com/embed/W45nMCvYJwg"
+                        title="女皇武则天 上集 - 百家讲坛"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
                 </div>
 
                 <div class="knowledge-card">
@@ -1810,6 +1843,16 @@
                 <div class="chapter-header">
                     <h2 class="chapter-title">👑 第9集：重用酷吏</h2>
                     <p class="chapter-meta">武则天称帝后的统治手段 · 4个知识点 · 4道测试题</p>
+                </div>
+
+                <div class="video-container">
+                    <h4>📺 原始视频讲座 - 下集</h4>
+                    <iframe
+                        src="https://www.youtube.com/embed/mSLM1mhVyBI"
+                        title="女皇武则天 下集 - 百家讲坛"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
                 </div>
 
                 <div class="knowledge-card">
