@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太平公主：百家讲坛完整学习版</title>
+    <style>
+        :root {
+            --bg: #F0EBE3;
+            --card: #FFFFFF;
+            --text: #5C5350;
+            --text-secondary: #8A7F7A;
+            --accent: #9AABB8;
+            --accent-hover: #8A9CAA;
+            --accent-light: #E8EFF3;
+            --success: #A5B5A0;
+            --warning: #D4C5A5;
+            --info: #9AABB8;
+            --pink: #D4A5A5;
+            --purple: #B5A5C5;
+            --border: #E0D8D0;
+            --shadow: 0 2px 12px rgba(92, 83, 80, 0.08);
+            --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+        }
+        .hero {
+            background: linear-gradient(135deg, #D4A5A5 0%, #B5A5C5 50%, #9AABB8 100%);
+            color: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        .hero-description {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 15px;
+            opacity: 0.95;
+        }
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pink), var(--accent), var(--purple));
+            z-index: 1000;
+            transition: width 0.3s;
+        }
+        .nav {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--accent);
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        .sidebar-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .sidebar-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .toc-list { list-style: none; }
+        .toc-item { margin-bottom: 6px; }
+        .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .toc-link:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        .toc-link.completed {
+            background: rgba(165, 181, 160, 0.2);
+            color: var(--success);
+        }
+        .toc-icon { font-size: 18px; }
+        .toc-text { flex: 1; font-weight: 500; }
+        .chapter-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--accent);
+        }
+        .chapter-header {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .chapter-title {
+            font-size: 24px;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        .chapter-meta {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .knowledge-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        .conclusion {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(181, 165, 197, 0.2));
+            border-radius: 12px;
+            border-left: 4px solid var(--pink);
+        }
+        .conclusion-icon { font-size: 22px; margin-right: 10px; }
+        .explanation {
+            font-size: 16px;
+            line-height: 2;
+            color: var(--text);
+            margin-bottom: 20px;
+            padding: 0 16px;
+        }
+        .explanation p {
+            margin-bottom: 16px;
+            text-indent: 2em;
+        }
+        .examples {
+            font-size: 15px;
+            color: var(--text-secondary);
+            padding: 16px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 12px;
+            border: 1px dashed var(--border);
+        }
+        .examples strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        .example-item {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            line-height: 1.6;
+        }
+        .example-item::before {
+            content: '•';
+            position: absolute;
+            left: 8px;
+            color: var(--accent);
+            font-weight: bold;
+        }
+        .quiz-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-top: 32px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--warning);
+        }
+        .quiz-header {
+            margin-bottom: 28px;
+        }
+        .quiz-header h3 {
+            font-size: 22px;
+            color: var(--warning);
+            margin-bottom: 12px;
+        }
+        .quiz-progress {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .question-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid var(--border);
+        }
+        .question-card.active { display: block; }
+        .question-text {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .options-list { list-style: none; }
+        .option-item {
+            padding: 18px 24px;
+            margin-bottom: 14px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .option-item:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+        .option-item.selected {
+            border-color: var(--info);
+            background: rgba(154, 171, 184, 0.15);
+        }
+        .option-item.correct {
+            border-color: var(--success);
+            background: rgba(165, 181, 160, 0.2);
+        }
+        .option-item.wrong {
+            border-color: var(--pink);
+            background: rgba(212, 165, 165, 0.2);
+        }
+        .feedback {
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 18px;
+            display: none;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .feedback.show { display: block; }
+        .feedback.correct {
+            background: rgba(165, 181, 160, 0.2);
+            border: 1px solid var(--success);
+            color: #5a7a52;
+        }
+        .feedback.wrong {
+            background: rgba(212, 165, 165, 0.2);
+            border: 1px solid var(--pink);
+            color: #8a5a5a;
+        }
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 28px;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .chapter-complete {
+            background: linear-gradient(135deg, var(--success), #8fa889);
+            color: white;
+            padding: 28px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 28px;
+            display: none;
+        }
+        .chapter-complete.show { display: block; }
+        .reset-chapter-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 0;
+            min-width: 200px;
+            box-shadow: 0 8px 24px rgba(92, 83, 80, 0.15);
+            z-index: 1000;
+            margin-top: 8px;
+        }
+        .dropdown-content a {
+            display: block;
+            padding: 14px 24px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .dropdown-content a:hover { background: var(--bg); }
+        .dropdown-content a.danger { color: var(--pink); }
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+        @media (max-width: 768px) {
+            .hero { padding: 40px 15px 30px; }
+            .nav-inner { flex-direction: column; align-items: stretch; }
+            .nav-links { justify-content: center; }
+            .chapter-section { padding: 24px; }
+            .knowledge-card { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <header class="hero">
+        <h1>👸 太平公主：百家讲坛完整学习版</h1>
+        <div class="hero-meta">
+            <span>📺 百家讲坛</span>
+            <span>👩‍🏫 蒙曼教授</span>
+            <span>⏱️ 10小时30分钟</span>
+            <span>📚 18集</span>
+            <span>🎯 12个知识点</span>
+            <span>📝 25道测试题</span>
+        </div>
+        <p class="hero-description">
+            从红妆时代到开元盛世，太平公主的一生展现了女性在男权社会中的挣扎与奋斗。
+            蒙曼教授为您详细讲述这位传奇公主的政治智慧与悲剧命运。
+        </p>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-links">
+                <a onclick="showSection('learning')" class="active" id="nav-learning">🎯 学习目标</a>
+                <a onclick="showSection('content')" id="nav-content">📖 内容学习</a>
+                <a onclick="showSection('quiz')" id="nav-quiz">✅ 知识检查</a>
+                <div class="dropdown">
+                    <a onclick="toggleDropdown()">🔄 重置进度 ▾</a>
+                    <div id="resetDropdown" class="dropdown-content">
+                        <a onclick="resetChapterProgress(1)">👸 重置第1章：红妆时代</a>
+                        <a onclick="resetChapterProgress(2)">👸 重置第2章：初涉政坛</a>
+                        <a onclick="resetChapterProgress(3)">👸 重置第3章：威风八面</a>
+                        <a onclick="resetChapterProgress(4)">👸 重置第4章：韦后崛起</a>
+                        <a onclick="resetChapterProgress(5)">👸 重置第5章：中宗之死</a>
+                        <a onclick="resetChapterProgress(6)">👸 重置第6章：唐隆政变</a>
+                        <a onclick="resetChapterProgress(7)">👸 重置第7章：睿宗登基</a>
+                        <a onclick="resetChapterProgress(8)">👸 重置第8章：姑侄斗法</a>
+                        <a onclick="resetChapterProgress(9)">👸 重置第9章：走向开元</a>
+                        <a onclick="resetProgress()" class="danger">🗑️ 重置全部进度</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3>📊 学习进度</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="readCount">0</div>
+                        <div class="stat-label">已学习</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="quizScore">0</div>
+                        <div class="stat-label">测试得分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">总知识点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">25</div>
+                        <div class="stat-label">总测试题</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-card">
+                <h3>📑 章节导航</h3>
+                <ul class="toc-list">
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(0)" id="toc-0"><span class="toc-icon">📋</span><span class="toc-text">学习目标与导读</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(1)" id="toc-1"><span class="toc-icon">👸</span><span class="toc-text">第1章：红妆时代</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(2)" id="toc-2"><span class="toc-icon">👸</span><span class="toc-text">第2章：初涉政坛</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(3)" id="toc-3"><span class="toc-icon">👸</span><span class="toc-text">第3章：威风八面</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(4)" id="toc-4"><span class="toc-icon">👸</span><span class="toc-text">第4章：韦后崛起</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(5)" id="toc-5"><span class="toc-icon">👸</span><span class="toc-text">第5章：中宗之死</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(6)" id="toc-6"><span class="toc-icon">👸</span><span class="toc-text">第6章：唐隆政变</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(7)" id="toc-7"><span class="toc-icon">👸</span><span class="toc-text">第7章：睿宗登基</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(8)" id="toc-8"><span class="toc-icon">👸</span><span class="toc-text">第8章：姑侄斗法</span></a></li>
+                    <li class="toc-item"><a class="toc-link" onclick="scrollToChapter(9)" id="toc-9"><span class="toc-icon">👸</span><span class="toc-text">第9章：走向开元</span></a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="content" id="content">
+            <section id="section-learning" class="chapter-section">
+                <div style="background: linear-gradient(135deg, rgba(165, 181, 160, 0.2), rgba(154, 171, 184, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 28px; border-left: 4px solid var(--success);">
+                    <h2 style="color: var(--success); margin-bottom: 20px; font-size: 22px;">🎯 学习目标</h2>
+                    <ul style="list-style: none;">
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>了解太平公主的出身背景和早期经历</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>理解太平公主在唐朝政坛上的崛起与衰落</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>分析太平公主与李隆基的权力斗争</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>评价太平公主的历史地位和影响</li>
+                        <li style="padding: 12px 0; padding-left: 28px; position: relative; font-size: 16px; line-height: 1.6;"><span style="position: absolute; left: 0; color: var(--success);">✓</span>理解唐朝"红妆时代"的历史意义</li>
+                    </ul>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(154, 171, 184, 0.2), rgba(181, 165, 197, 0.2)); padding: 28px; border-radius: 16px; margin-bottom: 28px; border-left: 4px solid var(--accent);">
+                    <h2 style="color: var(--accent); margin-bottom: 16px; font-size: 22px;">📝 课程导读</h2>
+                    <div style="font-size: 16px; line-height: 2;">
+                        <p style="margin-bottom: 16px; text-indent: 2em;">太平公主（约665-713年）是唐高宗和武则天的女儿，中国历史上最著名的女性政治家之一。她继承了母亲武则天的政治才能，但最终没能像母亲那样登上权力的巅峰。</p>
+                        <p style="margin-bottom: 16px; text-indent: 2em;">蒙曼教授在百家讲坛中详细讲述了太平公主传奇的一生：从最初的贤妻良母，到后来的威风八面，再到最终的悲剧收场。这个系列共18集，涵盖了太平公主从出生到死亡的完整历程。</p>
+                        <p style="text-indent: 2em;">通过本课程，你将不仅了解太平公主的生平事迹，更能深入理解唐朝的政治制度、社会文化以及女性在历史中的角色与贡献。</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="startLearning()" style="width: 100%;">开始学习第一章 →</button>
+            </section>
+
+            <section id="section-chapter1" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第1章：红妆时代</h2>
+                    <p class="chapter-meta">太平公主的出身与早期经历 · 2个知识点 · 4道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>太平公主是唐高宗和武则天的女儿，出身于唐朝最显赫的皇室家庭</span>
+                    </div>
+                    <div class="explanation">
+                        <p>太平公主（约665-713年）是唐高宗李治和武则天的女儿，也是中国历史上最著名的女性政治家之一。她出身于唐朝最显赫的皇室家庭，从小就接受了良好的教育。</p>
+                        <p>太平公主的母亲武则天是中国历史上唯一的女皇帝，父亲唐高宗也是一位有作为的皇帝。在这样的家庭环境中长大，太平公主从小就展现出了非凡的政治才能和智慧。</p>
+                        <p>太平公主的名字"太平"寓意着太平盛世，寄托了父母对她的期望。然而，她的一生却充满了政治斗争和权力角逐，最终以悲剧收场。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">出生时间：约665年</div>
+                        <div class="example-item">父亲：唐高宗李治</div>
+                        <div class="example-item">母亲：武则天</div>
+                        <div class="example-item">寓意：太平盛世</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>太平公主最初被按照贤妻良母的标准培养，但命运让她走上了政治道路</span>
+                    </div>
+                    <div class="explanation">
+                        <p>太平公主最初并不是按照政治家的标准培养的。在唐代，女性的主要角色是相夫教子，做一个贤妻良母。太平公主的父母也希望她能够过上幸福的家庭生活。</p>
+                        <p>然而，命运却让她走上了完全不同的道路。她的第一次婚姻以悲剧收场，丈夫薛绍因为牵连谋反而被处死。这次打击让太平公主彻底觉醒，她开始意识到，在这个男权社会中，只有掌握权力才能保护自己。</p>
+                        <p>从此，太平公主开始涉足政治，逐渐展现出她母亲武则天遗传给她的政治才能。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">初始培养方向：贤妻良母</div>
+                        <div class="example-item">第一次婚姻：嫁给薛绍</div>
+                        <div class="example-item">婚姻结局：薛绍被处死</div>
+                        <div class="example-item">人生转折：开始涉足政治</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第1章</h3>
+                        <p class="quiz-progress">问题 <span id="q1-current">1</span>/4</p>
+                    </div>
+
+                    <div class="question-card active" id="q1-1">
+                        <p class="question-text">1. 太平公主的父母是谁？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">A. 唐太宗和长孙皇后</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', true)">B. 唐高宗和武则天</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">C. 唐中宗和韦皇后</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-1', false)">D. 唐睿宗和窦德妃</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q1-2">
+                        <p class="question-text">2. 太平公主最初被按照什么标准培养？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">A. 政治家</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">B. 军事家</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', true)">C. 贤妻良母</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-2', false)">D. 诗人</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-2"></div>
+                    </div>
+
+                    <div class="question-card " id="q1-3">
+                        <p class="question-text">3. 太平公主的第一任丈夫是谁？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">A. 武攸暨</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', true)">B. 薛绍</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">C. 李隆基</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-3', false)">D. 韦皇后</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-3"></div>
+                    </div>
+
+                    <div class="question-card " id="q1-4">
+                        <p class="question-text">4. 太平公主是什么让她转变为政治人物？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">A. 母亲的教导</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">B. 父亲的安排</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', true)">C. 婚姻悲剧</li>
+                            <li class="option-item" onclick="selectOption(this, 'q1-4', false)">D. 天生野心</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q1-4"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter1">
+                        <h4>🎉 恭喜完成第1章！</h4>
+                        <p>你已经了解了太平公主的出身与早期经历。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(2)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(1)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q1-prev" onclick="prevQuestion(1)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q1-next" onclick="nextQuestion(1)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter2" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第2章：初涉政坛</h2>
+                    <p class="chapter-meta">太平公主开始参与政治 · 2个知识点 · 4道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>太平公主在神龙政变中发挥了重要作用，正式登上政治舞台</span>
+                    </div>
+                    <div class="explanation">
+                        <p>神龙政变（705年）是唐朝历史上的一个重要转折点。在这场政变中，太平公主发挥了重要作用，帮助推翻了母亲武则天的统治，恢复了李唐王朝。</p>
+                        <p>太平公主在政变中的表现展现了她非凡的政治智慧和决断力。她不仅参与了政变的策划，还在关键时刻发挥了重要作用，确保了政变的成功。</p>
+                        <p>神龙政变后，太平公主正式登上了政治舞台，成为唐朝政坛上一位重要的女性政治家。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">时间：705年</div>
+                        <div class="example-item">事件：神龙政变</div>
+                        <div class="example-item">作用：帮助推翻武则天统治</div>
+                        <div class="example-item">结果：正式登上政治舞台</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>太平公主在政变后采取韬光养晦的策略，积累政治资本</span>
+                    </div>
+                    <div class="explanation">
+                        <p>神龙政变后，太平公主并没有急于扩张自己的势力，而是采取了韬光养晦的策略。她深知，在这个男权社会中，女性掌权会面临巨大的阻力。</p>
+                        <p>太平公主采取了三件事来巩固自己的地位：第一，结交朝中大臣，建立自己的人脉网络；第二，培养自己的势力，为日后掌权做准备；第三，保持低调，避免引起其他政治势力的警觉。</p>
+                        <p>这种韬光养晦的策略，为太平公主日后的政治生涯奠定了坚实的基础。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">策略：韬光养晦</div>
+                        <div class="example-item">措施1：结交朝中大臣</div>
+                        <div class="example-item">措施2：培养自己的势力</div>
+                        <div class="example-item">措施3：保持低调</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第2章</h3>
+                        <p class="quiz-progress">问题 <span id="q2-current">1</span>/4</p>
+                    </div>
+
+                    <div class="question-card active" id="q2-1">
+                        <p class="question-text">1. 神龙政变发生在哪一年？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">A. 690年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">B. 700年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', true)">C. 705年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-1', false)">D. 710年</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q2-2">
+                        <p class="question-text">2. 太平公主在神龙政变中的作用是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">A. 旁观者</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">B. 反对者</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', true)">C. 重要参与者</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-2', false)">D. 策划者</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-2"></div>
+                    </div>
+
+                    <div class="question-card " id="q2-3">
+                        <p class="question-text">3. 太平公主在政变后采取了什么策略？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">A. 急于扩张</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', true)">B. 韬光养晦</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">C. 退出政坛</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-3', false)">D. 反对李唐</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-3"></div>
+                    </div>
+
+                    <div class="question-card " id="q2-4">
+                        <p class="question-text">4. 太平公主采取了哪三件事来巩固地位？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q2-4', true)">A. 结交大臣、培养势力、保持低调</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-4', false)">B. 打压对手、扩张权力、建立军队</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-4', false)">C. 退出政坛、专心家庭、培养子女</li>
+                            <li class="option-item" onclick="selectOption(this, 'q2-4', false)">D. 反对李唐、支持武氏、建立新朝</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q2-4"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter2">
+                        <h4>🎉 恭喜完成第2章！</h4>
+                        <p>你已经了解了太平公主开始参与政治。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(3)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(2)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q2-prev" onclick="prevQuestion(2)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q2-next" onclick="nextQuestion(2)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter3" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第3章：威风八面</h2>
+                    <p class="chapter-meta">太平公主在唐中宗时期的权势 · 1个知识点 · 2道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>唐中宗时期，太平公主权势达到顶峰，被称为"威风八面"</span>
+                    </div>
+                    <div class="explanation">
+                        <p>唐中宗复位后，太平公主的权势达到了顶峰。她不仅在政治上拥有很大的影响力，还在经济上获得了巨大的财富。</p>
+                        <p>太平公主在这一时期被称为"威风八面"，形容她的权势和影响力。她参与了许多重大政治决策，对唐朝的政治走向产生了重要影响。</p>
+                        <p>然而，太平公主的权势也引起了其他政治势力的警惕，特别是韦皇后和安乐公主，她们也开始效仿武则天，想要掌握更大的权力。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">时期：唐中宗复位后</div>
+                        <div class="example-item">地位：权势达到顶峰</div>
+                        <div class="example-item">称号：威风八面</div>
+                        <div class="example-item">影响：参与重大政治决策</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第3章</h3>
+                        <p class="quiz-progress">问题 <span id="q3-current">1</span>/2</p>
+                    </div>
+
+                    <div class="question-card active" id="q3-1">
+                        <p class="question-text">1. 太平公主在哪个时期权势达到顶峰？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">A. 武则天时期</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', true)">B. 唐中宗时期</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">C. 唐睿宗时期</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-1', false)">D. 唐玄宗时期</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q3-2">
+                        <p class="question-text">2. 太平公主在这一时期被称为什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">A. 红妆时代</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', true)">B. 威风八面</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">C. 韬光养晦</li>
+                            <li class="option-item" onclick="selectOption(this, 'q3-2', false)">D. 太平盛世</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q3-2"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter3">
+                        <h4>🎉 恭喜完成第3章！</h4>
+                        <p>你已经了解了太平公主在唐中宗时期的权势。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(4)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(3)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q3-prev" onclick="prevQuestion(3)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q3-next" onclick="nextQuestion(3)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter4" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第4章：韦后崛起</h2>
+                    <p class="chapter-meta">韦皇后效仿武则天 · 1个知识点 · 2道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>韦皇后效仿武则天，想要掌握更大的权力</span>
+                    </div>
+                    <div class="explanation">
+                        <p>唐中宗时期，韦皇后开始效仿武则天，想要掌握更大的权力。她不仅干预朝政，还想要效仿武则天称帝。</p>
+                        <p>韦皇后将武则天树为楷模，学习她的政治手段和权谋之术。她通过控制唐中宗来掌握实权，并开始培养自己的势力。</p>
+                        <p>然而，韦皇后并没有武则天那样的政治才能和智慧，她的野心最终导致了自己的失败。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">楷模：武则天</div>
+                        <div class="example-item">手段：控制唐中宗</div>
+                        <div class="example-item">目标：效仿武则天称帝</div>
+                        <div class="example-item">结果：最终失败</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第4章</h3>
+                        <p class="quiz-progress">问题 <span id="q4-current">1</span>/2</p>
+                    </div>
+
+                    <div class="question-card active" id="q4-1">
+                        <p class="question-text">1. 韦皇后效仿谁想要掌握权力？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">A. 长孙皇后</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', true)">B. 武则天</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">C. 太平公主</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-1', false)">D. 杨贵妃</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q4-2">
+                        <p class="question-text">2. 韦皇后通过什么方式掌握实权？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">A. 直接称帝</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', true)">B. 控制唐中宗</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">C. 发动政变</li>
+                            <li class="option-item" onclick="selectOption(this, 'q4-2', false)">D. 培养军队</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q4-2"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter4">
+                        <h4>🎉 恭喜完成第4章！</h4>
+                        <p>你已经了解了韦皇后效仿武则天。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(5)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(4)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q4-prev" onclick="prevQuestion(4)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q4-next" onclick="nextQuestion(4)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter5" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第5章：中宗之死</h2>
+                    <p class="chapter-meta">唐中宗的死亡之谜 · 1个知识点 · 2道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>唐中宗的死亡存在争议，有传言是被韦皇后和安乐公主毒杀</span>
+                    </div>
+                    <div class="explanation">
+                        <p>唐中宗的死亡是唐朝历史上的一个谜团。根据史料记载，唐中宗是在吃了韦皇后送来的糕点后暴毙的。</p>
+                        <p>关于唐中宗的死因，有四种说法：第一，被韦皇后和安乐公主毒杀；第二，自然死亡；第三，被其他政治势力谋杀；第四，自杀。</p>
+                        <p>无论真相如何，唐中宗的死亡为韦皇后提供了掌权的机会，也为后来的唐隆政变埋下了伏笔。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">时间：710年</div>
+                        <div class="example-item">争议：死因不明</div>
+                        <div class="example-item">传言：被韦皇后和安乐公主毒杀</div>
+                        <div class="example-item">影响：为唐隆政变埋下伏笔</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第5章</h3>
+                        <p class="quiz-progress">问题 <span id="q5-current">1</span>/2</p>
+                    </div>
+
+                    <div class="question-card active" id="q5-1">
+                        <p class="question-text">1. 唐中宗的死亡存在什么问题？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">A. 时间不明</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">B. 地点不明</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', true)">C. 死因争议</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-1', false)">D. 身份不明</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q5-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q5-2">
+                        <p class="question-text">2. 关于唐中宗的死因，有几种说法？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q5-2', false)">A. 2种</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-2', false)">B. 3种</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-2', true)">C. 4种</li>
+                            <li class="option-item" onclick="selectOption(this, 'q5-2', false)">D. 5种</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q5-2"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter5">
+                        <h4>🎉 恭喜完成第5章！</h4>
+                        <p>你已经了解了唐中宗的死亡之谜。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(6)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(5)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q5-prev" onclick="prevQuestion(5)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q5-next" onclick="nextQuestion(5)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter6" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第6章：唐隆政变</h2>
+                    <p class="chapter-meta">太平公主推翻韦皇后 · 1个知识点 · 2道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>太平公主发动唐隆政变，推翻了韦皇后的统治</span>
+                    </div>
+                    <div class="explanation">
+                        <p>唐隆政变（710年）是太平公主政治生涯中的一个重要转折点。在这场政变中，太平公主联合李隆基等人，推翻了韦皇后的统治。</p>
+                        <p>太平公主在政变中发挥了关键作用，她不仅参与了政变的策划，还在关键时刻提供了重要的支持。政变成功后，太平公主的权势进一步扩大。</p>
+                        <p>唐隆政变的成功，展现了太平公主非凡的政治才能和决断力，也让她成为了唐朝政坛上最举足轻重的人物之一。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">时间：710年</div>
+                        <div class="example-item">事件：唐隆政变</div>
+                        <div class="example-item">合作者：李隆基</div>
+                        <div class="example-item">结果：推翻韦皇后统治</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第6章</h3>
+                        <p class="quiz-progress">问题 <span id="q6-current">1</span>/2</p>
+                    </div>
+
+                    <div class="question-card active" id="q6-1">
+                        <p class="question-text">1. 唐隆政变发生在哪一年？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">A. 705年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', true)">B. 710年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">C. 712年</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-1', false)">D. 713年</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q6-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q6-2">
+                        <p class="question-text">2. 太平公主在唐隆政变中与谁合作？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q6-2', false)">A. 韦皇后</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-2', false)">B. 安乐公主</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-2', true)">C. 李隆基</li>
+                            <li class="option-item" onclick="selectOption(this, 'q6-2', false)">D. 武则天</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q6-2"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter6">
+                        <h4>🎉 恭喜完成第6章！</h4>
+                        <p>你已经了解了太平公主推翻韦皇后。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(7)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(6)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q6-prev" onclick="prevQuestion(6)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q6-next" onclick="nextQuestion(6)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter7" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第7章：睿宗登基</h2>
+                    <p class="chapter-meta">唐睿宗复位与太平公主的权势 · 1个知识点 · 2道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>唐睿宗复位后，太平公主的权势达到新的高峰</span>
+                    </div>
+                    <div class="explanation">
+                        <p>唐隆政变后，唐睿宗复位。太平公主因为在这场政变中的功劳，权势达到了新的高峰。</p>
+                        <p>唐睿宗对太平公主非常信任，许多重大政治决策都会征求她的意见。太平公主在这一时期实际上掌握了朝廷的大权。</p>
+                        <p>然而，太平公主的权势也引起了太子李隆基的警惕，两人之间的矛盾逐渐加深，为后来的姑侄斗法埋下了伏笔。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">事件：唐睿宗复位</div>
+                        <div class="example-item">权势：达到新高峰</div>
+                        <div class="example-item">地位：掌握朝廷大权</div>
+                        <div class="example-item">矛盾：与李隆基的冲突</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第7章</h3>
+                        <p class="quiz-progress">问题 <span id="q7-current">1</span>/2</p>
+                    </div>
+
+                    <div class="question-card active" id="q7-1">
+                        <p class="question-text">1. 唐睿宗复位后，太平公主的权势如何？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">A. 下降</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">B. 不变</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', true)">C. 达到新高峰</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-1', false)">D. 消失</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q7-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q7-2">
+                        <p class="question-text">2. 太平公主与谁产生了矛盾？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q7-2', false)">A. 韦皇后</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-2', false)">B. 安乐公主</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-2', true)">C. 李隆基</li>
+                            <li class="option-item" onclick="selectOption(this, 'q7-2', false)">D. 唐睿宗</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q7-2"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter7">
+                        <h4>🎉 恭喜完成第7章！</h4>
+                        <p>你已经了解了唐睿宗复位与太平公主的权势。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(8)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(7)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q7-prev" onclick="prevQuestion(7)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q7-next" onclick="nextQuestion(7)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter8" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第8章：姑侄斗法</h2>
+                    <p class="chapter-meta">太平公主与李隆基的权力斗争 · 1个知识点 · 3道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>太平公主与李隆基展开了激烈的权力斗争</span>
+                    </div>
+                    <div class="explanation">
+                        <p>太平公主与李隆基的矛盾逐渐公开化，两人展开了激烈的权力斗争。太平公主想要废掉李隆基的太子之位，另立一个更听话的太子。</p>
+                        <p>然而，李隆基也不是省油的灯。他虽然年轻，但已经展现出了非凡的政治才能和决断力。他暗中积蓄力量，准备与太平公主一决高下。</p>
+                        <p>这场姑侄斗法，最终以李隆基的胜利而告终。太平公主在这场斗争中落于下风，最终被迫自尽。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">斗争双方：太平公主 vs 李隆基</div>
+                        <div class="example-item">太平公主目标：废掉李隆基</div>
+                        <div class="example-item">李隆基策略：暗中积蓄力量</div>
+                        <div class="example-item">结果：李隆基胜利</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第8章</h3>
+                        <p class="quiz-progress">问题 <span id="q8-current">1</span>/3</p>
+                    </div>
+
+                    <div class="question-card active" id="q8-1">
+                        <p class="question-text">1. 太平公主与谁展开了权力斗争？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q8-1', false)">A. 韦皇后</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-1', false)">B. 安乐公主</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-1', true)">C. 李隆基</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-1', false)">D. 唐睿宗</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q8-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q8-2">
+                        <p class="question-text">2. 太平公主想要对李隆基做什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q8-2', false)">A. 支持他</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-2', true)">B. 废掉他的太子之位</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-2', false)">C. 与他合作</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-2', false)">D. 培养他</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q8-2"></div>
+                    </div>
+
+                    <div class="question-card " id="q8-3">
+                        <p class="question-text">3. 姑侄斗法的结果是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q8-3', false)">A. 太平公主胜利</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-3', true)">B. 李隆基胜利</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-3', false)">C. 平局</li>
+                            <li class="option-item" onclick="selectOption(this, 'q8-3', false)">D. 两败俱伤</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q8-3"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter8">
+                        <h4>🎉 恭喜完成第8章！</h4>
+                        <p>你已经了解了太平公主与李隆基的权力斗争。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(9)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(8)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q8-prev" onclick="prevQuestion(8)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q8-next" onclick="nextQuestion(8)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-chapter9" class="chapter-section" style="display: none;">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">👸 第9章：走向开元</h2>
+                    <p class="chapter-meta">太平公主的结局与开元盛世 · 2个知识点 · 4道测试题</p>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>太平公主在与李隆基的斗争中失败，被迫自尽</span>
+                    </div>
+                    <div class="explanation">
+                        <p>太平公主在与李隆基的斗争中最终失败。李隆基发动政变，掌握了实权，太平公主被迫逃入山中，最终自尽。</p>
+                        <p>太平公主的死，标志着唐朝历史上"红妆时代"的结束。从此，唐朝再也没有出现过像武则天、太平公主这样权势显赫的女性政治家。</p>
+                        <p>然而，太平公主的死也为开元盛世的到来创造了条件。李隆基在掌握实权后，开创了唐朝最繁荣的时期。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">结局：被迫自尽</div>
+                        <div class="example-item">意义：红妆时代结束</div>
+                        <div class="example-item">影响：为开元盛世创造条件</div>
+                        <div class="example-item">继承者：李隆基（唐玄宗）</div>
+                    </div>
+                </div>
+
+                <div class="knowledge-card">
+                    <div class="conclusion">
+                        <span class="conclusion-icon">💡</span>
+                        <span>太平公主的一生展现了女性在男权社会中的挣扎与奋斗</span>
+                    </div>
+                    <div class="explanation">
+                        <p>太平公主的一生，是女性在男权社会中挣扎与奋斗的缩影。她继承了母亲武则天的政治才能，但最终没能像母亲那样登上权力的巅峰。</p>
+                        <p>太平公主的失败，并不是因为她缺乏才能或智慧，而是因为她生活在一个对女性更加严苛的时代。在武则天之后，唐朝社会对女性掌权产生了强烈的反弹。</p>
+                        <p>然而，太平公主的一生也证明了，女性同样可以拥有卓越的政治才能和领导能力。她的故事，至今仍然激励着无数女性追求自己的梦想。</p>
+                    </div>
+                    <div class="examples">
+                        <strong>📊 关键信息：</strong>
+                        <div class="example-item">历史意义：女性奋斗的缩影</div>
+                        <div class="example-item">才能：继承武则天的政治才能</div>
+                        <div class="example-item">失败原因：时代限制</div>
+                        <div class="example-item">影响：激励后世女性</div>
+                    </div>
+                </div>
+
+                <div class="quiz-section">
+                    <div class="quiz-header">
+                        <h3>📝 知识检查 - 第9章</h3>
+                        <p class="quiz-progress">问题 <span id="q9-current">1</span>/4</p>
+                    </div>
+
+                    <div class="question-card active" id="q9-1">
+                        <p class="question-text">1. 太平公主的结局是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q9-1', false)">A. 善终</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-1', false)">B. 被处死</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-1', true)">C. 被迫自尽</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-1', false)">D. 流放</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q9-1"></div>
+                    </div>
+
+                    <div class="question-card " id="q9-2">
+                        <p class="question-text">2. 太平公主的死标志着什么时代的结束？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q9-2', false)">A. 贞观之治</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-2', false)">B. 开元盛世</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-2', true)">C. 红妆时代</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-2', false)">D. 武周时代</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q9-2"></div>
+                    </div>
+
+                    <div class="question-card " id="q9-3">
+                        <p class="question-text">3. 太平公主的死为哪个盛世创造了条件？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q9-3', false)">A. 贞观之治</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-3', true)">B. 开元盛世</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-3', false)">C. 永徽之治</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-3', false)">D. 光武中兴</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q9-3"></div>
+                    </div>
+
+                    <div class="question-card " id="q9-4">
+                        <p class="question-text">4. 太平公主失败的主要原因是什么？</p>
+                        <ul class="options-list">
+                            <li class="option-item" onclick="selectOption(this, 'q9-4', false)">A. 缺乏才能</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-4', true)">B. 时代限制</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-4', false)">C. 运气不好</li>
+                            <li class="option-item" onclick="selectOption(this, 'q9-4', false)">D. 缺乏支持</li>
+                        </ul>
+                        <div class="feedback" id="feedback-q9-4"></div>
+                    </div>
+
+                    <div class="chapter-complete" id="complete-chapter9">
+                        <h4>🎉 恭喜完成第9章！</h4>
+                        <p>你已经了解了太平公主的结局与开元盛世。</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="showChapter(10)">继续学习下一章 →</button>
+                            <button class="reset-chapter-btn" onclick="resetChapterProgress(9)">🔄 重置本章</button>
+                        </div>
+                    </div>
+                    <div class="quiz-nav">
+                        <button class="btn btn-secondary" id="q9-prev" onclick="prevQuestion(9)" disabled>← 上一题</button>
+                        <button class="btn btn-primary" id="q9-next" onclick="nextQuestion(9)">下一题 →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-summary" class="chapter-section" style="display: none;">
+                <div style="background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(181, 165, 197, 0.2)); padding: 32px; border-radius: 16px; margin-bottom: 28px; border-left: 4px solid var(--pink);">
+                    <h2 style="color: var(--pink); margin-bottom: 20px; font-size: 24px;">🎓 学习总结</h2>
+                    <p style="font-size: 16px; line-height: 2; margin-bottom: 24px; text-indent: 2em;">恭喜你完成了《太平公主》百家讲坛的全部学习内容！</p>
+                    <h3 style="font-size: 18px; margin: 24px 0 16px;">📊 太平公主生平大事记</h3>
+                    <ul style="list-style: none; font-size: 15px;">
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);"><strong>约665年：</strong>出生于唐朝皇室</li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);"><strong>第一次婚姻：</strong>嫁给薛绍，后因牵连谋反而被处死</li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);"><strong>705年：</strong>参与神龙政变，推翻武则天统治</li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);"><strong>710年：</strong>发动唐隆政变，推翻韦皇后</li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);"><strong>唐睿宗时期：</strong>权势达到顶峰</li>
+                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border);"><strong>713年：</strong>与李隆基斗争失败，被迫自尽</li>
+                    </ul>
+                </div>
+                <button class="btn btn-primary" onclick="resetProgress()" style="width: 100%;">🔄 重新学习</button>
+            </section>
+        </main>
+    </div>
+    <footer class="footer">
+        <p>📚 百家讲坛学习站 · 蒙曼教授主讲 · 2026</p>
+    </footer>
+<script>
+        let currentChapter = 0;
+        let currentQuestion = {1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1, 9:1, 10:1, 9:1};
+        let readSections = JSON.parse(localStorage.getItem('taiping-detailed-read') || '{}');
+        let quizScores = JSON.parse(localStorage.getItem('taiping-detailed-scores') || '{}');
+
+        function init() { updateStats(); restoreProgress(); }
+
+        function showSection(section) {
+            document.querySelectorAll('.chapter-section').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            if (section === 'learning') {
+                document.getElementById('section-learning').style.display = 'block';
+                document.getElementById('nav-learning').classList.add('active');
+            } else if (section === 'content') {
+                showChapter(currentChapter || 1);
+                document.getElementById('nav-content').classList.add('active');
+            } else if (section === 'quiz') {
+                const chapter = currentChapter || 1;
+                showChapter(chapter);
+                document.getElementById('nav-quiz').classList.add('active');
+                setTimeout(() => {
+                    const quizSection = document.querySelector(`#section-chapter${chapter} .quiz-section`);
+                    if (quizSection) { quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+                }, 100);
+            }
+        }
+
+        function startLearning() {
+            showChapter(1);
+            document.getElementById('nav-content').classList.add('active');
+            document.getElementById('nav-learning').classList.remove('active');
+        }
+
+        function showChapter(chapterNum) {
+            currentChapter = chapterNum;
+            document.querySelectorAll('.chapter-section').forEach(el => { el.style.display = 'none'; });
+            const sectionId = chapterNum === 0 ? 'section-learning' : chapterNum === 12 ? 'section-summary' : `section-chapter${chapterNum}`;
+            document.getElementById(sectionId).style.display = 'block';
+            updateTOC();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (chapterNum > 0 && chapterNum < 12) {
+                readSections[chapterNum] = true;
+                localStorage.setItem('taiping-detailed-read', JSON.stringify(readSections));
+                updateStats();
+            }
+        }
+
+        function showFinalSummary() { showChapter(12); }
+        function scrollToChapter(chapterNum) { showChapter(chapterNum); }
+
+        function updateTOC() {
+            for (let i = 0; i <= 9; i++) {
+                const toc = document.getElementById(`toc-${i}`);
+                if (toc) {
+                    if (readSections[i]) { toc.classList.add('completed'); } else { toc.classList.remove('completed'); }
+                    if (i === currentChapter) { toc.style.background = 'var(--accent-light)'; } else { toc.style.background = ''; }
+                }
+            }
+        }
+
+        function selectOption(element, questionId, isCorrect) {
+            const parent = element.parentElement;
+            parent.querySelectorAll('.option-item').forEach(item => { item.classList.remove('selected', 'correct', 'wrong'); });
+            element.classList.add('selected');
+            if (isCorrect) {
+                element.classList.add('correct');
+                showFeedback(questionId, true);
+            } else {
+                element.classList.add('wrong');
+                showFeedback(questionId, false);
+                parent.querySelectorAll('.option-item').forEach(item => { if (item.getAttribute('onclick').includes('true')) { item.classList.add('correct'); } });
+            }
+            parent.querySelectorAll('.option-item').forEach(item => { item.style.pointerEvents = 'none'; });
+            const chapter = questionId.split('-')[0].replace('q', '');
+            if (!quizScores[chapter]) quizScores[chapter] = {correct: 0, total: 0};
+            quizScores[chapter].total++;
+            if (isCorrect) quizScores[chapter].correct++;
+            localStorage.setItem('taiping-detailed-scores', JSON.stringify(quizScores));
+            updateStats();
+        }
+
+        function showFeedback(questionId, isCorrect) {
+            const feedback = document.getElementById(`feedback-${questionId}`);
+            if (isCorrect) {
+                feedback.textContent = '✅ 回答正确！';
+                feedback.className = 'feedback show correct';
+            } else {
+                feedback.textContent = '❌ 回答错误。请查看正确答案。';
+                feedback.className = 'feedback show wrong';
+            }
+        }
+
+        function nextQuestion(chapter) {
+            const maxQ = {1:5, 2:5, 3:5, 4:5, 5:5, 6:4, 7:4, 8:5, 9:4, 10:4, 9:4};
+            if (currentQuestion[chapter] < maxQ[chapter]) {
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.remove('active');
+                currentQuestion[chapter]++;
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.add('active');
+                document.getElementById(`q${chapter}-current`).textContent = currentQuestion[chapter];
+                updateQuizButtons(chapter);
+            } else {
+                document.getElementById(`complete-chapter${chapter}`).classList.add('show');
+            }
+        }
+
+        function prevQuestion(chapter) {
+            if (currentQuestion[chapter] > 1) {
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.remove('active');
+                currentQuestion[chapter]--;
+                document.getElementById(`q${chapter}-${currentQuestion[chapter]}`).classList.add('active');
+                document.getElementById(`q${chapter}-current`).textContent = currentQuestion[chapter];
+                updateQuizButtons(chapter);
+            }
+        }
+
+        function updateQuizButtons(chapter) {
+            const maxQ = {1:5, 2:5, 3:5, 4:5, 5:5, 6:4, 7:4, 8:5, 9:4, 10:4, 9:4};
+            document.getElementById(`q${chapter}-prev`).disabled = currentQuestion[chapter] === 1;
+            document.getElementById(`q${chapter}-next`).textContent = currentQuestion[chapter] === maxQ[chapter] ? '完成 ✓' : '下一题 →';
+        }
+
+        function updateStats() {
+            document.getElementById('readCount').textContent = Object.keys(readSections).length;
+            let totalCorrect = 0;
+            Object.values(quizScores).forEach(score => { totalCorrect += score.correct; });
+            document.getElementById('quizScore').textContent = totalCorrect;
+        }
+
+        function restoreProgress() { updateTOC(); }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('resetDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('resetDropdown');
+            if (!event.target.closest('.dropdown') && dropdown) { dropdown.style.display = 'none'; }
+        });
+
+        function resetChapterProgress(chapter) {
+            const names = {1:'出身之谜', 2:'入宫岁月', 3:'感业寺风云', 4:'争夺后位', 5:'新皇后三把火', 6:'二圣临朝', 7:'与儿子斗法', 8:'高宗遗产', 9:'重用酷吏', 10:'摆平大叛乱', 9:'大唐新气象'};
+            if (confirm(`确定要重置「${names[chapter]}」吗？`)) {
+                delete readSections[chapter];
+                localStorage.setItem('taiping-detailed-read', JSON.stringify(readSections));
+                delete quizScores[chapter];
+                localStorage.setItem('taiping-detailed-scores', JSON.stringify(quizScores));
+                const section = document.getElementById(`section-chapter${chapter}`);
+                if (section) {
+                    section.querySelectorAll('.question-card').forEach(card => { card.classList.remove('active'); });
+                    section.querySelectorAll('.option-item').forEach(item => { item.classList.remove('selected', 'correct', 'wrong'); item.style.pointerEvents = ''; });
+                    section.querySelectorAll('.feedback').forEach(fb => { fb.classList.remove('show'); });
+                    const complete = document.getElementById(`complete-chapter${chapter}`);
+                    if (complete) complete.classList.remove('show');
+                    currentQuestion[chapter] = 1;
+                    document.getElementById(`q${chapter}-current`).textContent = '1';
+                    document.getElementById(`q${chapter}-1`).classList.add('active');
+                    updateQuizButtons(chapter);
+                }
+                updateStats(); updateTOC();
+                document.getElementById('resetDropdown').style.display = 'none';
+                if (currentChapter === chapter) showChapter(chapter);
+                alert(`✅「${names[chapter]}」已重置！`);
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('确定要重置所有学习进度吗？')) {
+                localStorage.removeItem('taiping-detailed-read');
+                localStorage.removeItem('taiping-detailed-scores');
+                readSections = {}; quizScores = {}; currentChapter = 0;
+                currentQuestion = {1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1, 9:1, 10:1, 9:1};
+                updateStats(); showSection('learning');
+                document.querySelectorAll('.question-card').forEach(card => { card.classList.remove('active'); });
+                document.querySelectorAll('.option-item').forEach(item => { item.classList.remove('selected', 'correct', 'wrong'); item.style.pointerEvents = ''; });
+                document.querySelectorAll('.feedback').forEach(fb => { fb.classList.remove('show'); });
+                document.querySelectorAll('.chapter-complete').forEach(cc => { cc.classList.remove('show'); });
+                for (let i = 1; i <= 9; i++) document.getElementById(`q${i}-1`).classList.add('active');
+                document.getElementById('resetDropdown').style.display = 'none';
+                alert('✅ 所有进度已重置！');
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            document.getElementById('progressBar').style.width = (scrollTop / docHeight) * 100 + '%';
+        });
+
+        init();
+    </script>
+</body>
+</html>
